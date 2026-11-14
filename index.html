@@ -841,6 +841,7 @@ function updateCombat(dt){
 function banner(text){
   const el = $('banner');
   el.textContent = text;
+  say(text);
   el.classList.remove('on');
   void el.offsetWidth;
   el.classList.add('on');
