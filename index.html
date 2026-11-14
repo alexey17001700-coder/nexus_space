@@ -909,6 +909,32 @@ function hitPlayer(){
   if (hp <= 0){ hp = 0; endGame(false); }
 }
 
+/* --- столкновение с планетами (атмосфера отбрасывает корабль) --- */
+let planetWarn = 0;
+function updatePlanets(dt){
+  if (planetWarn > 0) planetWarn -= dt;
+  for (const p of planets){
+    const R = p.userData.radius;
+    const d = p.position.distanceTo(shipRoot.position);
+    if (d < R + 4){
+      _v1.subVectors(shipRoot.position, p.position);
+      if (_v1.lengthSq() < 1) _v1.set(0, 1, 0);
+      _v1.normalize();
+      shipRoot.position.copy(p.position).addScaledVector(_v1, R + 5);
+      explode(shipRoot.position, 15, 0xff8844);
+      shake = 1.3;
+      if (invuln <= 0){
+        hp -= 26; invuln = 1.4;
+        if (hp <= maxHp * 0.35) say('Критические повреждения');
+        if (hp <= 0){ hp = 0; endGame(false); return; }
+      }
+    } else if (d < R + 160 && planetWarn <= 0){
+      planetWarn = 14;
+      say('Осторожно, планета');
+    }
+  }
+}
+
 /* --- спавн --- */
 function updateSpawns(dt){
   astTimer -= dt;
