@@ -862,20 +862,29 @@ function makeEnemy(){
 
   // красный ореол — врага видно издалека
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: DOT, color: 0xff3355, transparent: true, opacity: 0.8,
+    map: DOT, color: 0xff2a4e, transparent: true, opacity: 1,
     blending: THREE.AdditiveBlending, depthWrite: false
   }));
-  halo.scale.set(13, 13, 1);
+  halo.scale.set(20, 20, 1);
   g.add(halo);
   g.userData.halo = halo;
 
-  // маркер-«прицел» над врагом — заметно даже в гуще боя
-  const mark = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: DOT, color: 0xffe066, transparent: true, opacity: 0.9,
+  // белое ядро ореола — силуэт читается даже на ярком фоне
+  const core = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: DOT, color: 0xffd0d8, transparent: true, opacity: 0.85,
     blending: THREE.AdditiveBlending, depthWrite: false
   }));
-  mark.scale.set(1.6, 1.6, 1);
-  mark.position.set(0, 1.6, 0);
+  core.scale.set(8, 8, 1);
+  g.add(core);
+  g.userData.core = core;
+
+  // маркер-«прицел» над врагом — заметно даже в гуще боя
+  const mark = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: DOT, color: 0xffe066, transparent: true, opacity: 1,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  mark.scale.set(2.6, 2.6, 1);
+  mark.position.set(0, 2.0, 0);
   g.add(mark);
   g.userData.mark = mark;
   return g;
