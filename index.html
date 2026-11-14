@@ -1282,7 +1282,9 @@ function readInput(dt){
 /* ---------------- Логика полёта ---------------- */
 const fwd = new THREE.Vector3();
 function updateShip(dt){
-  const yawRate = 1.5, pitchRate = 1.25;
+  // двигатель теперь отвечает за манёвренность (скорость постоянна)
+  const agility = 1 + (upg.engine - 1) * 0.12;
+  const yawRate = 1.5 * agility, pitchRate = 1.25 * agility;
   yaw   -= input.x * yawRate   * dt;
   pitch += input.y * pitchRate * dt;
   pitch = Math.max(-0.95, Math.min(0.95, pitch));
