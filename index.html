@@ -1080,17 +1080,25 @@ function updateCombat(dt){
     e.mesh.position.addScaledVector(e.vel, dt);
     e.mesh.lookAt(shipRoot.position);
 
-    // пульсация ореола и маркера — врага отлично видно
+    const dist = e.mesh.position.distanceTo(shipRoot.position);
+
+    // ПЕРСПЕКТИВА: чем ближе враг — тем крупнее он становится
+    const near = Math.max(0, Math.min(1, (ENEMY_GROW_DIST - dist) / ENEMY_GROW_DIST));
+    const sc = ENEMY_SCALE * (1 + near * 1.0);
+    e.mesh.scale.setScalar(sc);
+    e.radius = (2.4 / 1.35) * sc;
+
+    // ореол, ядро и маркер держим одного размера в мире (компенсируем масштаб)
+    const inv = 1 / sc;
     const halo = e.mesh.userData.halo;
-    if (halo) halo.scale.setScalar(19 + Math.sin(elapsed * 7 + e.mesh.position.x * 0.3) * 3.2);
+    if (halo) halo.scale.setScalar((25.6 + Math.sin(elapsed * 7 + e.mesh.position.x * 0.3) * 4.3) * inv);
     const core = e.mesh.userData.core;
-    if (core) core.scale.setScalar(7.6 + Math.sin(elapsed * 5 + e.mesh.position.z * 0.2) * 1.4);
+    if (core) core.scale.setScalar((10.3 + Math.sin(elapsed * 5 + e.mesh.position.z * 0.2) * 1.9) * inv);
     const mark = e.mesh.userData.mark;
-    if (mark) mark.scale.setScalar(2.3 + Math.sin(elapsed * 9 + e.mesh.position.y) * 0.7);
+    if (mark) mark.scale.setScalar((3.1 + Math.sin(elapsed * 9 + e.mesh.position.y) * 0.95) * inv);
 
     // враги стреляют в ответ
     e.fireCd -= dt;
-    const dist = e.mesh.position.distanceTo(shipRoot.position);
     if (e.fireCd <= 0 && dist < 300){
       enemyFire(e);
       e.fireCd = Math.max(0.65, 2.1 - level * 0.22) * (0.7 + Math.random() * 0.8);
