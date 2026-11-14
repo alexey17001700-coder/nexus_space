@@ -1209,7 +1209,7 @@ function updateShip(dt){
   shipModel.rotation.x = -input.y * 0.08;
 
   // движение вперёд (базовая скорость + прокачка двигателя)
-  speed = 46 + (upg.engine - 1) * 8 + Math.min(38, elapsed * 0.7);
+  speed = 30 + (upg.engine - 1) * 5 + Math.min(18, elapsed * 0.35);
   fwd.set(0, 0, -1).applyQuaternion(shipRoot.quaternion);
   shipRoot.position.addScaledVector(fwd, speed * dt);
 
