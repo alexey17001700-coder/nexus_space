@@ -1088,9 +1088,14 @@ function updatePlanets(dt){
       explode(shipRoot.position, 15, 0xff8844);
       shake = 1.3;
       if (invuln <= 0){
-        hp -= 26; invuln = 1.4;
-        if (hp <= maxHp * 0.35) say('Критические повреждения');
-        if (hp <= 0){ hp = 0; endGame(false); return; }
+        const rest = absorbShield(26);
+        if (rest > 0){
+          hp -= rest;
+          if (hp <= maxHp * 0.35) say('Критические повреждения');
+          if (hp <= 0){ hp = 0; endGame(false); return; }
+        }
+        invuln = 1.4;
+        refreshHUD();
       }
     } else if (d < R + 160 && planetWarn <= 0){
       planetWarn = 14;
