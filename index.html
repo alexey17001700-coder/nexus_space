@@ -1869,6 +1869,10 @@ function resetGame(){
   upg.weapon = upg.shield = upg.engine = 1;
   maxHp = BASE_HP;
   hp = maxHp;
+  maxShield = BASE_SHIELD;
+  shieldHp = maxShield;
+  shieldRegenDelay = 0; shieldFlash = 0;
+  if (shieldMesh) shieldMesh.visible = true;
   levelTimer = 0; astTimer = 1.0; enTimer = 2.4;
   fireCd = 0; invuln = 0; shake = 0; planetWarn = 0;
   gameOver = false; victory = false; shopOpen = false;
