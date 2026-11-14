@@ -1331,6 +1331,8 @@ function animate(){
     camera.lookAt(0, 0.2, 0);
     updateTrail(dt);
   }
+  updateDebris(dt);
+  updateShockwaves(dt);
   renderer.render(scene, camera);
 }
 
