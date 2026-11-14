@@ -1296,8 +1296,8 @@ function updateShip(dt){
   shipModel.rotation.z = bank;
   shipModel.rotation.x = -input.y * 0.08;
 
-  // движение вперёд (базовая скорость + прокачка двигателя)
-  speed = 20 + (upg.engine - 1) * 4 + Math.min(10, elapsed * 0.2);
+  // движение вперёд — ОДНА постоянная скорость, без разгона
+  speed = 20;
   fwd.set(0, 0, -1).applyQuaternion(shipRoot.quaternion);
   shipRoot.position.addScaledVector(fwd, speed * dt);
 
