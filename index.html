@@ -459,7 +459,7 @@ function buildShip(){
   shipModel.add(body);
 
   // нос
-  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.62, 1.7, 20), hull);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.62, 1.7, 36), hull);
   nose.rotation.x = -Math.PI / 2;
   nose.position.z = -2.55;
   shipModel.add(nose);
