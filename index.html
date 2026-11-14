@@ -1777,7 +1777,8 @@ function animate(){
     readInput(dt);
     updateShip(dt);
     updateTrail(dt);
-    updateSpawns(dt);
+    updateBoss(dt);
+    if (!boss) updateSpawns(dt);
     updateCombat(dt);
     updatePlanets(dt);
     updateExplosions(dt);
