@@ -1055,12 +1055,22 @@ function damageObject(obj, dmg){
 }
 function hitPlayer(dmg){
   if (invuln > 0) return;
-  hp -= (dmg || 18);
+  const rest = absorbShield(dmg || 18);
+  if (rest <= 0){
+    // щит выдержал — только вспышка на сфере
+    invuln = 0.45;
+    shake = 0.55;
+    explode(shipRoot.position, 5, 0x66ccff);
+    refreshHUD();
+    return;
+  }
+  hp -= rest;
   invuln = 1.3;
   shake = 1;
   explode(shipRoot.position, 7, 0xff5533);
   if (hp <= maxHp * 0.35) say('Критические повреждения');
   if (hp <= 0){ hp = 0; endGame(false); }
+  refreshHUD();
 }
 
 /* --- столкновение с планетами (атмосфера отбрасывает корабль) --- */
