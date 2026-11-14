@@ -1510,9 +1510,10 @@ function closeShop(){
   levelTimer = 0;
   astTimer = 1.2;
   enTimer  = 2.6;
-  banner('УРОВЕНЬ ' + level);
   clock.getDelta();
   playing = true;
+  if (BOSS_LEVELS.includes(level)) spawnBoss();
+  else banner('УРОВЕНЬ ' + level);
 }
 
 function buyUpgrade(kind){
