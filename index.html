@@ -680,6 +680,7 @@ function makeEnemy(){
   return g;
 }
 function spawnEnemy(){
+  if (!enemyAlerted){ enemyAlerted = true; say('Обнаружены враги'); }
   const mesh = makeEnemy();
   mesh.scale.setScalar(1.15);
   _v1.copy(fwd).multiplyScalar(340 + Math.random() * 200);
