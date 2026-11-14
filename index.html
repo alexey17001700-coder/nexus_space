@@ -580,10 +580,10 @@ function updateTrail(dt){
     trailPos[i*3]   += trailVel[i*3]   * dt;
     trailPos[i*3+1] += trailVel[i*3+1] * dt;
     trailPos[i*3+2] += trailVel[i*3+2] * dt;
-    const k = Math.max(0, trailLife[i]) * 1.5;
-    trailCol[i*3]   = 0.35 * k;
-    trailCol[i*3+1] = 0.85 * k;
-    trailCol[i*3+2] = 1.0  * k;
+    const k = Math.max(0, trailLife[i]) * 1.1;
+    trailCol[i*3]   = 0.14 * k;
+    trailCol[i*3+1] = 0.34 * k;
+    trailCol[i*3+2] = 0.46 * k;
   }
   trail.geometry.attributes.position.needsUpdate = true;
   trail.geometry.attributes.color.needsUpdate = true;
