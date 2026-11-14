@@ -847,7 +847,7 @@ function spawnEnemy(){
 function spawnOneEnemy(i){
   const mesh = makeEnemy();
   mesh.scale.setScalar(1.15);
-  _v1.copy(fwd).multiplyScalar(260 + Math.random() * 160);
+  _v1.copy(fwd).multiplyScalar(200 + Math.random() * 120);
   _v1.x += (Math.random() - 0.5) * 170 + (i - 1) * 26;
   _v1.y += (Math.random() - 0.5) * 100 + (i % 2 ? 16 : -16);
   _v1.z += (Math.random() - 0.5) * 140;
