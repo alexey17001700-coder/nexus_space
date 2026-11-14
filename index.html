@@ -1735,8 +1735,11 @@ function endGame(win){
   shopOpen = false;
   victory = win;
   $('shop').classList.add('hide');
+  if (boss){ scene.remove(boss); boss = null; }
+  bossParts = []; bossDeath = 0;
+  $('bossbar').classList.remove('on');
   $('overTitle').textContent = win ? 'МИССИЯ ВЫПОЛНЕНА' : 'ИГРА ОКОНЧЕНА';
-  $('overSub').textContent   = win ? 'Все 5 уровней пройдены' : 'Корабль уничтожен';
+  $('overSub').textContent   = win ? 'Все части корпуса супер-босса уничтожены' : 'Корабль уничтожен';
   $('overScore').textContent = score;
   $('overCred').textContent  = credits;
   $('overLevel').textContent = level;
