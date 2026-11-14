@@ -1073,6 +1073,17 @@ function updateCombat(dt){
         damageObject(e, upg.weapon); hit = true; break;
       }
     }
+    // части супер-босса
+    if (!hit && boss) for (const p of bossParts){
+      if (!p.alive) continue;
+      if (b.mesh.position.distanceTo(p.world) < p.radius + 1.6){
+        damageBossPart(p, upg.weapon); hit = true; break;
+      }
+    }
+    // броня корпуса босса — искры, урона нет
+    if (!hit && boss && b.mesh.position.distanceTo(boss.position) < 24){
+      explode(b.mesh.position, 2.4, 0xffdd88); hit = true;
+    }
     if (hit){ b.alive = false; b.mesh.visible = false; }
   }
 
