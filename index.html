@@ -48,6 +48,13 @@
   #hpbar{height:100%;width:100%;border-radius:8px;
     background:linear-gradient(90deg,#00ffa8,#00c8ff);transition:width .18s ease}
   #hpbar.low{background:linear-gradient(90deg,#ff5a5a,#ff9a3c)}
+  #shwrap{position:absolute;left:10px;bottom:calc(72px + env(safe-area-inset-bottom));
+    width:150px;height:10px;border-radius:8px;background:rgba(6,18,34,.65);
+    border:1px solid rgba(120,180,255,.42);overflow:hidden;
+    box-shadow:0 0 14px rgba(80,160,255,.25) inset}
+  #shbar{height:100%;width:100%;border-radius:8px;
+    background:linear-gradient(90deg,#7fb8ff,#c8e8ff);transition:width .18s ease}
+  #shbar.low{background:linear-gradient(90deg,#5a7fff,#9a6cff)}
   #reticle{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;opacity:.5}
   #reticle:before,#reticle:after{content:"";position:absolute;background:rgba(0,220,255,.55)}
   #reticle:before{left:50%;top:0;width:1px;height:14px;margin-left:-.5px;box-shadow:0 50px 0 rgba(0,220,255,.55)}
