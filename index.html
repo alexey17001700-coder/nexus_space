@@ -230,6 +230,31 @@ let joyActive = false, joyId = null, joyStart = { x: 0, y: 0 }, joyVec = { x: 0,
 
 const $ = id => document.getElementById(id);
 
+/* ---------------- Озвучка: бортовой компьютер (Web Speech API) ---------------- */
+let voiceOn = true, voiceRu = null, enemyAlerted = false;
+function initVoice(){
+  if (!('speechSynthesis' in window)){ voiceOn = false; return; }
+  const pick = () => {
+    const vs = speechSynthesis.getVoices() || [];
+    voiceRu = vs.find(v => /^ru/i.test(v.lang)) || vs.find(v => /ru/i.test(v.lang)) || vs[0] || null;
+  };
+  pick();
+  if ('onvoiceschanged' in speechSynthesis) speechSynthesis.onvoiceschanged = pick;
+}
+function say(text, rate, pitch){
+  if (!voiceOn || !('speechSynthesis' in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ru-RU';
+    if (voiceRu) u.voice = voiceRu;
+    u.rate = rate || 1.0;
+    u.pitch = pitch || 0.8;
+    u.volume = 1;
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+
 /* ---------------- Текстуры (генерим на canvas) ---------------- */
 function dotTexture(){
   const s = 64, cv = document.createElement('canvas');
