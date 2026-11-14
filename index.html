@@ -963,9 +963,9 @@ function damageObject(obj, dmg){
     explode(obj.mesh.position, obj.radius * 0.8, 0xffdd88);
   }
 }
-function hitPlayer(){
+function hitPlayer(dmg){
   if (invuln > 0) return;
-  hp -= 18;
+  hp -= (dmg || 18);
   invuln = 1.3;
   shake = 1;
   explode(shipRoot.position, 7, 0xff5533);
