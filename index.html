@@ -795,11 +795,11 @@ function spawnAsteroid(){
 /* --- вражеские корабли (нос смотрит в +Z) --- */
 function makeEnemy(){
   const g = new THREE.Group();
-  const hull = new THREE.MeshStandardMaterial({ color: 0xb03450, metalness: 0.9, roughness: 0.26,
-    emissive: 0x6a0a1e, emissiveIntensity: 1.0 });
-  const dark = new THREE.MeshStandardMaterial({ color: 0x4a2630, metalness: 0.8, roughness: 0.45,
-    emissive: 0x2a0810, emissiveIntensity: 0.6 });
-  const glow = new THREE.MeshBasicMaterial({ color: 0xff4a68 });
+  const hull = new THREE.MeshStandardMaterial({ color: 0xe0506f, metalness: 0.9, roughness: 0.24,
+    emissive: 0x9a1030, emissiveIntensity: 1.45 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x6a3040, metalness: 0.8, roughness: 0.42,
+    emissive: 0x4a0a18, emissiveIntensity: 0.9 });
+  const glow = new THREE.MeshBasicMaterial({ color: 0xff7a90 });
 
   const body = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.75, 2.6, 14), hull);
   body.rotation.x = Math.PI / 2;
