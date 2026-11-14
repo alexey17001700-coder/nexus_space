@@ -1279,7 +1279,8 @@ function resetGame(){
   asteroids.forEach(o => { scene.remove(o.mesh); o.mesh.geometry.dispose(); o.mesh.material.dispose(); });
   enemies.forEach(o => scene.remove(o.mesh));
   explosions.forEach(e => scene.remove(e.sp));
-  asteroids = []; enemies = []; explosions = [];
+  shockwaves.forEach(s => { scene.remove(s.ring); s.ring.material.dispose(); });
+  asteroids = []; enemies = []; explosions = []; shockwaves = [];
   bullets.forEach(b => { b.alive = false; b.mesh.visible = false; });
 
   score = 0; level = 1;
