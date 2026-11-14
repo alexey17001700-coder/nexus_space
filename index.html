@@ -544,7 +544,7 @@ function buildTrail(){
   geo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
   geo.setAttribute('color',    new THREE.BufferAttribute(trailCol, 3));
   const mat = new THREE.PointsMaterial({
-    size: 0.85, map: DOT, vertexColors: true, transparent: true,
+    size: 0.7, map: DOT, vertexColors: true, transparent: true, opacity: 0.55,
     depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
   });
   trail = new THREE.Points(geo, mat);
