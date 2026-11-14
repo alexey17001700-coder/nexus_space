@@ -1163,6 +1163,286 @@ function updateCombat(dt){
   }
 }
 
+/* ============================================================
+   СУПЕР-БОСС — гигантский корабль, летит по нашему курсу
+   ============================================================ */
+const BOSS_SCALE = 1.5;
+const BOSS_PARTS = 4;
+const Z_AXIS = new THREE.Vector3(0, 0, 1);
+
+function buildBossMesh(){
+  const g = new THREE.Group();
+  const hullMat = new THREE.MeshStandardMaterial({ color: 0x7c8698, metalness: 0.78, roughness: 0.36 });
+  const darkMat = new THREE.MeshStandardMaterial({ color: 0x2b3342, metalness: 0.72, roughness: 0.5 });
+  const redMat  = new THREE.MeshStandardMaterial({ color: 0xff3a5c, metalness: 0.5, roughness: 0.28,
+    emissive: 0xff1030, emissiveIntensity: 1.7 });
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0xffe0e6 });
+
+  const hull = new THREE.Mesh(new THREE.BoxGeometry(9, 4.6, 34), hullMat);
+  g.add(hull);
+
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(6.4, 10, 4), hullMat);
+  nose.rotation.x = Math.PI / 2;
+  nose.rotation.y = Math.PI / 4;
+  nose.position.z = 21;
+  g.add(nose);
+
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(5.4, 3.2, 9), darkMat);
+  bridge.position.set(0, 3.8, 2);
+  g.add(bridge);
+  const bridgeGlow = new THREE.Mesh(new THREE.BoxGeometry(4.4, 1.1, 7.6), glowMat);
+  bridgeGlow.position.set(0, 3.9, 2.4);
+  g.add(bridgeGlow);
+
+  [-1, 1].forEach(s => {
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(17, 1.3, 13), hullMat);
+    wing.position.set(s * 11.5, 0, -2);
+    wing.rotation.z = s * 0.06;
+    g.add(wing);
+    const fin = new THREE.Mesh(new THREE.BoxGeometry(1.1, 7, 9), darkMat);
+    fin.position.set(s * 18, 2, 0);
+    g.add(fin);
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 12), redMat);
+    stripe.position.set(s * 11.5, 0.85, -2);
+    g.add(stripe);
+  });
+
+  // центральное сопло (корма смотрит на игрока)
+  const core = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.6, 4, 20), darkMat);
+  core.rotation.x = Math.PI / 2;
+  core.position.z = -18;
+  g.add(core);
+  const coreGlow = new THREE.Mesh(new THREE.CircleGeometry(3.0, 20), new THREE.MeshBasicMaterial({
+    color: 0xff6a8a, transparent: true, opacity: 0.85,
+    blending: THREE.AdditiveBlending, depthWrite: false }));
+  coreGlow.position.z = -20.1;
+  coreGlow.rotation.y = Math.PI;
+  g.add(coreGlow);
+  g.userData.coreGlow = coreGlow;
+  return g;
+}
+
+function makeBossPart(kind){
+  const grp = new THREE.Group();
+  const darkMat = new THREE.MeshStandardMaterial({ color: 0x333c4d, metalness: 0.7, roughness: 0.45 });
+  const redMat  = new THREE.MeshStandardMaterial({ color: 0xff3a5c, metalness: 0.5, roughness: 0.3,
+    emissive: 0xff1030, emissiveIntensity: 1.8 });
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0xffe0e6 });
+
+  if (kind === 'engine'){
+    const pod = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 3.0, 9, 18), darkMat);
+    pod.rotation.x = Math.PI / 2;
+    grp.add(pod);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(2.9, 0.45, 10, 24), redMat);
+    ring.position.z = -3.4;
+    grp.add(ring);
+    const flame = new THREE.Mesh(new THREE.ConeGeometry(2.4, 6, 18), new THREE.MeshBasicMaterial({
+      color: 0xff8aa8, transparent: true, opacity: 0.8,
+      blending: THREE.AdditiveBlending, depthWrite: false }));
+    flame.rotation.x = -Math.PI / 2;
+    flame.position.z = -7.5;
+    grp.add(flame);
+    grp.userData.flame = flame;
+  } else {
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.6, 1.6, 16), darkMat);
+    grp.add(base);
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(1.9, 18, 14), redMat);
+    dome.position.y = 1.2;
+    grp.add(dome);
+    [-1, 1].forEach(s => {
+      const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 6, 10), glowMat);
+      barrel.rotation.x = Math.PI / 2;
+      barrel.position.set(s * 0.9, 1.2, -2.6);
+      grp.add(barrel);
+    });
+  }
+
+  const mark = new THREE.Sprite(new THREE.SpriteMaterial({ map: DOT, color: 0xffe066,
+    transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false }));
+  mark.scale.set(9, 9, 1);
+  mark.position.y = kind === 'engine' ? 0 : 5;
+  grp.add(mark);
+  grp.userData.mark = mark;
+
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: DOT, color: 0xff2a4e,
+    transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
+  halo.scale.set(26, 26, 1);
+  grp.add(halo);
+  grp.userData.halo = halo;
+  return grp;
+}
+
+function updateBossBar(){
+  let cur = 0, max = 0, alive = 0;
+  bossParts.forEach(p => { max += p.maxHp; cur += Math.max(0, p.hp); if (p.alive) alive++; });
+  $('bossfill').style.width = (max ? cur / max * 100 : 0) + '%';
+  $('bossparts').textContent = 'Части корпуса: ' + alive + ' / ' + BOSS_PARTS;
+}
+
+function spawnBoss(){
+  boss = buildBossMesh();
+  boss.scale.setScalar(BOSS_SCALE);
+  boss.position.copy(shipRoot.position).addScaledVector(fwd, 150);
+  bossCourse.copy(fwd);
+  scene.add(boss);
+
+  bossParts = [];
+  const partHp = 22 + level * 2;
+  const defs = [
+    { kind: 'engine', pos: new THREE.Vector3(-7.5, -0.6, -17), name: 'ЛЕВЫЙ ДВИГАТЕЛЬ', r: 6.5 },
+    { kind: 'engine', pos: new THREE.Vector3( 7.5, -0.6, -17), name: 'ПРАВЫЙ ДВИГАТЕЛЬ', r: 6.5 },
+    { kind: 'turret', pos: new THREE.Vector3(-11.5, 1.6, -2),  name: 'ЛЕВАЯ ТУРЕЛЬ', r: 5.5 },
+    { kind: 'turret', pos: new THREE.Vector3( 11.5, 1.6, -2),  name: 'ПРАВАЯ ТУРЕЛЬ', r: 5.5 }
+  ];
+  defs.forEach(d => {
+    const grp = makeBossPart(d.kind);
+    grp.position.copy(d.pos);
+    boss.add(grp);
+    bossParts.push({ grp, kind: d.kind, name: d.name, hp: partHp, maxHp: partHp,
+      radius: d.r, alive: true, world: new THREE.Vector3() });
+  });
+
+  bossShootCd = 1.8;
+  bossDeath = 0;
+
+  // поле чистое — бой только с боссом
+  asteroids.forEach(a => { a.alive = false; a.mesh.visible = false; });
+  enemies.forEach(e => { e.alive = false; e.mesh.visible = false; });
+  eBullets.forEach(b => { b.alive = false; b.mesh.visible = false; });
+
+  hp = Math.min(maxHp, hp + 40);
+  refreshHUD();
+
+  $('bossbar').classList.add('on');
+  updateBossBar();
+  banner('СУПЕР-БОСС');
+  say('Внимание. Обнаружен супер-босс');
+}
+
+function bossFire(pos){
+  const b = getEBullet();
+  b.alive = true; b.life = 4.0; b.dmg = 8;
+  b.mesh.visible = true;
+  b.mesh.position.copy(pos);
+  _v1.subVectors(shipRoot.position, pos).normalize();
+  _v1.x += (Math.random() - 0.5) * 0.07;
+  _v1.y += (Math.random() - 0.5) * 0.07;
+  _v1.normalize();
+  b.mesh.quaternion.setFromUnitVectors(Z_AXIS, _v1);
+  b.vel.copy(_v1).multiplyScalar(150);
+}
+
+function damageBossPart(p, dmg){
+  p.hp -= dmg;
+  if (p.hp <= 0){
+    p.alive = false;
+    p.grp.visible = false;
+    explode(p.world, 16, 0xffaa44);
+    explode(p.world, 10, 0xff4466);
+    score += 400;
+    credits += 200;
+    updateBossBar();
+    refreshHUD();
+    if (bossParts.every(x => !x.alive)) startBossDeath();
+    else say('Часть корпуса уничтожена');
+  } else {
+    explode(p.world, 3.0, 0xffdd88);
+    updateBossBar();
+  }
+}
+
+function startBossDeath(){
+  bossDeath = 2.6;
+  score += 2000;
+  credits += 800;
+  refreshHUD();
+  $('bossbar').classList.remove('on');
+  banner('БОСС УНИЧТОЖЕН');
+}
+
+function finishBoss(){
+  if (boss){ scene.remove(boss); boss = null; }
+  bossParts = [];
+  bossDeath = 0;
+  $('bossbar').classList.remove('on');
+  if (level >= MAX_LEVEL) endGame(true);
+  else openShop();
+}
+
+function updateBoss(dt){
+  if (!boss) return;
+
+  // курс — прочь от игрока (босс всегда впереди, мы его догоняем)
+  _v1.subVectors(boss.position, shipRoot.position);
+  const dist = _v1.length();
+  if (dist > 0.001) _v1.normalize(); else _v1.set(0, 0, -1);
+  bossCourse.lerp(_v1, 1 - Math.pow(0.25, dt)).normalize();
+
+  let bs = 15;
+  if (dist > 180) bs = 25;
+  else if (dist < 95) bs = 5;
+  boss.position.addScaledVector(bossCourse, bs * dt);
+
+  // корма развёрнута к игроку
+  _v2.copy(boss.position).add(bossCourse);
+  boss.lookAt(_v2);
+
+  const cg = boss.userData.coreGlow;
+  if (cg) cg.material.opacity = 0.6 + Math.sin(elapsed * 9) * 0.25;
+
+  // части: мировые координаты, маркеры, пламя
+  let turrets = 0;
+  const inv = 1 / BOSS_SCALE;
+  bossParts.forEach(p => {
+    if (!p.alive) return;
+    p.grp.getWorldPosition(p.world);
+    const m = p.grp.userData.mark;
+    if (m) m.scale.setScalar((9 + Math.sin(elapsed * 8 + p.world.x * 0.2) * 2.4) * inv);
+    const h = p.grp.userData.halo;
+    if (h) h.scale.setScalar((26 + Math.sin(elapsed * 6 + p.world.z * 0.15) * 5) * inv);
+    const fl = p.grp.userData.flame;
+    if (fl) fl.scale.set(1, 1, 0.8 + Math.sin(elapsed * 18 + p.world.x) * 0.25);
+    if (p.kind === 'turret') turrets++;
+  });
+
+  // залпы босса
+  bossShootCd -= dt;
+  if (bossShootCd <= 0 && turrets > 0){
+    bossShootCd = 1.5;
+    bossParts.forEach(p => {
+      if (!p.alive || p.kind !== 'turret') return;
+      bossFire(p.world);
+      bossFire(p.world);
+    });
+  }
+
+  // таран корпуса
+  if (dist < 26){
+    _v1.subVectors(shipRoot.position, boss.position);
+    if (_v1.lengthSq() < 1) _v1.set(0, 1, 0);
+    _v1.normalize();
+    shipRoot.position.copy(boss.position).addScaledVector(_v1, 27);
+    explode(shipRoot.position, 12, 0xff8844);
+    shake = 1.2;
+    if (invuln <= 0){
+      hp -= 20; invuln = 1.4;
+      if (hp <= maxHp * 0.35) say('Критические повреждения');
+      if (hp <= 0){ hp = 0; endGame(false); return; }
+    }
+  }
+
+  // агония босса
+  if (bossDeath > 0){
+    bossDeath -= dt;
+    if (Math.random() < 0.55){
+      _v1.set((Math.random() - 0.5) * 40, (Math.random() - 0.5) * 24, (Math.random() - 0.5) * 40)
+        .add(boss.position);
+      explode(_v1, 12 + Math.random() * 10, 0xffaa44);
+    }
+    if (bossDeath <= 0) finishBoss();
+  }
+}
+
 /* --- уровни --- */
 function banner(text){
   const el = $('banner');
