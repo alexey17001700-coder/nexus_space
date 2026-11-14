@@ -783,7 +783,7 @@ function spawnAsteroid(){
   const aim = new THREE.Vector3().subVectors(shipRoot.position, mesh.position);
   aim.x += (Math.random() - 0.5) * 26;
   aim.y += (Math.random() - 0.5) * 26;
-  aim.normalize().multiplyScalar(24 + level * 6 + Math.random() * 12);
+  aim.normalize().multiplyScalar(15 + level * 4 + Math.random() * 8);
 
   asteroids.push({
     mesh, vel: aim, radius: r, hp: Math.max(1, Math.ceil(r / 2.4)), alive: true,
