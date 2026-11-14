@@ -797,7 +797,7 @@ function getEBullet(){
 }
 function enemyFire(e){
   const b = getEBullet();
-  b.alive = true; b.life = 3.2;
+  b.alive = true; b.life = 3.2; b.dmg = 10;
   b.mesh.visible = true;
   b.mesh.position.copy(e.mesh.position);
   b.mesh.quaternion.copy(e.mesh.quaternion);
