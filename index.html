@@ -445,13 +445,13 @@ function buildShip(){
   shipRoot.add(shipModel);
   scene.add(shipRoot);
 
-  const hull = new THREE.MeshStandardMaterial({ color: 0x93a1b2, metalness: 0.68, roughness: 0.42 });
-  const dark = new THREE.MeshStandardMaterial({ color: 0x212a36, metalness: 0.66, roughness: 0.52 });
-  const accent = new THREE.MeshStandardMaterial({ color: 0x1c7ba0, metalness: 0.55, roughness: 0.38,
-    emissive: 0x004a66, emissiveIntensity: 0.4 });
-  const glass = new THREE.MeshStandardMaterial({ color: 0x0a1622, metalness: 0.88, roughness: 0.12,
-    emissive: 0x062a4a, emissiveIntensity: 0.28 });
-  const hot = new THREE.MeshBasicMaterial({ color: 0x6fc4dd });
+  const hull = new THREE.MeshStandardMaterial({ color: 0xb9c6d6, metalness: 0.98, roughness: 0.24 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x2a3442, metalness: 0.85, roughness: 0.42 });
+  const accent = new THREE.MeshStandardMaterial({ color: 0x00c8ff, metalness: 0.7, roughness: 0.25,
+    emissive: 0x0088cc, emissiveIntensity: 1.1 });
+  const glass = new THREE.MeshStandardMaterial({ color: 0x081826, metalness: 0.95, roughness: 0.06,
+    emissive: 0x0a3a66, emissiveIntensity: 0.7 });
+  const hot = new THREE.MeshBasicMaterial({ color: 0x5fc8f0, transparent: true, opacity: 0.7 });
 
   // фюзеляж
   const body = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.8, 3.4, 20), hull);
