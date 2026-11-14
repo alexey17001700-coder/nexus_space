@@ -740,6 +740,7 @@ function hitPlayer(){
   invuln = 1.3;
   shake = 1;
   explode(shipRoot.position, 7, 0xff5533);
+  if (hp <= maxHp * 0.35) say('Критические повреждения');
   if (hp <= 0){ hp = 0; endGame(false); }
 }
 
