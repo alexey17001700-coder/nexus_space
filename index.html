@@ -602,7 +602,7 @@ function buildPlasma(){
   geo.setAttribute('position', new THREE.BufferAttribute(plasmaPos, 3));
   geo.setAttribute('color',    new THREE.BufferAttribute(plasmaCol, 3));
   const mat = new THREE.PointsMaterial({
-    size: 2.6, map: DOT, vertexColors: true, transparent: true, opacity: 0.55,
+    size: 1.8, map: DOT, vertexColors: true, transparent: true, opacity: 0.28,
     depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
   });
   plasma = new THREE.Points(geo, mat);
