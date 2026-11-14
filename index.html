@@ -841,11 +841,15 @@ function makeEnemy(){
 }
 function spawnEnemy(){
   if (!enemyAlerted){ enemyAlerted = true; say('Обнаружены враги'); }
+  const n = 1 + Math.floor(Math.random() * (level >= 3 ? 3 : 2));
+  for (let i = 0; i < n; i++) spawnOneEnemy(i);
+}
+function spawnOneEnemy(i){
   const mesh = makeEnemy();
   mesh.scale.setScalar(1.15);
   _v1.copy(fwd).multiplyScalar(340 + Math.random() * 200);
-  _v1.x += (Math.random() - 0.5) * 170;
-  _v1.y += (Math.random() - 0.5) * 100;
+  _v1.x += (Math.random() - 0.5) * 170 + (i - 1) * 26;
+  _v1.y += (Math.random() - 0.5) * 100 + (i % 2 ? 16 : -16);
   _v1.z += (Math.random() - 0.5) * 140;
   mesh.position.copy(shipRoot.position).add(_v1);
   mesh.lookAt(shipRoot.position);
