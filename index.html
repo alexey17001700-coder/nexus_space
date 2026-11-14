@@ -27,12 +27,39 @@
   #ver b{color:#fff}
   #spd{top:calc(10px + env(safe-area-inset-top));right:10px;text-align:right;color:#7fd8ff}
   #spd span{display:block;font-size:20px;font-weight:700;color:#eaf7ff;letter-spacing:.02em}
+  #score{top:calc(62px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
+    text-align:center;color:#7fd8ff;min-width:110px}
+  #score span{display:block;font-size:22px;font-weight:800;color:#eaf7ff;letter-spacing:.02em}
+  #lvl{top:calc(116px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
+    text-align:center;color:#ffd27f;font-size:11px}
+  #lvl b{color:#fff}
   #fps{bottom:calc(10px + env(safe-area-inset-bottom));right:10px;font-size:10px;color:#4d7f9e}
   #hint{bottom:calc(10px + env(safe-area-inset-bottom));left:10px;font-size:10px;color:#5f93b3;max-width:52vw;line-height:1.5}
+  #hpwrap{position:absolute;left:10px;bottom:calc(56px + env(safe-area-inset-bottom));
+    width:150px;height:12px;border-radius:8px;background:rgba(6,18,34,.65);
+    border:1px solid rgba(0,200,255,.32);overflow:hidden;
+    box-shadow:0 0 14px rgba(0,140,255,.2) inset}
+  #hpbar{height:100%;width:100%;border-radius:8px;
+    background:linear-gradient(90deg,#00ffa8,#00c8ff);transition:width .18s ease}
+  #hpbar.low{background:linear-gradient(90deg,#ff5a5a,#ff9a3c)}
   #reticle{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;opacity:.5}
   #reticle:before,#reticle:after{content:"";position:absolute;background:rgba(0,220,255,.55)}
   #reticle:before{left:50%;top:0;width:1px;height:14px;margin-left:-.5px;box-shadow:0 50px 0 rgba(0,220,255,.55)}
   #reticle:after{top:50%;left:0;height:1px;width:14px;margin-top:-.5px;box-shadow:50px 0 0 rgba(0,220,255,.55)}
+
+  /* ---------- Баннер уровня ---------- */
+  #banner{position:fixed;left:50%;top:36%;transform:translate(-50%,-50%) scale(.6);
+    z-index:15;pointer-events:none;opacity:0;text-align:center;white-space:nowrap;
+    font-size:clamp(22px,7vw,46px);font-weight:800;letter-spacing:.14em;
+    color:#eaf7ff;text-shadow:0 0 30px rgba(0,190,255,.85),0 0 70px rgba(0,120,255,.5)}
+  #banner.on{animation:bannerIn 1.9s ease forwards}
+  @keyframes bannerIn{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}
+    16%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
+    28%{transform:translate(-50%,-50%) scale(1)}
+    72%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(1.12)}
+  }
 
   /* ---------- Джойстик ---------- */
   #joy{position:fixed;z-index:12;width:130px;height:130px;margin:-65px 0 0 -65px;
@@ -81,26 +108,41 @@
 <canvas id="c"></canvas>
 
 <div id="hud">
-  <div class="panel" id="ver">NEXUS SPACE <b>v1.0</b> · build 1</div>
+  <div class="panel" id="ver">NEXUS SPACE <b>v2.0</b> · build 2</div>
   <div class="panel" id="spd">скорость<span id="spdv">0</span></div>
-  <div class="panel" id="hint">Тяни палец по экрану — корабль летит за пальцем<br>Клавиатура: WASD / стрелки</div>
+  <div class="panel" id="score">очки<span id="scorev">0</span></div>
+  <div class="panel" id="lvl">уровень <b id="lvlv">1</b> / 5</div>
+  <div id="hpwrap"><div id="hpbar"></div></div>
+  <div class="panel" id="hint">Тяни палец по экрану — корабль летит за пальцем<br>Огонь автоматический · WASD / стрелки</div>
   <div class="panel" id="fps">-- fps</div>
   <div id="reticle"></div>
 </div>
 
+<div id="banner"></div>
 <div id="joy"><div id="knob"></div></div>
-<div id="build">NEXUS SPACE v1.0 · build 1</div>
+<div id="build">NEXUS SPACE v2.0 · build 2</div>
 <button id="upd">⬆ Новая версия — обновить</button>
 
 <div class="screen" id="start">
   <h1>NEXUS SPACE</h1>
-  <div class="sub">Этап 1 · 3D-движок</div>
+  <div class="sub">Этап 2 · бой и уровни</div>
   <button class="btn" id="play">Старт</button>
   <div class="keys">
     <b>Тяни палец</b> по экрану — управление кораблём<br>
+    <b>Огонь</b> — автоматический, целься корпусом<br>
     <b>WASD / ←↑↓→</b> — на компьютере<br>
-    Версия: <b>v1.0 (build 1)</b>
+    Версия: <b>v2.0 (build 2)</b>
   </div>
+</div>
+
+<div class="screen hide" id="over">
+  <h1 id="overTitle">ИГРА ОКОНЧЕНА</h1>
+  <div class="sub" id="overSub">Корабль уничтожен</div>
+  <div class="keys" style="margin-top:0;margin-bottom:24px">
+    Очки: <b id="overScore">0</b><br>
+    Достигнутый уровень: <b id="overLevel">1</b>
+  </div>
+  <button class="btn" id="again">Ещё раз</button>
 </div>
 
 <div id="boot">ЗАГРУЗКА ДВИГАТЕЛЯ…</div>
@@ -108,11 +150,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ============================================================
-   NEXUS SPACE — Этап 1: база и 3D-движок
+   NEXUS SPACE — Этап 2: геймплей (астероиды, враги, стрельба, уровни)
    Three.js (WebGL) + управление + камера-преследование
    ============================================================ */
-const BUILD_VERSION = "1.0";
-const BUILD_NUMBER  = 1;
+const BUILD_VERSION = "2.0";
+const BUILD_NUMBER  = 2;
 
 let renderer, scene, camera, clock;
 let shipRoot, shipModel, engineGlowL, engineGlowR, engineLight;
@@ -430,6 +472,297 @@ function updateTrail(dt){
   trail.geometry.attributes.color.needsUpdate = true;
 }
 
+/* ============================================================
+   ЭТАП 2: БОЙ — пули, астероиды, враги, взрывы, уровни
+   ============================================================ */
+const MAX_LEVEL  = 5;
+const LEVEL_TIME = 30;              // секунд на уровень
+
+let bullets = [], asteroids = [], enemies = [], explosions = [];
+let score = 0, level = 1, hp = 100, maxHp = 100;
+let fireCd = 0, astTimer = 0, enTimer = 0, levelTimer = 0, invuln = 0;
+let shake = 0, gameOver = false, victory = false;
+
+/* --- лазерные лучи --- */
+const bulletGeo = new THREE.CylinderGeometry(0.07, 0.07, 2.6, 8);
+bulletGeo.rotateX(Math.PI / 2);
+const bulletMat = new THREE.MeshBasicMaterial({ color: 0x9dffe0 });
+const bulletGlowMat = new THREE.MeshBasicMaterial({ color: 0x00ffaa, transparent: true,
+  opacity: 0.32, blending: THREE.AdditiveBlending, depthWrite: false });
+
+function getBullet(){
+  for (const b of bullets) if (!b.alive) return b;
+  const mesh = new THREE.Mesh(bulletGeo, bulletMat);
+  const glow = new THREE.Mesh(bulletGeo, bulletGlowMat);
+  glow.scale.set(3.0, 3.0, 1.15);
+  mesh.add(glow);
+  scene.add(mesh);
+  const b = { mesh, alive: false, life: 0, vel: new THREE.Vector3() };
+  bullets.push(b);
+  return b;
+}
+function fire(){
+  for (const ox of [-1.35, 1.35]){
+    const b = getBullet();
+    b.alive = true; b.life = 2.2;
+    b.mesh.visible = true;
+    _v1.set(ox, -0.02, -1.7).applyQuaternion(shipRoot.quaternion).add(shipRoot.position);
+    b.mesh.position.copy(_v1);
+    b.mesh.quaternion.copy(shipRoot.quaternion);
+    b.vel.copy(fwd).multiplyScalar(340);
+  }
+}
+
+/* --- астероиды --- */
+function makeAsteroid(){
+  const geo = new THREE.IcosahedronGeometry(1, 1);
+  const p = geo.attributes.position;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < p.count; i++){
+    v.fromBufferAttribute(p, i).multiplyScalar(0.72 + Math.random() * 0.55);
+    p.setXYZ(i, v.x, v.y, v.z);
+  }
+  geo.computeVertexNormals();
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x8b8073, roughness: 0.96, metalness: 0.12, flatShading: true
+  });
+  return new THREE.Mesh(geo, mat);
+}
+function spawnAsteroid(){
+  const mesh = makeAsteroid();
+  const r = 2.2 + Math.random() * 4.5;
+  mesh.scale.setScalar(r);
+  _v1.copy(fwd).multiplyScalar(300 + Math.random() * 180);
+  _v1.x += (Math.random() - 0.5) * 150;
+  _v1.y += (Math.random() - 0.5) * 90;
+  _v1.z += (Math.random() - 0.5) * 120;
+  mesh.position.copy(shipRoot.position).add(_v1);
+  mesh.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
+
+  const aim = new THREE.Vector3().subVectors(shipRoot.position, mesh.position);
+  aim.x += (Math.random() - 0.5) * 26;
+  aim.y += (Math.random() - 0.5) * 26;
+  aim.normalize().multiplyScalar(34 + level * 9 + Math.random() * 18);
+
+  asteroids.push({
+    mesh, vel: aim, radius: r, hp: Math.max(1, Math.ceil(r / 2.4)), alive: true,
+    spin: new THREE.Vector3((Math.random()-0.5)*1.4, (Math.random()-0.5)*1.4, (Math.random()-0.5)*1.4),
+    points: Math.round(r * 4)
+  });
+}
+
+/* --- вражеские корабли (нос смотрит в +Z) --- */
+function makeEnemy(){
+  const g = new THREE.Group();
+  const hull = new THREE.MeshStandardMaterial({ color: 0x6b2b3c, metalness: 0.92, roughness: 0.3 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x241820, metalness: 0.8, roughness: 0.5 });
+  const glow = new THREE.MeshBasicMaterial({ color: 0xff3b5c });
+
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.75, 2.6, 14), hull);
+  body.rotation.x = Math.PI / 2;
+  g.add(body);
+
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.5, 14), hull);
+  nose.rotation.x = Math.PI / 2;
+  nose.position.z = 2.0;
+  g.add(nose);
+
+  const eye = new THREE.Mesh(new THREE.SphereGeometry(0.26, 12, 10), glow);
+  eye.position.set(0, 0.2, 1.5);
+  g.add(eye);
+
+  [-1, 1].forEach(s => {
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.12, 0.9), dark);
+    wing.position.set(s * 1.0, 0, -0.3);
+    wing.rotation.z = s * 0.2;
+    g.add(wing);
+
+    const tip = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.42, 0.7), glow);
+    tip.position.set(s * 1.75, 0.1, -0.4);
+    g.add(tip);
+
+    const eng = new THREE.Mesh(new THREE.ConeGeometry(0.26, 1.1, 12), glow);
+    eng.rotation.x = -Math.PI / 2;
+    eng.position.set(s * 0.42, 0, -1.9);
+    g.add(eng);
+  });
+  return g;
+}
+function spawnEnemy(){
+  const mesh = makeEnemy();
+  mesh.scale.setScalar(1.15);
+  _v1.copy(fwd).multiplyScalar(340 + Math.random() * 200);
+  _v1.x += (Math.random() - 0.5) * 170;
+  _v1.y += (Math.random() - 0.5) * 100;
+  _v1.z += (Math.random() - 0.5) * 140;
+  mesh.position.copy(shipRoot.position).add(_v1);
+  mesh.lookAt(shipRoot.position);
+
+  const vel = new THREE.Vector3().subVectors(shipRoot.position, mesh.position);
+  vel.x += (Math.random() - 0.5) * 18;
+  vel.y += (Math.random() - 0.5) * 18;
+  vel.normalize().multiplyScalar(46 + level * 12 + Math.random() * 16);
+
+  enemies.push({
+    mesh, vel, radius: 2.4, hp: 2 + Math.floor(level / 2), alive: true,
+    points: 60 + level * 10
+  });
+}
+
+/* --- взрывы --- */
+function explode(pos, size, color){
+  const mat = new THREE.SpriteMaterial({ map: DOT, color, transparent: true, opacity: 1,
+    blending: THREE.AdditiveBlending, depthWrite: false });
+  const sp = new THREE.Sprite(mat);
+  sp.position.copy(pos);
+  sp.scale.setScalar(size * 0.6);
+  scene.add(sp);
+  explosions.push({ sp, t: 0, dur: 0.5, size });
+}
+function updateExplosions(dt){
+  for (let i = explosions.length - 1; i >= 0; i--){
+    const e = explosions[i];
+    e.t += dt;
+    const k = e.t / e.dur;
+    if (k >= 1){ scene.remove(e.sp); e.sp.material.dispose(); explosions.splice(i, 1); continue; }
+    e.sp.scale.setScalar(e.size * (0.6 + k * 1.7));
+    e.sp.material.opacity = 1 - k;
+  }
+}
+
+/* --- урон --- */
+function damageObject(obj, dmg){
+  obj.hp -= dmg;
+  if (obj.hp <= 0){
+    obj.alive = false;
+    obj.mesh.visible = false;
+    explode(obj.mesh.position, obj.radius * 2.3, 0xffaa44);
+    score += obj.points;
+  } else {
+    explode(obj.mesh.position, obj.radius * 0.8, 0xffdd88);
+  }
+}
+function hitPlayer(){
+  if (invuln > 0) return;
+  hp -= 18;
+  invuln = 1.3;
+  shake = 1;
+  explode(shipRoot.position, 7, 0xff5533);
+  if (hp <= 0){ hp = 0; endGame(false); }
+}
+
+/* --- спавн --- */
+function updateSpawns(dt){
+  astTimer -= dt;
+  enTimer  -= dt;
+  if (astTimer <= 0){
+    spawnAsteroid();
+    astTimer = Math.max(0.5, 1.7 - level * 0.18) * (0.7 + Math.random() * 0.6);
+  }
+  if (enTimer <= 0){
+    spawnEnemy();
+    enTimer = Math.max(1.1, 3.6 - level * 0.45) * (0.8 + Math.random() * 0.5);
+  }
+}
+
+/* --- бой --- */
+function updateCombat(dt){
+  // стрельба
+  fireCd -= dt;
+  if (fireCd <= 0){ fire(); fireCd = 0.15; }
+
+  // пули
+  for (const b of bullets){
+    if (!b.alive) continue;
+    b.life -= dt;
+    b.mesh.position.addScaledVector(b.vel, dt);
+    if (b.life <= 0){ b.alive = false; b.mesh.visible = false; continue; }
+
+    let hit = false;
+    for (const a of asteroids){
+      if (!a.alive) continue;
+      if (b.mesh.position.distanceTo(a.mesh.position) < a.radius + 1.4){
+        damageObject(a, 1); hit = true; break;
+      }
+    }
+    if (!hit) for (const e of enemies){
+      if (!e.alive) continue;
+      if (b.mesh.position.distanceTo(e.mesh.position) < e.radius + 1.4){
+        damageObject(e, 1); hit = true; break;
+      }
+    }
+    if (hit){ b.alive = false; b.mesh.visible = false; }
+  }
+
+  // астероиды
+  for (const a of asteroids){
+    if (!a.alive) continue;
+    a.mesh.position.addScaledVector(a.vel, dt);
+    a.mesh.rotation.x += a.spin.x * dt;
+    a.mesh.rotation.y += a.spin.y * dt;
+    a.mesh.rotation.z += a.spin.z * dt;
+
+    if (a.mesh.position.distanceTo(shipRoot.position) < a.radius + 2.0){
+      a.alive = false; a.mesh.visible = false;
+      explode(a.mesh.position, a.radius * 2, 0xffaa44);
+      hitPlayer();
+      continue;
+    }
+    if (_v2.subVectors(a.mesh.position, shipRoot.position).dot(fwd) < -60){
+      a.alive = false; a.mesh.visible = false;
+    }
+  }
+
+  // враги
+  for (const e of enemies){
+    if (!e.alive) continue;
+    e.mesh.position.addScaledVector(e.vel, dt);
+    e.mesh.lookAt(shipRoot.position);
+
+    if (e.mesh.position.distanceTo(shipRoot.position) < e.radius + 2.0){
+      e.alive = false; e.mesh.visible = false;
+      explode(e.mesh.position, e.radius * 2.4, 0xff4466);
+      hitPlayer();
+      continue;
+    }
+    if (_v2.subVectors(e.mesh.position, shipRoot.position).dot(fwd) < -60){
+      e.alive = false; e.mesh.visible = false;
+    }
+  }
+
+  // уборка
+  for (let i = asteroids.length - 1; i >= 0; i--){
+    const a = asteroids[i];
+    if (!a.alive){
+      scene.remove(a.mesh);
+      a.mesh.geometry.dispose();
+      a.mesh.material.dispose();
+      asteroids.splice(i, 1);
+    }
+  }
+  for (let i = enemies.length - 1; i >= 0; i--){
+    if (!enemies[i].alive){ scene.remove(enemies[i].mesh); enemies.splice(i, 1); }
+  }
+}
+
+/* --- уровни --- */
+function banner(text){
+  const el = $('banner');
+  el.textContent = text;
+  el.classList.remove('on');
+  void el.offsetWidth;
+  el.classList.add('on');
+}
+function updateLevel(dt){
+  levelTimer += dt;
+  if (levelTimer >= LEVEL_TIME){
+    levelTimer = 0;
+    if (level >= MAX_LEVEL){ endGame(true); return; }
+    level++;
+    banner('УРОВЕНЬ ' + level);
+  }
+}
+
 /* ---------------- Управление ---------------- */
 function bindControls(){
   addEventListener('keydown', e => {
@@ -530,6 +863,13 @@ function updateShip(dt){
   shipModel.position.y = Math.sin(elapsed * 2.2) * 0.045;
   shipModel.rotation.y = Math.sin(elapsed * 1.3) * 0.02;
 
+  // неуязвимость — мигание
+  if (invuln > 0){
+    invuln -= dt;
+    shipModel.visible = Math.floor(invuln * 14) % 2 === 0;
+    if (invuln <= 0) shipModel.visible = true;
+  }
+
   // пульс двигателей
   const pulse = 0.85 + Math.sin(elapsed * 22) * 0.12 + Math.min(0.5, speed / 200);
   engineGlowL.scale.set(pulse, 0.9 + pulse * 0.35, pulse);
@@ -549,6 +889,14 @@ function updateCamera(dt){
 
   camTarget.copy(shipRoot.position).addScaledVector(fwd, 14);
   camera.lookAt(camTarget);
+
+  // тряска при попадании
+  if (shake > 0){
+    shake = Math.max(0, shake - dt * 2.2);
+    const s = shake * 0.55;
+    camera.position.x += (Math.random() - 0.5) * s;
+    camera.position.y += (Math.random() - 0.5) * s;
+  }
 
   // FOV растёт со скоростью — ощущение разгона
   const targetFov = 72 + Math.min(14, (speed - 46) * 0.4);
@@ -590,6 +938,13 @@ let hudTick = 0;
 function updateHUD(dt){
   fpsAcc += dt; fpsFrames++;
   hudTick += dt;
+
+  $('scorev').textContent = score;
+  $('lvlv').textContent = level;
+  const pct = Math.max(0, hp) / maxHp * 100;
+  $('hpbar').style.width = pct + '%';
+  $('hpbar').classList.toggle('low', pct < 35);
+
   if (hudTick > 0.35){
     $('spdv').textContent = Math.round(speed * 10);
     $('fps').textContent = Math.round(fpsFrames / fpsAcc) + ' fps';
@@ -597,18 +952,57 @@ function updateHUD(dt){
   }
 }
 
+/* ---------------- Конец игры ---------------- */
+function endGame(win){
+  playing = false;
+  gameOver = true;
+  victory = win;
+  $('overTitle').textContent = win ? 'МИССИЯ ВЫПОЛНЕНА' : 'ИГРА ОКОНЧЕНА';
+  $('overSub').textContent   = win ? 'Все 5 уровней пройдены' : 'Корабль уничтожен';
+  $('overScore').textContent = score;
+  $('overLevel').textContent = level;
+  $('over').classList.remove('hide');
+}
+
+function resetGame(){
+  asteroids.forEach(o => { scene.remove(o.mesh); o.mesh.geometry.dispose(); o.mesh.material.dispose(); });
+  enemies.forEach(o => scene.remove(o.mesh));
+  explosions.forEach(e => scene.remove(e.sp));
+  asteroids = []; enemies = []; explosions = [];
+  bullets.forEach(b => { b.alive = false; b.mesh.visible = false; });
+
+  score = 0; level = 1; hp = maxHp;
+  levelTimer = 0; astTimer = 1.0; enTimer = 2.4;
+  fireCd = 0; invuln = 0; shake = 0;
+  gameOver = false; victory = false;
+  shipModel.visible = true;
+  $('scorev').textContent = '0';
+  $('lvlv').textContent = '1';
+  $('hpbar').style.width = '100%';
+  $('hpbar').classList.remove('low');
+}
+
 /* ---------------- Цикл ---------------- */
 function animate(){
   requestAnimationFrame(animate);
   const dt = Math.min(0.05, clock.getDelta());
+
   if (playing){
     elapsed += dt;
     readInput(dt);
     updateShip(dt);
     updateTrail(dt);
+    updateSpawns(dt);
+    updateCombat(dt);
+    updateExplosions(dt);
+    updateLevel(dt);
     recycle(dt);
     updateCamera(dt);
     updateHUD(dt);
+  } else if (gameOver){
+    updateExplosions(dt);
+    updateTrail(dt);
+    updateCamera(dt);
   } else {
     // медленный облёт корабля на стартовом экране
     elapsed += dt * 0.35;
@@ -631,6 +1025,8 @@ function onResize(){
 /* ---------------- Старт ---------------- */
 function startGame(){
   $('start').classList.add('hide');
+  $('over').classList.add('hide');
+  resetGame();
   shipRoot.position.set(0, 0, 0);
   shipRoot.rotation.set(0, 0, 0);
   yaw = pitch = bank = 0;
@@ -640,6 +1036,7 @@ function startGame(){
   camera.position.set(0, 2.6, 8.6);
   playing = true;
   clock.getDelta();
+  banner('УРОВЕНЬ 1');
 }
 
 function boot(){
@@ -647,6 +1044,7 @@ function boot(){
     initScene();
     bindControls();
     $('play').addEventListener('click', startGame);
+    $('again').addEventListener('click', startGame);
     $('boot').classList.add('hide');
     animate();
     checkVersion();
