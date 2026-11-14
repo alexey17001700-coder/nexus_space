@@ -616,10 +616,10 @@ function updatePlasma(dt){
     plasmaPos[i*3]   += plasmaVel[i*3]   * dt;
     plasmaPos[i*3+1] += plasmaVel[i*3+1] * dt;
     plasmaPos[i*3+2] += plasmaVel[i*3+2] * dt;
-    const k = Math.max(0, plasmaLife[i]) * 1.1;
-    plasmaCol[i*3]   = 0.25 * k;
-    plasmaCol[i*3+1] = 0.62 * k;
-    plasmaCol[i*3+2] = 1.0  * k;
+    const k = Math.max(0, plasmaLife[i]) * 0.8;
+    plasmaCol[i*3]   = 0.10 * k;
+    plasmaCol[i*3+1] = 0.26 * k;
+    plasmaCol[i*3+2] = 0.42 * k;
   }
   plasma.geometry.attributes.position.needsUpdate = true;
   plasma.geometry.attributes.color.needsUpdate = true;
