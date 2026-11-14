@@ -839,6 +839,7 @@ function spawnEnemy(){
 
 /* --- взрывы --- */
 function explode(pos, size, color){
+  // огненная вспышка
   const mat = new THREE.SpriteMaterial({ map: DOT, color, transparent: true, opacity: 1,
     blending: THREE.AdditiveBlending, depthWrite: false });
   const sp = new THREE.Sprite(mat);
@@ -846,6 +847,19 @@ function explode(pos, size, color){
   sp.scale.setScalar(size * 0.6);
   scene.add(sp);
   explosions.push({ sp, t: 0, dur: 0.5, size });
+
+  // белое раскалённое ядро
+  const coreMat = new THREE.SpriteMaterial({ map: DOT, color: 0xffffff, transparent: true, opacity: 0.95,
+    blending: THREE.AdditiveBlending, depthWrite: false });
+  const core = new THREE.Sprite(coreMat);
+  core.position.copy(pos);
+  core.scale.setScalar(size * 0.35);
+  scene.add(core);
+  explosions.push({ sp: core, t: 0, dur: 0.26, size: size * 0.95 });
+
+  // осколки и ударная волна
+  spawnDebris(pos, size, color);
+  spawnShockwave(pos, size, color);
 }
 function updateExplosions(dt){
   for (let i = explosions.length - 1; i >= 0; i--){
