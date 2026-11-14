@@ -1155,7 +1155,7 @@ function updateCombat(dt){
     if (b.life <= 0){ b.alive = false; b.mesh.visible = false; continue; }
     if (b.mesh.position.distanceTo(shipRoot.position) < 2.8){
       b.alive = false; b.mesh.visible = false;
-      hitPlayer(10);
+      hitPlayer(b.dmg || 10);
     }
   }
 
