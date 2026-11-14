@@ -712,6 +712,9 @@ function updateShockwaves(dt){
    ============================================================ */
 const MAX_LEVEL  = 5;
 const LEVEL_TIME = 30;              // секунд на уровень
+const ENEMY_SCALE = 1.9;            // базовый размер врага (было 1.35)
+const ENEMY_R_PER_SCALE = 1.78;     // радиус столкновения на единицу масштаба
+const ENEMY_GROW_DIST = 300;        // с какого расстояния враг начинает «расти»
 
 let bullets = [], asteroids = [], enemies = [], explosions = [], shockwaves = [];
 let score = 0, level = 1, hp = 100, maxHp = 100;
