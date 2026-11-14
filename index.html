@@ -829,6 +829,14 @@ function makeEnemy(){
     eng.position.set(s * 0.42, 0, -1.9);
     g.add(eng);
   });
+
+  // красный ореол — врага видно издалека
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: DOT, color: 0xff3355, transparent: true, opacity: 0.6,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  halo.scale.set(8, 8, 1);
+  g.add(halo);
   return g;
 }
 function spawnEnemy(){
