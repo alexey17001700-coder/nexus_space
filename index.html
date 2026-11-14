@@ -33,6 +33,12 @@
   #lvl{top:calc(116px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
     text-align:center;color:#ffd27f;font-size:11px}
   #lvl b{color:#fff}
+  #cred{top:calc(158px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
+    text-align:center;color:#a8ff9f;font-size:11px;min-width:110px}
+  #cred span{display:block;font-size:18px;font-weight:800;color:#eaffe6;letter-spacing:.02em}
+  #upg{left:10px;bottom:calc(78px + env(safe-area-inset-bottom));
+    color:#9fd8ff;font-size:11px;letter-spacing:.08em}
+  #upg b{color:#fff}
   #fps{bottom:calc(10px + env(safe-area-inset-bottom));right:10px;font-size:10px;color:#4d7f9e}
   #hint{bottom:calc(10px + env(safe-area-inset-bottom));left:10px;font-size:10px;color:#5f93b3;max-width:52vw;line-height:1.5}
   #hpwrap{position:absolute;left:10px;bottom:calc(56px + env(safe-area-inset-bottom));
@@ -46,6 +52,26 @@
   #reticle:before,#reticle:after{content:"";position:absolute;background:rgba(0,220,255,.55)}
   #reticle:before{left:50%;top:0;width:1px;height:14px;margin-left:-.5px;box-shadow:0 50px 0 rgba(0,220,255,.55)}
   #reticle:after{top:50%;left:0;height:1px;width:14px;margin-top:-.5px;box-shadow:50px 0 0 rgba(0,220,255,.55)}
+
+  /* ---------- Магазин ---------- */
+  .shopgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+    width:100%;max-width:540px;margin-bottom:20px}
+  .item{pointer-events:auto;padding:12px 8px;border-radius:14px;text-align:center;
+    background:rgba(6,18,34,.72);border:1px solid rgba(0,200,255,.3);
+    box-shadow:0 0 18px rgba(0,140,255,.14) inset}
+  .item .ico{font-size:26px;line-height:1.2}
+  .item .nm{font-size:11px;font-weight:800;letter-spacing:.12em;color:#bfe9ff;margin-top:2px}
+  .item .lv{font-size:10px;color:#7fd8ff;letter-spacing:.1em;margin:4px 0 2px}
+  .item .lv b{color:#fff}
+  .item .ds{font-size:9px;color:#5f93b3;line-height:1.4;min-height:28px;margin-bottom:8px}
+  .buy{pointer-events:auto;cursor:pointer;width:100%;border:none;border-radius:10px;
+    padding:9px 4px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#00131f;
+    background:linear-gradient(180deg,#9dffcf,#12c88a 60%,#0a8a5e);
+    box-shadow:0 0 16px rgba(0,220,140,.4);transition:transform .1s ease}
+  .buy b{color:#00131f}
+  .buy:disabled{opacity:.38;filter:grayscale(.7);box-shadow:none;cursor:default}
+  .buy:active:not(:disabled){transform:scale(.95)}
+  #shop .sub b{color:#eaffe6}
 
   /* ---------- Баннер уровня ---------- */
   #banner{position:fixed;left:50%;top:36%;transform:translate(-50%,-50%) scale(.6);
@@ -108,10 +134,12 @@
 <canvas id="c"></canvas>
 
 <div id="hud">
-  <div class="panel" id="ver">NEXUS SPACE <b>v2.0</b> · build 2</div>
+  <div class="panel" id="ver">NEXUS SPACE <b>v3.0</b> · build 3</div>
   <div class="panel" id="spd">скорость<span id="spdv">0</span></div>
   <div class="panel" id="score">очки<span id="scorev">0</span></div>
   <div class="panel" id="lvl">уровень <b id="lvlv">1</b> / 5</div>
+  <div class="panel" id="cred">кредиты<span id="credv">0</span></div>
+  <div class="panel" id="upg">⚡<b id="upgw">1</b> · 🛡<b id="upgs">1</b> · 🚀<b id="upge">1</b></div>
   <div id="hpwrap"><div id="hpbar"></div></div>
   <div class="panel" id="hint">Тяни палец по экрану — корабль летит за пальцем<br>Огонь автоматический · WASD / стрелки</div>
   <div class="panel" id="fps">-- fps</div>
@@ -120,19 +148,49 @@
 
 <div id="banner"></div>
 <div id="joy"><div id="knob"></div></div>
-<div id="build">NEXUS SPACE v2.0 · build 2</div>
+<div id="build">NEXUS SPACE v3.0 · build 3</div>
 <button id="upd">⬆ Новая версия — обновить</button>
 
 <div class="screen" id="start">
   <h1>NEXUS SPACE</h1>
-  <div class="sub">Этап 2 · бой и уровни</div>
+  <div class="sub">Этап 3 · прокачка и магазин</div>
   <button class="btn" id="play">Старт</button>
   <div class="keys">
     <b>Тяни палец</b> по экрану — управление кораблём<br>
     <b>Огонь</b> — автоматический, целься корпусом<br>
     <b>WASD / ←↑↓→</b> — на компьютере<br>
-    Версия: <b>v2.0 (build 2)</b>
+    <b>Магазин</b> — между уровнями, за кредиты<br>
+    Версия: <b>v3.0 (build 3)</b>
   </div>
+</div>
+
+<div class="screen hide" id="shop">
+  <h1>МАГАЗИН</h1>
+  <div class="sub">Уровень <b id="shopLvl">2</b> · Кредиты: <b id="shopCred">0</b></div>
+  <div class="shopgrid">
+    <div class="item">
+      <div class="ico">⚡</div>
+      <div class="nm">ОРУЖИЕ</div>
+      <div class="lv">ур. <b id="lw">1</b> / 5</div>
+      <div class="ds">Урон и скорострельность</div>
+      <button class="buy" id="buyw">Купить · <b id="cw">120</b></button>
+    </div>
+    <div class="item">
+      <div class="ico">🛡</div>
+      <div class="nm">ЩИТЫ</div>
+      <div class="lv">ур. <b id="ls">1</b> / 5</div>
+      <div class="ds">Прочность корпуса +40</div>
+      <button class="buy" id="buys">Купить · <b id="cs">140</b></button>
+    </div>
+    <div class="item">
+      <div class="ico">🚀</div>
+      <div class="nm">ДВИГАТЕЛЬ</div>
+      <div class="lv">ур. <b id="le">1</b> / 5</div>
+      <div class="ds">Скорость полёта +8</div>
+      <button class="buy" id="buye">Купить · <b id="ce">110</b></button>
+    </div>
+  </div>
+  <button class="btn" id="shopGo">Продолжить</button>
 </div>
 
 <div class="screen hide" id="over">
@@ -140,6 +198,7 @@
   <div class="sub" id="overSub">Корабль уничтожен</div>
   <div class="keys" style="margin-top:0;margin-bottom:24px">
     Очки: <b id="overScore">0</b><br>
+    Кредиты: <b id="overCred">0</b><br>
     Достигнутый уровень: <b id="overLevel">1</b>
   </div>
   <button class="btn" id="again">Ещё раз</button>
@@ -150,11 +209,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ============================================================
-   NEXUS SPACE — Этап 2: геймплей (астероиды, враги, стрельба, уровни)
-   Three.js (WebGL) + управление + камера-преследование
+   NEXUS SPACE — Этап 3: HUD, кредиты, магазин и прокачка
+   Three.js (WebGL) + бой + уровни + апгрейды
    ============================================================ */
-const BUILD_VERSION = "2.0";
-const BUILD_NUMBER  = 2;
+const BUILD_VERSION = "3.0";
+const BUILD_NUMBER  = 3;
 
 let renderer, scene, camera, clock;
 let shipRoot, shipModel, engineGlowL, engineGlowR, engineLight;
@@ -473,7 +532,7 @@ function updateTrail(dt){
 }
 
 /* ============================================================
-   ЭТАП 2: БОЙ — пули, астероиды, враги, взрывы, уровни
+   БОЙ — пули, астероиды, враги, взрывы, уровни
    ============================================================ */
 const MAX_LEVEL  = 5;
 const LEVEL_TIME = 30;              // секунд на уровень
@@ -481,7 +540,14 @@ const LEVEL_TIME = 30;              // секунд на уровень
 let bullets = [], asteroids = [], enemies = [], explosions = [];
 let score = 0, level = 1, hp = 100, maxHp = 100;
 let fireCd = 0, astTimer = 0, enTimer = 0, levelTimer = 0, invuln = 0;
-let shake = 0, gameOver = false, victory = false;
+let shake = 0, gameOver = false, victory = false, shopOpen = false;
+
+/* --- ЭТАП 3: кредиты и прокачка --- */
+let credits = 0;
+const UPG_MAX  = 5;
+const upg      = { weapon: 1, shield: 1, engine: 1 };
+const UPG_COST = { weapon: 120, shield: 140, engine: 110 };
+const BASE_HP  = 100;
 
 /* --- лазерные лучи --- */
 const bulletGeo = new THREE.CylinderGeometry(0.07, 0.07, 2.6, 8);
@@ -638,6 +704,7 @@ function damageObject(obj, dmg){
     obj.mesh.visible = false;
     explode(obj.mesh.position, obj.radius * 2.3, 0xffaa44);
     score += obj.points;
+    credits += Math.round(obj.points * 0.6);
   } else {
     explode(obj.mesh.position, obj.radius * 0.8, 0xffdd88);
   }
@@ -667,9 +734,9 @@ function updateSpawns(dt){
 
 /* --- бой --- */
 function updateCombat(dt){
-  // стрельба
+  // стрельба (скорострельность зависит от прокачки оружия)
   fireCd -= dt;
-  if (fireCd <= 0){ fire(); fireCd = 0.15; }
+  if (fireCd <= 0){ fire(); fireCd = Math.max(0.07, 0.15 - (upg.weapon - 1) * 0.02); }
 
   // пули
   for (const b of bullets){
@@ -682,13 +749,13 @@ function updateCombat(dt){
     for (const a of asteroids){
       if (!a.alive) continue;
       if (b.mesh.position.distanceTo(a.mesh.position) < a.radius + 1.4){
-        damageObject(a, 1); hit = true; break;
+        damageObject(a, upg.weapon); hit = true; break;
       }
     }
     if (!hit) for (const e of enemies){
       if (!e.alive) continue;
       if (b.mesh.position.distanceTo(e.mesh.position) < e.radius + 1.4){
-        damageObject(e, 1); hit = true; break;
+        damageObject(e, upg.weapon); hit = true; break;
       }
     }
     if (hit){ b.alive = false; b.mesh.visible = false; }
@@ -758,9 +825,62 @@ function updateLevel(dt){
   if (levelTimer >= LEVEL_TIME){
     levelTimer = 0;
     if (level >= MAX_LEVEL){ endGame(true); return; }
-    level++;
-    banner('УРОВЕНЬ ' + level);
+    openShop();
   }
+}
+
+/* ============================================================
+   ЭТАП 3: МАГАЗИН И ПРОКАЧКА
+   ============================================================ */
+function upgCost(kind){ return UPG_COST[kind] * upg[kind]; }
+
+function updateShopUI(){
+  $('shopLvl').textContent  = level;
+  $('shopCred').textContent = credits;
+  $('lw').textContent = upg.weapon;
+  $('ls').textContent = upg.shield;
+  $('le').textContent = upg.engine;
+
+  const cw = upgCost('weapon'), cs = upgCost('shield'), ce = upgCost('engine');
+  $('cw').textContent = cw;
+  $('cs').textContent = cs;
+  $('ce').textContent = ce;
+
+  $('buyw').disabled = upg.weapon >= UPG_MAX || credits < cw;
+  $('buys').disabled = upg.shield >= UPG_MAX || credits < cs;
+  $('buye').disabled = upg.engine >= UPG_MAX || credits < ce;
+}
+
+function openShop(){
+  playing  = false;
+  shopOpen = true;
+  level++;
+  updateShopUI();
+  $('shop').classList.remove('hide');
+}
+
+function closeShop(){
+  $('shop').classList.add('hide');
+  shopOpen = false;
+  levelTimer = 0;
+  astTimer = 1.2;
+  enTimer  = 2.6;
+  banner('УРОВЕНЬ ' + level);
+  clock.getDelta();
+  playing = true;
+}
+
+function buyUpgrade(kind){
+  const cost = upgCost(kind);
+  if (upg[kind] >= UPG_MAX || credits < cost) return;
+  credits -= cost;
+  upg[kind]++;
+  if (kind === 'shield'){
+    maxHp = BASE_HP + (upg.shield - 1) * 40;
+    hp = maxHp;
+  }
+  updateShopUI();
+  refreshHUD();
 }
 
 /* ---------------- Управление ---------------- */
@@ -854,8 +974,8 @@ function updateShip(dt){
   shipModel.rotation.z = bank;
   shipModel.rotation.x = -input.y * 0.08;
 
-  // движение вперёд
-  speed = 46 + Math.min(38, elapsed * 0.7);
+  // движение вперёд (базовая скорость + прокачка двигателя)
+  speed = 46 + (upg.engine - 1) * 8 + Math.min(38, elapsed * 0.7);
   fwd.set(0, 0, -1).applyQuaternion(shipRoot.quaternion);
   shipRoot.position.addScaledVector(fwd, speed * dt);
 
@@ -935,15 +1055,22 @@ function recycle(dt){
 
 /* ---------------- HUD ---------------- */
 let hudTick = 0;
+function refreshHUD(){
+  $('scorev').textContent = score;
+  $('lvlv').textContent   = level;
+  $('credv').textContent  = credits;
+  $('upgw').textContent   = upg.weapon;
+  $('upgs').textContent   = upg.shield;
+  $('upge').textContent   = upg.engine;
+  const pct = Math.max(0, hp) / maxHp * 100;
+  $('hpbar').style.width = pct + '%';
+  $('hpbar').classList.toggle('low', pct < 35);
+}
 function updateHUD(dt){
   fpsAcc += dt; fpsFrames++;
   hudTick += dt;
 
-  $('scorev').textContent = score;
-  $('lvlv').textContent = level;
-  const pct = Math.max(0, hp) / maxHp * 100;
-  $('hpbar').style.width = pct + '%';
-  $('hpbar').classList.toggle('low', pct < 35);
+  refreshHUD();
 
   if (hudTick > 0.35){
     $('spdv').textContent = Math.round(speed * 10);
@@ -956,10 +1083,13 @@ function updateHUD(dt){
 function endGame(win){
   playing = false;
   gameOver = true;
+  shopOpen = false;
   victory = win;
+  $('shop').classList.add('hide');
   $('overTitle').textContent = win ? 'МИССИЯ ВЫПОЛНЕНА' : 'ИГРА ОКОНЧЕНА';
   $('overSub').textContent   = win ? 'Все 5 уровней пройдены' : 'Корабль уничтожен';
   $('overScore').textContent = score;
+  $('overCred').textContent  = credits;
   $('overLevel').textContent = level;
   $('over').classList.remove('hide');
 }
@@ -971,15 +1101,17 @@ function resetGame(){
   asteroids = []; enemies = []; explosions = [];
   bullets.forEach(b => { b.alive = false; b.mesh.visible = false; });
 
-  score = 0; level = 1; hp = maxHp;
+  score = 0; level = 1;
+  credits = 0;
+  upg.weapon = upg.shield = upg.engine = 1;
+  maxHp = BASE_HP;
+  hp = maxHp;
   levelTimer = 0; astTimer = 1.0; enTimer = 2.4;
   fireCd = 0; invuln = 0; shake = 0;
-  gameOver = false; victory = false;
+  gameOver = false; victory = false; shopOpen = false;
   shipModel.visible = true;
-  $('scorev').textContent = '0';
-  $('lvlv').textContent = '1';
-  $('hpbar').style.width = '100%';
-  $('hpbar').classList.remove('low');
+  $('shop').classList.add('hide');
+  refreshHUD();
 }
 
 /* ---------------- Цикл ---------------- */
@@ -999,6 +1131,10 @@ function animate(){
     recycle(dt);
     updateCamera(dt);
     updateHUD(dt);
+  } else if (shopOpen){
+    updateExplosions(dt);
+    updateTrail(dt);
+    updateCamera(dt);
   } else if (gameOver){
     updateExplosions(dt);
     updateTrail(dt);
@@ -1026,6 +1162,7 @@ function onResize(){
 function startGame(){
   $('start').classList.add('hide');
   $('over').classList.add('hide');
+  $('shop').classList.add('hide');
   resetGame();
   shipRoot.position.set(0, 0, 0);
   shipRoot.rotation.set(0, 0, 0);
@@ -1045,6 +1182,10 @@ function boot(){
     bindControls();
     $('play').addEventListener('click', startGame);
     $('again').addEventListener('click', startGame);
+    $('shopGo').addEventListener('click', closeShop);
+    $('buyw').addEventListener('click', () => buyUpgrade('weapon'));
+    $('buys').addEventListener('click', () => buyUpgrade('shield'));
+    $('buye').addEventListener('click', () => buyUpgrade('engine'));
     $('boot').classList.add('hide');
     animate();
     checkVersion();
