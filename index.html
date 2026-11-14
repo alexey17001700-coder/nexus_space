@@ -1507,9 +1507,14 @@ function updateBoss(dt){
     explode(shipRoot.position, 12, 0xff8844);
     shake = 1.2;
     if (invuln <= 0){
-      hp -= 20; invuln = 1.4;
-      if (hp <= maxHp * 0.35) say('Критические повреждения');
-      if (hp <= 0){ hp = 0; endGame(false); return; }
+      const rest = absorbShield(20);
+      if (rest > 0){
+        hp -= rest;
+        if (hp <= maxHp * 0.35) say('Критические повреждения');
+        if (hp <= 0){ hp = 0; endGame(false); return; }
+      }
+      invuln = 1.4;
+      refreshHUD();
     }
   }
 
