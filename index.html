@@ -1243,7 +1243,7 @@ function recycle(dt){
     s.geometry.attributes.position.needsUpdate = true;
   });
   nebulas.forEach(n => wrap(n, n.userData.spread));
-  if (planet) wrap(planet, planet.userData.spread);
+  planets.forEach(p => wrap(p, p.userData.spread));
   if (sunSprite) wrap(sunSprite, sunSprite.userData.spread);
 }
 
