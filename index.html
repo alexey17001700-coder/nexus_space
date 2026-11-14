@@ -547,6 +547,16 @@ function spawnTrail(){
     trailVel[i*3] = _v2.x * 9; trailVel[i*3+1] = _v2.y * 9; trailVel[i*3+2] = _v2.z * 9;
     trailLife[i] = 0.55 + Math.random() * 0.35;
   }
+  // плазменный шлейф — крупная мягкая частица между соплами
+  const pi = plasmaIdx = (plasmaIdx + 1) % PLASMA_MAX;
+  engineGlowL.getWorldPosition(_v1);
+  engineGlowR.getWorldPosition(_v2);
+  plasmaPos[pi*3]   = (_v1.x + _v2.x) * 0.5;
+  plasmaPos[pi*3+1] = (_v1.y + _v2.y) * 0.5;
+  plasmaPos[pi*3+2] = (_v1.z + _v2.z) * 0.5;
+  _v2.set((Math.random()-0.5)*0.8, (Math.random()-0.5)*0.8, 1).applyQuaternion(shipRoot.quaternion);
+  plasmaVel[pi*3] = _v2.x * 5; plasmaVel[pi*3+1] = _v2.y * 5; plasmaVel[pi*3+2] = _v2.z * 5;
+  plasmaLife[pi] = 0.7 + Math.random() * 0.5;
 }
 function updateTrail(dt){
   for (let i = 0; i < TRAIL_MAX; i++){
