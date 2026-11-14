@@ -1722,6 +1722,29 @@ function updateShip(dt){
   engineLight.intensity = 1.3 + pulse * 0.7;
 
   // шлейф за кораблём убран — в вакууме остаётся только пламя из сопел
+
+  // --- щит: регенерация и визуал ---
+  if (shieldRegenDelay > 0) shieldRegenDelay -= dt;
+  else if (shieldHp < maxShield) shieldHp = Math.min(maxShield, shieldHp + SHIELD_REGEN * dt);
+
+  if (shieldMesh){
+    const on = shieldHp > 0;
+    shieldMesh.visible = on;
+    if (on){
+      const frac = shieldHp / maxShield;
+      shieldFlash = Math.max(0, shieldFlash - dt * 2.4);
+      shieldMesh.material.opacity = 0.09 + frac * 0.10 + shieldFlash * 0.55;
+      shieldMesh.material.color.setHSL(0.55 - shieldFlash * 0.52, 1, 0.62);
+      const w = shieldMesh.userData.wire;
+      if (w) w.material.opacity = 0.05 + frac * 0.07 + shieldFlash * 0.35;
+      const h = shieldMesh.userData.halo;
+      if (h) h.material.opacity = 0.12 + frac * 0.12 + shieldFlash * 0.5;
+      shieldMesh.rotation.y += dt * 0.35;
+      shieldMesh.rotation.z = Math.sin(elapsed * 0.9) * 0.08;
+      const s = 1 + shieldFlash * 0.06;
+      shieldMesh.scale.set(s, 0.86 * s, 1.18 * s);
+    }
+  }
 }
 
 /* ---------------- Камера-преследование ---------------- */
