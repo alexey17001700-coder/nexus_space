@@ -857,7 +857,7 @@ function spawnOneEnemy(i){
   const vel = new THREE.Vector3().subVectors(shipRoot.position, mesh.position);
   vel.x += (Math.random() - 0.5) * 18;
   vel.y += (Math.random() - 0.5) * 18;
-  vel.normalize().multiplyScalar(46 + level * 12 + Math.random() * 16);
+  vel.normalize().multiplyScalar(32 + level * 8 + Math.random() * 12);
 
   enemies.push({
     mesh, vel, radius: 2.4, hp: 2 + Math.floor(level / 2), alive: true,
