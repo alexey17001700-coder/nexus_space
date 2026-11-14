@@ -747,6 +747,11 @@ let bullets = [], asteroids = [], enemies = [], explosions = [], shockwaves = []
 let boss = null, bossParts = [], bossDeath = 0, bossShootCd = 0;
 const bossCourse = new THREE.Vector3();
 let score = 0, level = 1, hp = 100, maxHp = 100;
+/* --- ЭТАП 6: энергетический щит вокруг корабля --- */
+let shieldMesh = null, shieldHp = 100, maxShield = 100;
+let shieldRegenDelay = 0, shieldFlash = 0;
+const BASE_SHIELD = 100;
+const SHIELD_REGEN = 7;      // единиц в секунду после паузы
 let fireCd = 0, astTimer = 0, enTimer = 0, levelTimer = 0, invuln = 0;
 let shake = 0, gameOver = false, victory = false, shopOpen = false;
 
