@@ -1086,7 +1086,7 @@ function updateCombat(dt){
     const near = Math.max(0, Math.min(1, (ENEMY_GROW_DIST - dist) / ENEMY_GROW_DIST));
     const sc = ENEMY_SCALE * (1 + near * 1.0);
     e.mesh.scale.setScalar(sc);
-    e.radius = (2.4 / 1.35) * sc;
+    e.radius = ENEMY_R_PER_SCALE * sc;
 
     // ореол, ядро и маркер держим одного размера в мире (компенсируем масштаб)
     const inv = 1 / sc;
