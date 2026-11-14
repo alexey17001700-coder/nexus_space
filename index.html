@@ -1067,6 +1067,20 @@ function updateCombat(dt){
     e.mesh.position.addScaledVector(e.vel, dt);
     e.mesh.lookAt(shipRoot.position);
 
+    // пульсация ореола и маркера — врага отлично видно
+    const halo = e.mesh.userData.halo;
+    if (halo) halo.scale.setScalar(12 + Math.sin(elapsed * 7 + e.mesh.position.x * 0.3) * 2.4);
+    const mark = e.mesh.userData.mark;
+    if (mark) mark.scale.setScalar(1.4 + Math.sin(elapsed * 9 + e.mesh.position.y) * 0.5);
+
+    // враги стреляют в ответ
+    e.fireCd -= dt;
+    const dist = e.mesh.position.distanceTo(shipRoot.position);
+    if (e.fireCd <= 0 && dist < 300){
+      enemyFire(e);
+      e.fireCd = Math.max(0.65, 2.1 - level * 0.22) * (0.7 + Math.random() * 0.8);
+    }
+
     if (e.mesh.position.distanceTo(shipRoot.position) < e.radius + 2.0){
       e.alive = false; e.mesh.visible = false;
       explode(e.mesh.position, e.radius * 2.4, 0xff4466);
