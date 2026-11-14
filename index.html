@@ -562,6 +562,124 @@ function updateTrail(dt){
   }
   trail.geometry.attributes.position.needsUpdate = true;
   trail.geometry.attributes.color.needsUpdate = true;
+  updatePlasma(dt);
+}
+
+/* ---------------- Плазменный шлейф (крупные мягкие частицы) ---------------- */
+const PLASMA_MAX = 220;
+let plasma, plasmaPos, plasmaCol, plasmaLife, plasmaVel, plasmaIdx = 0;
+function buildPlasma(){
+  plasmaPos  = new Float32Array(PLASMA_MAX * 3);
+  plasmaCol  = new Float32Array(PLASMA_MAX * 3);
+  plasmaLife = new Float32Array(PLASMA_MAX);
+  plasmaVel  = new Float32Array(PLASMA_MAX * 3);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(plasmaPos, 3));
+  geo.setAttribute('color',    new THREE.BufferAttribute(plasmaCol, 3));
+  const mat = new THREE.PointsMaterial({
+    size: 2.6, map: DOT, vertexColors: true, transparent: true, opacity: 0.55,
+    depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+  });
+  plasma = new THREE.Points(geo, mat);
+  plasma.frustumCulled = false;
+  scene.add(plasma);
+}
+function updatePlasma(dt){
+  for (let i = 0; i < PLASMA_MAX; i++){
+    if (plasmaLife[i] <= 0){ plasmaCol[i*3] = plasmaCol[i*3+1] = plasmaCol[i*3+2] = 0; continue; }
+    plasmaLife[i] -= dt;
+    plasmaPos[i*3]   += plasmaVel[i*3]   * dt;
+    plasmaPos[i*3+1] += plasmaVel[i*3+1] * dt;
+    plasmaPos[i*3+2] += plasmaVel[i*3+2] * dt;
+    const k = Math.max(0, plasmaLife[i]) * 1.1;
+    plasmaCol[i*3]   = 0.25 * k;
+    plasmaCol[i*3+1] = 0.62 * k;
+    plasmaCol[i*3+2] = 1.0  * k;
+  }
+  plasma.geometry.attributes.position.needsUpdate = true;
+  plasma.geometry.attributes.color.needsUpdate = true;
+}
+
+/* ---------------- Осколки (debris) ---------------- */
+const DEBRIS_MAX = 300;
+let debris, debrisPos, debrisCol, debrisBase, debrisLife, debrisVel, debrisIdx = 0;
+function buildDebris(){
+  debrisPos  = new Float32Array(DEBRIS_MAX * 3);
+  debrisCol  = new Float32Array(DEBRIS_MAX * 3);
+  debrisBase = new Float32Array(DEBRIS_MAX * 3);
+  debrisLife = new Float32Array(DEBRIS_MAX);
+  debrisVel  = new Float32Array(DEBRIS_MAX * 3);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(debrisPos, 3));
+  geo.setAttribute('color',    new THREE.BufferAttribute(debrisCol, 3));
+  const mat = new THREE.PointsMaterial({
+    size: 0.7, map: DOT, vertexColors: true, transparent: true,
+    depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+  });
+  debris = new THREE.Points(geo, mat);
+  debris.frustumCulled = false;
+  scene.add(debris);
+}
+function spawnDebris(pos, size, color){
+  const c = new THREE.Color(color);
+  const n = Math.min(70, 16 + Math.round(size * 3));
+  for (let k = 0; k < n; k++){
+    const i = debrisIdx = (debrisIdx + 1) % DEBRIS_MAX;
+    debrisPos[i*3] = pos.x; debrisPos[i*3+1] = pos.y; debrisPos[i*3+2] = pos.z;
+    const sp = size * (0.7 + Math.random() * 1.6);
+    debrisVel[i*3]   = (Math.random() - 0.5) * sp;
+    debrisVel[i*3+1] = (Math.random() - 0.5) * sp;
+    debrisVel[i*3+2] = (Math.random() - 0.5) * sp;
+    debrisLife[i] = 0.5 + Math.random() * 0.8;
+    const t = 0.55 + Math.random() * 0.45;
+    debrisBase[i*3]   = c.r * t + (1 - t) * 1.0;
+    debrisBase[i*3+1] = c.g * t + (1 - t) * 0.92;
+    debrisBase[i*3+2] = c.b * t + (1 - t) * 0.6;
+  }
+}
+function updateDebris(dt){
+  for (let i = 0; i < DEBRIS_MAX; i++){
+    if (debrisLife[i] <= 0){ debrisCol[i*3] = debrisCol[i*3+1] = debrisCol[i*3+2] = 0; continue; }
+    debrisLife[i] -= dt;
+    debrisVel[i*3]   *= 0.965;
+    debrisVel[i*3+1] *= 0.965;
+    debrisVel[i*3+2] *= 0.965;
+    debrisPos[i*3]   += debrisVel[i*3]   * dt;
+    debrisPos[i*3+1] += debrisVel[i*3+1] * dt;
+    debrisPos[i*3+2] += debrisVel[i*3+2] * dt;
+    const k = Math.max(0, debrisLife[i]) * 1.5;
+    debrisCol[i*3]   = debrisBase[i*3]   * k;
+    debrisCol[i*3+1] = debrisBase[i*3+1] * k;
+    debrisCol[i*3+2] = debrisBase[i*3+2] * k;
+  }
+  debris.geometry.attributes.position.needsUpdate = true;
+  debris.geometry.attributes.color.needsUpdate = true;
+}
+
+/* ---------------- Ударная волна (shockwave) ---------------- */
+const shockGeo = new THREE.RingGeometry(0.55, 1.0, 56);
+function spawnShockwave(pos, size, color){
+  const mat = new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.85, side: THREE.DoubleSide,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  const ring = new THREE.Mesh(shockGeo, mat);
+  ring.position.copy(pos);
+  ring.lookAt(camera.position);
+  ring.scale.setScalar(size * 0.4);
+  scene.add(ring);
+  shockwaves.push({ ring, t: 0, dur: 0.55, size });
+}
+function updateShockwaves(dt){
+  for (let i = shockwaves.length - 1; i >= 0; i--){
+    const s = shockwaves[i];
+    s.t += dt;
+    const k = s.t / s.dur;
+    if (k >= 1){ scene.remove(s.ring); s.ring.material.dispose(); shockwaves.splice(i, 1); continue; }
+    s.ring.scale.setScalar(s.size * (0.4 + k * 2.4));
+    s.ring.material.opacity = 0.85 * (1 - k);
+    s.ring.lookAt(camera.position);
+  }
 }
 
 /* ============================================================
