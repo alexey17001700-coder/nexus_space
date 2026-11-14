@@ -832,11 +832,22 @@ function makeEnemy(){
 
   // красный ореол — врага видно издалека
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: DOT, color: 0xff3355, transparent: true, opacity: 0.6,
+    map: DOT, color: 0xff3355, transparent: true, opacity: 0.8,
     blending: THREE.AdditiveBlending, depthWrite: false
   }));
-  halo.scale.set(8, 8, 1);
+  halo.scale.set(13, 13, 1);
   g.add(halo);
+  g.userData.halo = halo;
+
+  // маркер-«прицел» над врагом — заметно даже в гуще боя
+  const mark = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: DOT, color: 0xffe066, transparent: true, opacity: 0.9,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  mark.scale.set(1.6, 1.6, 1);
+  mark.position.set(0, 1.6, 0);
+  g.add(mark);
+  g.userData.mark = mark;
   return g;
 }
 function spawnEnemy(){
