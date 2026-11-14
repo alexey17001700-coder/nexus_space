@@ -1092,6 +1092,18 @@ function updateCombat(dt){
     }
   }
 
+  // вражеские лазеры
+  for (const b of eBullets){
+    if (!b.alive) continue;
+    b.life -= dt;
+    b.mesh.position.addScaledVector(b.vel, dt);
+    if (b.life <= 0){ b.alive = false; b.mesh.visible = false; continue; }
+    if (b.mesh.position.distanceTo(shipRoot.position) < 2.8){
+      b.alive = false; b.mesh.visible = false;
+      hitPlayer();
+    }
+  }
+
   // уборка
   for (let i = asteroids.length - 1; i >= 0; i--){
     const a = asteroids[i];
