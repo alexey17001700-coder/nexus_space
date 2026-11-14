@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>NEXUS SPACE — 3D космос</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{width:100%;height:100%;overflow:hidden;background:#000;
+    font-family:"Segoe UI",Roboto,system-ui,-apple-system,sans-serif;
+    color:#cfe9ff;user-select:none;touch-action:none}
+  #c{position:fixed;inset:0;display:block;width:100%;height:100%}
+
+  /* ---------- HUD ---------- */
+  #hud{position:fixed;inset:0;pointer-events:none;z-index:10}
+  .panel{
+    position:absolute;padding:8px 12px;border-radius:10px;
+    background:rgba(6,18,34,.55);border:1px solid rgba(0,200,255,.28);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+    box-shadow:0 0 18px rgba(0,140,255,.18) inset,0 4px 18px rgba(0,0,0,.5)
+  }
+  #ver{top:calc(10px + env(safe-area-inset-top));left:10px;color:#7fd8ff}
+  #ver b{color:#fff}
+  #spd{top:calc(10px + env(safe-area-inset-top));right:10px;text-align:right;color:#7fd8ff}
+  #spd span{display:block;font-size:20px;font-weight:700;color:#eaf7ff;letter-spacing:.02em}
+  #fps{bottom:calc(10px + env(safe-area-inset-bottom));right:10px;font-size:10px;color:#4d7f9e}
+  #hint{bottom:calc(10px + env(safe-area-inset-bottom));left:10px;font-size:10px;color:#5f93b3;max-width:52vw;line-height:1.5}
+  #reticle{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;opacity:.5}
+  #reticle:before,#reticle:after{content:"";position:absolute;background:rgba(0,220,255,.55)}
+  #reticle:before{left:50%;top:0;width:1px;height:14px;margin-left:-.5px;box-shadow:0 50px 0 rgba(0,220,255,.55)}
+  #reticle:after{top:50%;left:0;height:1px;width:14px;margin-top:-.5px;box-shadow:50px 0 0 rgba(0,220,255,.55)}
+
+  /* ---------- Джойстик ---------- */
+  #joy{position:fixed;z-index:12;width:130px;height:130px;margin:-65px 0 0 -65px;
+    border-radius:50%;border:2px solid rgba(0,200,255,.35);
+    background:radial-gradient(circle,rgba(0,120,200,.18),rgba(0,40,80,.06));
+    display:none;pointer-events:none}
+  #joy.on{display:block}
+  #knob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;
+    border-radius:50%;background:radial-gradient(circle at 35% 30%,#8ff0ff,#0a86c8 60%,#053a5c);
+    box-shadow:0 0 22px rgba(0,200,255,.7)}
+
+  /* ---------- Экраны ---------- */
+  .screen{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:24px;
+    background:radial-gradient(ellipse at 50% 40%,rgba(0,60,120,.45),rgba(0,0,0,.92) 70%)}
+  .screen.hide{display:none}
+  h1{font-size:clamp(30px,9vw,64px);font-weight:800;letter-spacing:.16em;
+    background:linear-gradient(180deg,#ffffff,#39c8ff 55%,#0a5f9e);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 40px rgba(0,180,255,.45);margin-bottom:6px}
+  .sub{font-size:clamp(10px,3vw,13px);letter-spacing:.34em;color:#5fa8d8;text-transform:uppercase;margin-bottom:26px}
+  .btn{pointer-events:auto;cursor:pointer;border:none;border-radius:14px;
+    padding:16px 46px;font-size:16px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+    color:#00131f;background:linear-gradient(180deg,#8ff0ff,#12a6e0 60%,#0a6ea8);
+    box-shadow:0 0 30px rgba(0,190,255,.55),0 8px 26px rgba(0,0,0,.6);
+    transition:transform .12s ease,box-shadow .12s ease}
+  .btn:active{transform:scale(.96);box-shadow:0 0 16px rgba(0,190,255,.5)}
+  .keys{margin-top:26px;font-size:11px;line-height:2;color:#6ea9c9;letter-spacing:.08em}
+  .keys b{color:#bfe9ff}
+  #build{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:50%;
+    transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#3d6b88;z-index:11}
+
+  /* ---------- Кнопка обновления ---------- */
+  #upd{position:fixed;z-index:30;left:50%;top:calc(14px + env(safe-area-inset-top));
+    transform:translateX(-50%);display:none;cursor:pointer;
+    padding:10px 18px;border-radius:12px;font-size:12px;font-weight:700;letter-spacing:.1em;
+    color:#00131f;background:linear-gradient(180deg,#ffe08a,#ffb020);
+    box-shadow:0 0 24px rgba(255,180,40,.6);border:none}
+  #upd.on{display:block}
+  #boot{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
+    background:#000;color:#4fd0ff;font-size:12px;letter-spacing:.3em}
+  #boot.hide{display:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div class="panel" id="ver">NEXUS SPACE <b>v1.0</b> · build 1</div>
+  <div class="panel" id="spd">скорость<span id="spdv">0</span></div>
+  <div class="panel" id="hint">Тяни палец по экрану — корабль летит за пальцем<br>Клавиатура: WASD / стрелки</div>
+  <div class="panel" id="fps">-- fps</div>
+  <div id="reticle"></div>
+</div>
+
+<div id="joy"><div id="knob"></div></div>
+<div id="build">NEXUS SPACE v1.0 · build 1</div>
+<button id="upd">⬆ Новая версия — обновить</button>
+
+<div class="screen" id="start">
+  <h1>NEXUS SPACE</h1>
+  <div class="sub">Этап 1 · 3D-движок</div>
+  <button class="btn" id="play">Старт</button>
+  <div class="keys">
+    <b>Тяни палец</b> по экрану — управление кораблём<br>
+    <b>WASD / ←↑↓→</b> — на компьютере<br>
+    Версия: <b>v1.0 (build 1)</b>
+  </div>
+</div>
+
+<div id="boot">ЗАГРУЗКА ДВИГАТЕЛЯ…</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ============================================================
+   NEXUS SPACE — Этап 1: база и 3D-движок
+   Three.js (WebGL) + управление + камера-преследование
+   ============================================================ */
+const BUILD_VERSION = "1.0";
+const BUILD_NUMBER  = 1;
+
+let renderer, scene, camera, clock;
+let shipRoot, shipModel, engineGlowL, engineGlowR, engineLight;
+let stars = [], nebulas = [], planet, sunSprite;
+let trail, trailPos, trailCol, trailLife, trailVel, trailIdx = 0;
+const TRAIL_MAX = 420;
+
+let playing = false, elapsed = 0, speed = 46, fpsAcc = 0, fpsFrames = 0;
+let yaw = 0, pitch = 0, bank = 0;
+const input = { x: 0, y: 0 };       // сглаженный ввод -1..1
+const raw   = { x: 0, y: 0 };       // сырой ввод
+const keys  = {};
+let joyActive = false, joyId = null, joyStart = { x: 0, y: 0 }, joyVec = { x: 0, y: 0 };
+
+const $ = id => document.getElementById(id);
+
+/* ---------------- Текстуры (генерим на canvas) ---------------- */
+function dotTexture(){
+  const s = 64, cv = document.createElement('canvas');
+  cv.width = cv.height = s;
+  const ctx = cv.getContext('2d');
+  const g = ctx.createRadialGradient(s/2, s/2, 0, s/2, s/2, s/2);
+  g.addColorStop(0,   'rgba(255,255,255,1)');
+  g.addColorStop(0.3, 'rgba(255,255,255,0.7)');
+  g.addColorStop(1,   'rgba(255,255,255,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, s, s);
+  return new THREE.CanvasTexture(cv);
+}
+function nebulaTexture(hex){
+  const s = 256, cv = document.createElement('canvas');
+  cv.width = cv.height = s;
+  const ctx = cv.getContext('2d');
+  const g = ctx.createRadialGradient(s/2, s/2, 0, s/2, s/2, s/2);
+  g.addColorStop(0,    hex + 'cc');
+  g.addColorStop(0.35, hex + '55');
+  g.addColorStop(1,    hex + '00');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, s, s);
+  return new THREE.CanvasTexture(cv);
+}
+const DOT = dotTexture();
+
+/* ---------------- Сцена ---------------- */
+function initScene(){
+  renderer = new THREE.WebGLRenderer({ canvas: $('c'), antialias: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  if (THREE.sRGBEncoding) renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x02060f, 0.0016);
+
+  camera = new THREE.PerspectiveCamera(72, innerWidth / innerHeight, 0.1, 6000);
+  camera.position.set(0, 3, 10);
+
+  clock = new THREE.Clock();
+
+  /* --- свет --- */
+  scene.add(new THREE.AmbientLight(0x2a4a6e, 0.85));
+  const hemi = new THREE.HemisphereLight(0x88bbff, 0x101828, 0.5);
+  scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xfff2d8, 1.5);
+  sun.position.set(6, 9, 5);
+  scene.add(sun);
+  const rim = new THREE.DirectionalLight(0x3fa8ff, 0.9);
+  rim.position.set(-7, -3, -6);
+  scene.add(rim);
+
+  buildStars();
+  buildNebulas();
+  buildPlanet();
+  buildSun();
+  buildShip();
+  buildTrail();
+
+  addEventListener('resize', onResize);
+}
+
+/* ---------------- Звёзды (particle system, 3 слоя) ---------------- */
+function starLayer(count, spread, size, colorA, colorB, opacity){
+  const pos = new Float32Array(count * 3);
+  const col = new Float32Array(count * 3);
+  const cA = new THREE.Color(colorA), cB = new THREE.Color(colorB), tmp = new THREE.Color();
+  for (let i = 0; i < count; i++){
+    pos[i*3]   = (Math.random() - 0.5) * spread;
+    pos[i*3+1] = (Math.random() - 0.5) * spread;
+    pos[i*3+2] = (Math.random() - 0.5) * spread * 2;
+    tmp.copy(cA).lerp(cB, Math.random());
+    col[i*3] = tmp.r; col[i*3+1] = tmp.g; col[i*3+2] = tmp.b;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color',    new THREE.BufferAttribute(col, 3));
+  const mat = new THREE.PointsMaterial({
+    size, map: DOT, vertexColors: true, transparent: true, opacity,
+    depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+  });
+  const pts = new THREE.Points(geo, mat);
+  pts.userData = { spread, pos };
+  scene.add(pts);
+  stars.push(pts);
+  return pts;
+}
+function buildStars(){
+  starLayer(1600, 1400, 1.6, 0xffffff, 0xa8d8ff, 0.95);
+  starLayer(900,  1800, 3.0, 0x9fd0ff, 0xffd9a8, 0.75);
+  starLayer(260,  2200, 6.0, 0xffffff, 0x7fb8ff, 0.5);
+}
+
+/* ---------------- Туманности ---------------- */
+function buildNebulas(){
+  const palette = ['#3b2a8c', '#0d5f8c', '#7a1f6b', '#14406e', '#2b6f7a'];
+  for (let i = 0; i < 7; i++){
+    const hex = palette[i % palette.length];
+    const mat = new THREE.SpriteMaterial({
+      map: nebulaTexture(hex), transparent: true, opacity: 0.32,
+      depthWrite: false, blending: THREE.AdditiveBlending
+    });
+    const sp = new THREE.Sprite(mat);
+    const sc = 500 + Math.random() * 900;
+    sp.scale.set(sc, sc, 1);
+    sp.position.set((Math.random()-0.5)*2600, (Math.random()-0.5)*1800, -400 - Math.random()*2200);
+    sp.userData = { spread: 2600 };
+    scene.add(sp);
+    nebulas.push(sp);
+  }
+}
+
+/* ---------------- Планета и солнце ---------------- */
+function buildPlanet(){
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(
+    new THREE.SphereGeometry(90, 48, 32),
+    new THREE.MeshStandardMaterial({ color: 0x2f5f9e, roughness: 0.95, metalness: 0.05,
+      emissive: 0x0a1e3a, emissiveIntensity: 0.6 })
+  );
+  g.add(body);
+  const atmo = new THREE.Mesh(
+    new THREE.SphereGeometry(96, 48, 32),
+    new THREE.MeshBasicMaterial({ color: 0x4fa8ff, transparent: true, opacity: 0.12,
+      side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  g.add(atmo);
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(120, 175, 96),
+    new THREE.MeshBasicMaterial({ color: 0x8fd0ff, transparent: true, opacity: 0.16,
+      side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
+  ring.rotation.set(-1.15, 0.4, 0.2);
+  g.add(ring);
+  g.position.set(-320, 120, -900);
+  g.userData = { spread: 3000 };
+  scene.add(g);
+  planet = g;
+}
+function buildSun(){
+  const s = 512, cv = document.createElement('canvas');
+  cv.width = cv.height = s;
+  const ctx = cv.getContext('2d');
+  const g = ctx.createRadialGradient(s/2, s/2, 0, s/2, s/2, s/2);
+  g.addColorStop(0,   'rgba(255,255,240,1)');
+  g.addColorStop(0.12,'rgba(255,232,170,0.9)');
+  g.addColorStop(0.4, 'rgba(255,170,80,0.28)');
+  g.addColorStop(1,   'rgba(255,120,40,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, s, s);
+  const mat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv),
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+  sunSprite = new THREE.Sprite(mat);
+  sunSprite.scale.set(900, 900, 1);
+  sunSprite.position.set(700, 380, -2400);
+  sunSprite.userData = { spread: 3000 };
+  scene.add(sunSprite);
+}
+
+/* ---------------- Корабль (из простых фигур, металл) ---------------- */
+function buildShip(){
+  shipRoot = new THREE.Group();
+  shipRoot.rotation.order = 'YXZ';
+  shipModel = new THREE.Group();
+  shipRoot.add(shipModel);
+  scene.add(shipRoot);
+
+  const hull = new THREE.MeshStandardMaterial({ color: 0xb9c6d6, metalness: 0.98, roughness: 0.24 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x2a3442, metalness: 0.85, roughness: 0.42 });
+  const accent = new THREE.MeshStandardMaterial({ color: 0x00c8ff, metalness: 0.7, roughness: 0.25,
+    emissive: 0x0088cc, emissiveIntensity: 1.1 });
+  const glass = new THREE.MeshStandardMaterial({ color: 0x081826, metalness: 0.95, roughness: 0.06,
+    emissive: 0x0a3a66, emissiveIntensity: 0.7 });
+  const hot = new THREE.MeshBasicMaterial({ color: 0x9ff2ff });
+
+  // фюзеляж
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.8, 3.4, 20), hull);
+  body.rotation.x = Math.PI / 2;
+  shipModel.add(body);
+
+  // нос
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.62, 1.7, 20), hull);
+  nose.rotation.x = -Math.PI / 2;
+  nose.position.z = -2.55;
+  shipModel.add(nose);
+
+  // носовой обтекатель-акцент
+  const noseTip = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.7, 12), accent);
+  noseTip.rotation.x = -Math.PI / 2;
+  noseTip.position.z = -3.6;
+  shipModel.add(noseTip);
+
+  // кабина
+  const cockpit = new THREE.Mesh(new THREE.SphereGeometry(0.5, 20, 14), glass);
+  cockpit.scale.set(0.95, 0.72, 1.9);
+  cockpit.position.set(0, 0.42, -0.75);
+  shipModel.add(cockpit);
+
+  // крылья (стреловидные)
+  [-1, 1].forEach(s => {
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.14, 1.15), hull);
+    wing.position.set(s * 1.15, -0.05, 0.35);
+    wing.rotation.z = s * 0.16;
+    wing.rotation.y = s * -0.22;
+    shipModel.add(wing);
+
+    const tip = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.5, 0.85), accent);
+    tip.position.set(s * 2.0, 0.12, 0.5);
+    tip.rotation.z = s * 0.16;
+    shipModel.add(tip);
+
+    const gun = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 1.5, 10), dark);
+    gun.rotation.x = Math.PI / 2;
+    gun.position.set(s * 1.35, -0.02, -0.85);
+    shipModel.add(gun);
+  });
+
+  // двигатели
+  [-1, 1].forEach(s => {
+    const eng = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.4, 1.25, 16), dark);
+    eng.rotation.x = Math.PI / 2;
+    eng.position.set(s * 0.5, -0.1, 1.75);
+    shipModel.add(eng);
+
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.06, 8, 20), accent);
+    ring.position.set(s * 0.5, -0.1, 1.15);
+    shipModel.add(ring);
+
+    const flame = new THREE.Mesh(new THREE.ConeGeometry(0.3, 1.5, 14), hot);
+    flame.rotation.x = Math.PI / 2;
+    flame.position.set(s * 0.5, -0.1, 3.1);
+    shipModel.add(flame);
+    if (s < 0) engineGlowL = flame; else engineGlowR = flame;
+  });
+
+  // киль
+  const fin = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.95, 1.0), hull);
+  fin.position.set(0, 0.62, 1.5);
+  shipModel.add(fin);
+  const finTip = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.3, 0.5), accent);
+  finTip.position.set(0, 1.12, 1.6);
+  shipModel.add(finTip);
+
+  // полосы на корпусе
+  [-1, 1].forEach(s => {
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.16, 2.4), accent);
+    stripe.position.set(s * 0.72, 0.18, 0.1);
+    shipModel.add(stripe);
+  });
+
+  // свет двигателей
+  engineLight = new THREE.PointLight(0x66ddff, 3.2, 26, 2);
+  engineLight.position.set(0, -0.1, 3.2);
+  shipModel.add(engineLight);
+}
+
+/* ---------------- След двигателя (particles) ---------------- */
+function buildTrail(){
+  trailPos  = new Float32Array(TRAIL_MAX * 3);
+  trailCol  = new Float32Array(TRAIL_MAX * 3);
+  trailLife = new Float32Array(TRAIL_MAX);
+  trailVel  = new Float32Array(TRAIL_MAX * 3);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
+  geo.setAttribute('color',    new THREE.BufferAttribute(trailCol, 3));
+  const mat = new THREE.PointsMaterial({
+    size: 0.85, map: DOT, vertexColors: true, transparent: true,
+    depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+  });
+  trail = new THREE.Points(geo, mat);
+  trail.frustumCulled = false;
+  scene.add(trail);
+}
+const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3();
+function spawnTrail(){
+  const nozzles = [engineGlowL, engineGlowR];
+  for (let n = 0; n < 2; n++){
+    const i = trailIdx = (trailIdx + 1) % TRAIL_MAX;
+    nozzles[n].getWorldPosition(_v1);
+    trailPos[i*3] = _v1.x; trailPos[i*3+1] = _v1.y; trailPos[i*3+2] = _v1.z;
+    _v2.set((Math.random()-0.5)*1.2, (Math.random()-0.5)*1.2, 1).applyQuaternion(shipRoot.quaternion);
+    trailVel[i*3] = _v2.x * 9; trailVel[i*3+1] = _v2.y * 9; trailVel[i*3+2] = _v2.z * 9;
+    trailLife[i] = 0.55 + Math.random() * 0.35;
+  }
+}
+function updateTrail(dt){
+  for (let i = 0; i < TRAIL_MAX; i++){
+    if (trailLife[i] <= 0){ trailCol[i*3] = trailCol[i*3+1] = trailCol[i*3+2] = 0; continue; }
+    trailLife[i] -= dt;
+    trailPos[i*3]   += trailVel[i*3]   * dt;
+    trailPos[i*3+1] += trailVel[i*3+1] * dt;
+    trailPos[i*3+2] += trailVel[i*3+2] * dt;
+    const k = Math.max(0, trailLife[i]) * 1.5;
+    trailCol[i*3]   = 0.35 * k;
+    trailCol[i*3+1] = 0.85 * k;
+    trailCol[i*3+2] = 1.0  * k;
+  }
+  trail.geometry.attributes.position.needsUpdate = true;
+  trail.geometry.attributes.color.needsUpdate = true;
+}
+
+/* ---------------- Управление ---------------- */
+function bindControls(){
+  addEventListener('keydown', e => {
+    keys[e.key.toLowerCase()] = true;
+    if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase())) e.preventDefault();
+  });
+  addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+  const joy = $('joy'), knob = $('knob');
+  const R = 58;
+
+  function start(x, y, id){
+    joyActive = true; joyId = id;
+    joyStart.x = x; joyStart.y = y;
+    joy.style.left = x + 'px'; joy.style.top = y + 'px';
+    joy.classList.add('on');
+    knob.style.transform = 'translate(0,0)';
+  }
+  function move(x, y){
+    let dx = x - joyStart.x, dy = y - joyStart.y;
+    const len = Math.hypot(dx, dy);
+    if (len > R){ dx = dx / len * R; dy = dy / len * R; }
+    knob.style.transform = `translate(${dx}px,${dy}px)`;
+    joyVec.x = dx / R;
+    joyVec.y = -dy / R;
+  }
+  function end(){
+    joyActive = false; joyId = null;
+    joy.classList.remove('on');
+    joyVec.x = joyVec.y = 0;
+  }
+
+  const cv = $('c');
+  cv.addEventListener('touchstart', e => {
+    const t = e.changedTouches[0];
+    if (joyId === null) start(t.clientX, t.clientY, t.identifier);
+    e.preventDefault();
+  }, { passive: false });
+  cv.addEventListener('touchmove', e => {
+    for (const t of e.changedTouches){
+      if (t.identifier === joyId) move(t.clientX, t.clientY);
+    }
+    e.preventDefault();
+  }, { passive: false });
+  const tEnd = e => {
+    for (const t of e.changedTouches){
+      if (t.identifier === joyId) end();
+    }
+  };
+  cv.addEventListener('touchend', tEnd);
+  cv.addEventListener('touchcancel', tEnd);
+
+  // мышь (для отладки на ПК)
+  let mouseDown = false;
+  cv.addEventListener('mousedown', e => { mouseDown = true; start(e.clientX, e.clientY, 'm'); });
+  addEventListener('mousemove', e => { if (mouseDown) move(e.clientX, e.clientY); });
+  addEventListener('mouseup', () => { if (mouseDown){ mouseDown = false; end(); } });
+}
+
+function readInput(dt){
+  let tx = 0, ty = 0;
+  if (joyActive){ tx = joyVec.x; ty = joyVec.y; }
+  else {
+    if (keys['a'] || keys['arrowleft'])  tx -= 1;
+    if (keys['d'] || keys['arrowright']) tx += 1;
+    if (keys['w'] || keys['arrowup'])    ty += 1;
+    if (keys['s'] || keys['arrowdown'])  ty -= 1;
+  }
+  raw.x = tx; raw.y = ty;
+  const k = 1 - Math.pow(0.0008, dt);
+  input.x += (raw.x - input.x) * k;
+  input.y += (raw.y - input.y) * k;
+}
+
+/* ---------------- Логика полёта ---------------- */
+const fwd = new THREE.Vector3();
+function updateShip(dt){
+  const yawRate = 1.5, pitchRate = 1.25;
+  yaw   -= input.x * yawRate   * dt;
+  pitch += input.y * pitchRate * dt;
+  pitch = Math.max(-0.95, Math.min(0.95, pitch));
+  yaw   = Math.max(-1.25, Math.min(1.25, yaw));
+
+  shipRoot.rotation.set(pitch, yaw, 0);
+
+  // крен (визуальный)
+  const targetBank = -input.x * 0.75;
+  bank += (targetBank - bank) * (1 - Math.pow(0.002, dt));
+  shipModel.rotation.z = bank;
+  shipModel.rotation.x = -input.y * 0.08;
+
+  // движение вперёд
+  speed = 46 + Math.min(38, elapsed * 0.7);
+  fwd.set(0, 0, -1).applyQuaternion(shipRoot.quaternion);
+  shipRoot.position.addScaledVector(fwd, speed * dt);
+
+  // лёгкое покачивание
+  shipModel.position.y = Math.sin(elapsed * 2.2) * 0.045;
+  shipModel.rotation.y = Math.sin(elapsed * 1.3) * 0.02;
+
+  // пульс двигателей
+  const pulse = 0.85 + Math.sin(elapsed * 22) * 0.12 + Math.min(0.5, speed / 200);
+  engineGlowL.scale.set(pulse, 0.9 + pulse * 0.35, pulse);
+  engineGlowR.scale.set(pulse, 0.9 + pulse * 0.35, pulse);
+  engineLight.intensity = 2.6 + pulse * 1.6;
+
+  spawnTrail();
+}
+
+/* ---------------- Камера-преследование ---------------- */
+const camLocal = new THREE.Vector3(0, 2.6, 8.6);
+const camTarget = new THREE.Vector3();
+function updateCamera(dt){
+  const desired = camLocal.clone().applyQuaternion(shipRoot.quaternion).add(shipRoot.position);
+  const k = 1 - Math.pow(0.0006, dt);
+  camera.position.lerp(desired, k);
+
+  camTarget.copy(shipRoot.position).addScaledVector(fwd, 14);
+  camera.lookAt(camTarget);
+
+  // FOV растёт со скоростью — ощущение разгона
+  const targetFov = 72 + Math.min(14, (speed - 46) * 0.4);
+  camera.fov += (targetFov - camera.fov) * (1 - Math.pow(0.05, dt));
+  camera.updateProjectionMatrix();
+}
+
+/* ---------------- Бесконечный космос: рецикл объектов ---------------- */
+function recycle(dt){
+  const p = shipRoot.position;
+  const wrap = (obj, spread) => {
+    const o = obj.position;
+    if (o.z - p.z >  spread * 0.5) o.z -= spread;
+    if (o.z - p.z < -spread * 0.5) o.z += spread;
+    if (o.x - p.x >  spread * 0.5) o.x -= spread;
+    if (o.x - p.x < -spread * 0.5) o.x += spread;
+    if (o.y - p.y >  spread * 0.3) o.y -= spread * 0.6;
+    if (o.y - p.y < -spread * 0.3) o.y += spread * 0.6;
+  };
+  stars.forEach(s => {
+    const arr = s.userData.pos, sp = s.userData.spread;
+    for (let i = 0; i < arr.length; i += 3){
+      if (arr[i+2] - p.z >  sp * 0.5) arr[i+2] -= sp;
+      if (arr[i+2] - p.z < -sp * 0.5) arr[i+2] += sp;
+      if (arr[i]   - p.x >  sp * 0.5) arr[i]   -= sp;
+      if (arr[i]   - p.x < -sp * 0.5) arr[i]   += sp;
+      if (arr[i+1] - p.y >  sp * 0.3) arr[i+1] -= sp * 0.6;
+      if (arr[i+1] - p.y < -sp * 0.3) arr[i+1] += sp * 0.6;
+    }
+    s.geometry.attributes.position.needsUpdate = true;
+  });
+  nebulas.forEach(n => wrap(n, n.userData.spread));
+  if (planet) wrap(planet, planet.userData.spread);
+  if (sunSprite) wrap(sunSprite, sunSprite.userData.spread);
+}
+
+/* ---------------- HUD ---------------- */
+let hudTick = 0;
+function updateHUD(dt){
+  fpsAcc += dt; fpsFrames++;
+  hudTick += dt;
+  if (hudTick > 0.35){
+    $('spdv').textContent = Math.round(speed * 10);
+    $('fps').textContent = Math.round(fpsFrames / fpsAcc) + ' fps';
+    fpsAcc = 0; fpsFrames = 0; hudTick = 0;
+  }
+}
+
+/* ---------------- Цикл ---------------- */
+function animate(){
+  requestAnimationFrame(animate);
+  const dt = Math.min(0.05, clock.getDelta());
+  if (playing){
+    elapsed += dt;
+    readInput(dt);
+    updateShip(dt);
+    updateTrail(dt);
+    recycle(dt);
+    updateCamera(dt);
+    updateHUD(dt);
+  } else {
+    // медленный облёт корабля на стартовом экране
+    elapsed += dt * 0.35;
+    shipModel.rotation.y = Math.sin(elapsed * 0.6) * 0.35;
+    shipModel.position.y = Math.sin(elapsed * 1.6) * 0.05;
+    const a = elapsed * 0.35;
+    camera.position.set(Math.sin(a) * 9, 3.2 + Math.sin(a * 0.7) * 1.2, Math.cos(a) * 9);
+    camera.lookAt(0, 0.2, 0);
+    updateTrail(dt);
+  }
+  renderer.render(scene, camera);
+}
+
+function onResize(){
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+}
+
+/* ---------------- Старт ---------------- */
+function startGame(){
+  $('start').classList.add('hide');
+  shipRoot.position.set(0, 0, 0);
+  shipRoot.rotation.set(0, 0, 0);
+  yaw = pitch = bank = 0;
+  input.x = input.y = 0;
+  elapsed = 0;
+  speed = 46;
+  camera.position.set(0, 2.6, 8.6);
+  playing = true;
+  clock.getDelta();
+}
+
+function boot(){
+  try {
+    initScene();
+    bindControls();
+    $('play').addEventListener('click', startGame);
+    $('boot').classList.add('hide');
+    animate();
+    checkVersion();
+  } catch (err){
+    $('boot').textContent = 'ОШИБКА: ' + err.message;
+    console.error(err);
+  }
+}
+
+/* ---------------- Проверка новой версии (обход кэша) ---------------- */
+function checkVersion(){
+  setInterval(async () => {
+    try {
+      const r = await fetch('index.html?nocache=' + Date.now(), { cache: 'no-store' });
+      const t = await r.text();
+      const m = t.match(/BUILD_VERSION\s*=\s*"([^"]+)"/);
+      if (m && m[1] !== BUILD_VERSION) $('upd').classList.add('on');
+    } catch (e){}
+  }, 60000);
+}
+$('upd').addEventListener('click', () => { location.href = 'index.html?v=' + Date.now(); });
+
+boot();
+</script>
+</body>
+</html>
