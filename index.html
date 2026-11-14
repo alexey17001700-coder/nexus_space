@@ -754,6 +754,35 @@ function fire(){
   }
 }
 
+/* --- вражеские лазеры (враги стреляют в ответ) --- */
+let eBullets = [];
+const eBulletMat = new THREE.MeshBasicMaterial({ color: 0xffb8c6 });
+const eBulletGlowMat = new THREE.MeshBasicMaterial({ color: 0xff2244, transparent: true,
+  opacity: 0.42, blending: THREE.AdditiveBlending, depthWrite: false });
+function getEBullet(){
+  for (const b of eBullets) if (!b.alive) return b;
+  const mesh = new THREE.Mesh(bulletGeo, eBulletMat);
+  const glow = new THREE.Mesh(bulletGeo, eBulletGlowMat);
+  glow.scale.set(3.6, 3.6, 1.2);
+  mesh.add(glow);
+  scene.add(mesh);
+  const b = { mesh, alive: false, life: 0, vel: new THREE.Vector3() };
+  eBullets.push(b);
+  return b;
+}
+function enemyFire(e){
+  const b = getEBullet();
+  b.alive = true; b.life = 3.2;
+  b.mesh.visible = true;
+  b.mesh.position.copy(e.mesh.position);
+  b.mesh.quaternion.copy(e.mesh.quaternion);
+  _v1.subVectors(shipRoot.position, e.mesh.position).normalize();
+  _v1.x += (Math.random() - 0.5) * 0.10;
+  _v1.y += (Math.random() - 0.5) * 0.10;
+  _v1.normalize();
+  b.vel.copy(_v1).multiplyScalar(115);
+}
+
 /* --- астероиды --- */
 function makeAsteroid(){
   const geo = new THREE.IcosahedronGeometry(1, 1);
