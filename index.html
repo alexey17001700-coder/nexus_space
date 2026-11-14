@@ -1464,6 +1464,7 @@ function banner(text){
   el.classList.add('on');
 }
 function updateLevel(dt){
+  if (boss || bossDeath > 0) return;   // во время боя с боссом таймер не идёт
   levelTimer += dt;
   if (levelTimer >= LEVEL_TIME){
     levelTimer = 0;
