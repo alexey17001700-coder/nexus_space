@@ -561,6 +561,48 @@ function buildShip(){
   shipModel.add(engineLight);
 }
 
+/* ---------------- Энергетический щит (сфера вокруг корабля) ---------------- */
+function buildShield(){
+  const geo = new THREE.SphereGeometry(3.05, 32, 24);
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0x66ccff, transparent: true, opacity: 0.16,
+    blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+  });
+  shieldMesh = new THREE.Mesh(geo, mat);
+  shieldMesh.scale.set(1, 0.86, 1.18);
+  shieldMesh.renderOrder = 2;
+  shipRoot.add(shieldMesh);
+
+  // сетка-каркас — «энергетическая плёнка»
+  const wire = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+    color: 0x9fe4ff, wireframe: true, transparent: true, opacity: 0.10,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  wire.scale.set(1.01, 0.868, 1.19);
+  shieldMesh.add(wire);
+  shieldMesh.userData.wire = wire;
+
+  // мягкое свечение вокруг
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: DOT, color: 0x66ccff, transparent: true, opacity: 0.22,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  halo.scale.set(9, 9, 1);
+  shieldMesh.add(halo);
+  shieldMesh.userData.halo = halo;
+}
+
+/* Поглощение урона щитом. Возвращает остаток, который должен пройти в корпус. */
+function absorbShield(dmg){
+  if (shieldHp <= 0) return dmg;
+  const absorbed = Math.min(shieldHp, dmg);
+  shieldHp -= absorbed;
+  shieldFlash = 1;
+  shieldRegenDelay = 4;
+  if (shieldHp <= 0){ shieldHp = 0; say('Щит отключён'); }
+  return dmg - absorbed;
+}
+
 /* ---------------- След двигателя (particles) ---------------- */
 function buildTrail(){
   trailPos  = new Float32Array(TRAIL_MAX * 3);
