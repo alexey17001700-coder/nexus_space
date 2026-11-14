@@ -1120,6 +1120,7 @@ function endGame(win){
   $('overCred').textContent  = credits;
   $('overLevel').textContent = level;
   $('over').classList.remove('hide');
+  say(win ? 'Миссия выполнена' : 'Корабль уничтожен');
 }
 
 function resetGame(){
