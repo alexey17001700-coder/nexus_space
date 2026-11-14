@@ -852,27 +852,37 @@ function makeEnemy(){
 }
 function spawnEnemy(){
   if (!enemyAlerted){ enemyAlerted = true; say('Обнаружены враги'); }
-  const n = 1 + Math.floor(Math.random() * (level >= 3 ? 3 : 2));
-  for (let i = 0; i < n; i++) spawnOneEnemy(i);
+  // врагов стало заметно больше — группами по 2..5
+  const n = 2 + Math.floor(Math.random() * (level >= 3 ? 4 : 3));
+  for (let i = 0; i < n; i++) spawnOneEnemy(i, n);
 }
-function spawnOneEnemy(i){
+function spawnOneEnemy(i, n){
   const mesh = makeEnemy();
-  mesh.scale.setScalar(1.15);
+  mesh.scale.setScalar(1.35);
   _v1.copy(fwd).multiplyScalar(200 + Math.random() * 120);
-  _v1.x += (Math.random() - 0.5) * 170 + (i - 1) * 26;
-  _v1.y += (Math.random() - 0.5) * 100 + (i % 2 ? 16 : -16);
+  _v1.x += (Math.random() - 0.5) * 170 + (i - (n - 1) / 2) * 34;
+  _v1.y += (Math.random() - 0.5) * 100 + (i % 2 ? 18 : -18);
   _v1.z += (Math.random() - 0.5) * 140;
   mesh.position.copy(shipRoot.position).add(_v1);
   mesh.lookAt(shipRoot.position);
 
+  // половина врагов идёт на таран, половина — пролетает мимо
+  const passBy = Math.random() < 0.5;
   const vel = new THREE.Vector3().subVectors(shipRoot.position, mesh.position);
-  vel.x += (Math.random() - 0.5) * 18;
-  vel.y += (Math.random() - 0.5) * 18;
+  if (passBy){
+    const side = Math.random() < 0.5 ? -1 : 1;
+    vel.x += side * (30 + Math.random() * 55);
+    vel.y += (Math.random() - 0.5) * 45;
+  } else {
+    vel.x += (Math.random() - 0.5) * 24;
+    vel.y += (Math.random() - 0.5) * 24;
+  }
   vel.normalize().multiplyScalar(20 + level * 5 + Math.random() * 8);
 
   enemies.push({
     mesh, vel, radius: 2.4, hp: 2 + Math.floor(level / 2), alive: true,
-    points: 60 + level * 10
+    points: 60 + level * 10, passBy,
+    fireCd: 0.9 + Math.random() * 1.6
   });
 }
 
