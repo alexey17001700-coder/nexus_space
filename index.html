@@ -1816,6 +1816,9 @@ function refreshHUD(){
   const pct = Math.max(0, hp) / maxHp * 100;
   $('hpbar').style.width = pct + '%';
   $('hpbar').classList.toggle('low', pct < 35);
+  const spct = Math.max(0, shieldHp) / maxShield * 100;
+  $('shbar').style.width = spct + '%';
+  $('shbar').classList.toggle('low', spct < 35);
 }
 function updateHUD(dt){
   fpsAcc += dt; fpsFrames++;
