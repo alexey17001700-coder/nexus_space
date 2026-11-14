@@ -377,31 +377,45 @@ function buildNebulas(){
 }
 
 /* ---------------- Планета и солнце ---------------- */
-function buildPlanet(){
+let planets = [];
+function makePlanet(o){
   const g = new THREE.Group();
+  const R = o.radius;
   const body = new THREE.Mesh(
-    new THREE.SphereGeometry(90, 48, 32),
-    new THREE.MeshStandardMaterial({ color: 0x2f5f9e, roughness: 0.95, metalness: 0.05,
-      emissive: 0x0a1e3a, emissiveIntensity: 0.6 })
+    new THREE.SphereGeometry(R, 48, 32),
+    new THREE.MeshStandardMaterial({ color: o.color, roughness: 0.95, metalness: 0.05,
+      emissive: o.emissive, emissiveIntensity: 0.65 })
   );
   g.add(body);
   const atmo = new THREE.Mesh(
-    new THREE.SphereGeometry(96, 48, 32),
-    new THREE.MeshBasicMaterial({ color: 0x4fa8ff, transparent: true, opacity: 0.12,
+    new THREE.SphereGeometry(R * 1.07, 48, 32),
+    new THREE.MeshBasicMaterial({ color: o.atmo, transparent: true, opacity: 0.14,
       side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false })
   );
   g.add(atmo);
-  const ring = new THREE.Mesh(
-    new THREE.RingGeometry(120, 175, 96),
-    new THREE.MeshBasicMaterial({ color: 0x8fd0ff, transparent: true, opacity: 0.16,
-      side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false })
-  );
-  ring.rotation.set(-1.15, 0.4, 0.2);
-  g.add(ring);
-  g.position.set(-320, 120, -900);
-  g.userData = { spread: 3000 };
+  if (o.ring){
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(R * 1.33, R * 1.95, 96),
+      new THREE.MeshBasicMaterial({ color: o.atmo, transparent: true, opacity: 0.16,
+        side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false })
+    );
+    ring.rotation.set(-1.15, 0.4, 0.2);
+    g.add(ring);
+  }
+  g.position.copy(o.pos);
+  g.userData = { spread: 3000, radius: R };
   scene.add(g);
-  planet = g;
+  planets.push(g);
+  return g;
+}
+function buildPlanet(){
+  makePlanet({ radius: 90,  color: 0x2f5f9e, emissive: 0x0a1e3a, atmo: 0x4fa8ff, ring: true,
+    pos: new THREE.Vector3(-320, 120, -900) });
+  makePlanet({ radius: 58,  color: 0xa8543a, emissive: 0x2a0f08, atmo: 0xff9a5a, ring: false,
+    pos: new THREE.Vector3(430, -170, -1500) });
+  makePlanet({ radius: 135, color: 0x6a4fa8, emissive: 0x1a0f3a, atmo: 0xa88fff, ring: true,
+    pos: new THREE.Vector3(-950, -280, -2600) });
+  planet = planets[0];
 }
 function buildSun(){
   const s = 512, cv = document.createElement('canvas');
