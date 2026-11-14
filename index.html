@@ -1600,6 +1600,9 @@ function buyUpgrade(kind){
   if (kind === 'shield'){
     maxHp = BASE_HP + (upg.shield - 1) * 40;
     hp = maxHp;
+    maxShield = BASE_SHIELD + (upg.shield - 1) * 40;
+    shieldHp = maxShield;
+    shieldRegenDelay = 0;
   }
   updateShopUI();
   refreshHUD();
