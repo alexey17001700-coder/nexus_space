@@ -2209,13 +2209,8 @@ function boot(){
     $('buys').addEventListener('click', () => buyUpgrade('shield'));
     $('buye').addEventListener('click', () => buyUpgrade('engine'));
     initVoice();
-    $('voice').addEventListener('click', () => {
-      voiceOn = !voiceOn;
-      $('voice').textContent = voiceOn ? '🔊 Голос: вкл' : '🔇 Голос: выкл';
-      $('voice').classList.toggle('off', !voiceOn);
-      if (voiceOn) say('Голос включён');
-      else if ('speechSynthesis' in window) speechSynthesis.cancel();
-    });
+    $('voice').addEventListener('click', () => setVoice(!voiceOn));
+    bindMenu();
     $('boot').classList.add('hide');
     animate();
     checkVersion();
