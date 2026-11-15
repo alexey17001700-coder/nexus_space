@@ -1129,9 +1129,23 @@ function animate() {
    12. RESIZE + СТАРТ
    ============================================================ */
 addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+  fitCamera();
   renderer.setSize(window.innerWidth, window.innerHeight);
+});
+addEventListener('orientationchange', () => setTimeout(() => {
+  fitCamera();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}, 260));
+
+// Свернули браузер — сбрасываем ввод и время, чтобы при возврате не было рывка
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stickId = null;
+    stick.x = 0; stick.y = 0;
+    stickKnob.style.transform = 'translate(0,0)';
+    resetStickPos();
+    clock.getDelta();
+  }
 });
 
 document.getElementById('ver').textContent = 'NEXUS SPACE ' + VERSION;
