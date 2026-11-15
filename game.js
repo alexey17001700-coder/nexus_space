@@ -277,9 +277,7 @@ for (const [lx, lz] of lampPos) {
   room.add(lamp);
   // сам источник — только 4 реальных (по углам), остальные светятся материалом
   if (Math.abs(lx) === 11 && Math.abs(lz) === 11) {
-    const pl = new THREE.PointLight(0xbfe2ff, 52, 34, 2);
-    pl.position.set(lx, 6.1, lz);
-    room.add(pl);
+    addPointLight(0xbfe2ff, 52, 34, lx, 6.1, lz);
   }
 }
 
