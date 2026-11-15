@@ -64,7 +64,7 @@ const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerH
 // v3.0: камера БЛИЗКО к космонавту и всегда следует за ним.
 // Комната целиком в кадр НЕ влезает — это осознанно: обзор вокруг персонажа,
 // а не «вид на весь отсек».
-const CAM_OFFSET = new THREE.Vector3(4.0, 4.6, 4.0);
+const CAM_OFFSET = new THREE.Vector3(6.4, 7.36, 6.4);
 const camLook = new THREE.Vector3(0, 1.1, 0);
 
 // На узком (портретном) экране камера чуть отъезжает, чтобы персонаж
