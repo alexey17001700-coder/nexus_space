@@ -678,20 +678,23 @@ const ST_BENCH    = buildWorkbench(9.5, -9.5, -0.35);
 const ST_HELM     = buildHelm(0, 11.5, Math.PI);
 
 /* ---------- 6.4 Мелкий декор ---------- */
-// трубы по потолку
-const pipeMat = new THREE.MeshStandardMaterial({ color: 0x6a7c92, roughness: 0.45, metalness: 0.8 });
-for (let i = -1; i <= 1; i++) {
-  const p = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, ROOM_HALF * 2 - 2, 12), pipeMat);
-  p.rotation.z = Math.PI / 2;
-  p.position.set(0, 6.9, i * 6);
-  room.add(p);
-}
-// ящики у стены
+// грузовые ящики вдоль левого борта у кормы
 for (let i = 0; i < 5; i++) {
+  const z = HULL_Z1 - 5.5 - i * 2.6;
+  const w = hullHalf(z);
   const c = box(1.1, 0.9, 1.1, i % 2 ? MAT.crate : MAT.crate2,
-    -ROOM_HALF + 1.6, 0.45, -2 + i * 2.4, Math.random() * 0.6);
+    -w + 1.5, 0.45, z, Math.random() * 0.6);
   room.add(c);
-  addObstacle(-ROOM_HALF + 1.6, -2 + i * 2.4, 0.6, 0.6);
+  addObstacle(-w + 1.5, z, 0.6, 0.6);
+}
+// контейнеры у правого борта
+for (let i = 0; i < 3; i++) {
+  const z = HULL_Z1 - 7 - i * 3.0;
+  const w = hullHalf(z);
+  const c = box(1.0, 0.8, 1.0, i % 2 ? MAT.crate2 : MAT.crate,
+    w - 1.5, 0.4, z, Math.random() * 0.6);
+  room.add(c);
+  addObstacle(w - 1.5, z, 0.55, 0.55);
 }
 
 /* ============================================================
