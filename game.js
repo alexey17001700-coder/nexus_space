@@ -61,19 +61,21 @@ scene.background = new THREE.Color(0x070a12);
 scene.fog = new THREE.FogExp2(0x0b1220, 0.008);
 
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 400);
-// v2.2: камера придвинута на 20% ближе (12.5/14.5 → 10/11.6)
-const CAM_OFFSET = new THREE.Vector3(6.0, 6.96, 6.0);
+// v3.0: камера БЛИЗКО к космонавту и всегда следует за ним.
+// Комната целиком в кадр НЕ влезает — это осознанно: обзор вокруг персонажа,
+// а не «вид на весь отсек».
+const CAM_OFFSET = new THREE.Vector3(4.0, 4.6, 4.0);
 const camLook = new THREE.Vector3(0, 1.1, 0);
 
-// Изометрия подстраивается под пропорции экрана:
-// в портрете на телефоне камера отъезжает, чтобы комната влезала в кадр.
+// На узком (портретном) экране камера чуть отъезжает, чтобы персонаж
+// не упирался в края кадра, но остаётся близко к нему.
 function fitCamera() {
   const w = window.innerWidth, h = window.innerHeight;
   const aspect = w / h;
-  const k = aspect < 1 ? Math.min(1.85, 0.95 / Math.max(aspect, 0.42)) : 1;
-  CAM_OFFSET.set(10.0 * k, 11.6 * (0.82 + 0.18 * k), 10.0 * k);
+  const k = aspect < 1 ? Math.min(1.3, 0.98 / Math.max(aspect, 0.58)) : 1;
+  CAM_OFFSET.set(4.0 * k, 4.6 * (0.9 + 0.1 * k), 4.0 * k);
   camera.aspect = aspect;
-  camera.fov = aspect < 1 ? 46 : 40;
+  camera.fov = aspect < 1 ? 44 : 40;
   camera.updateProjectionMatrix();
 }
 fitCamera();
