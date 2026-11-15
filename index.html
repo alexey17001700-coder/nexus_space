@@ -19,7 +19,8 @@
     user-select:none;-webkit-user-select:none;touch-action:none;
     overscroll-behavior:none;-webkit-text-size-adjust:100%;-webkit-touch-callout:none}
   #app{position:fixed;inset:0}
-  canvas{display:block}
+  /* лёгкий «киношный» грейд вместо тяжёлого пост-процесса (без потери FPS) */
+  canvas{display:block;filter:saturate(1.13) contrast(1.06)}
 
   /* ---------- HUD ---------- */
   #hud{position:fixed;inset:0;pointer-events:none;z-index:10}
