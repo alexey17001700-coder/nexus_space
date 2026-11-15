@@ -627,6 +627,11 @@ const astro = buildAstronaut();
 astro.group.position.set(0, 0, -1);
 scene.add(astro.group);
 
+// мягкая подсветка вокруг космонавта — он всегда читается
+const astroFill = new THREE.PointLight(0xcfe6ff, 14, 12, 2);
+astroFill.position.set(0, 2.6, 0);
+astro.group.add(astroFill);
+
 /* ============================================================
    8. УПРАВЛЕНИЕ
    ============================================================ */
