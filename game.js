@@ -362,8 +362,10 @@ function archShape(w, h, inset, bottom) {
   return s;
 }
 const BW = hullHalf(HULL_Z0 + 0.8), BH = hullHeight(HULL_Z0 + 0.8);
+const capTex = makeWallTexture();
+capTex.repeat.set(0.14, 0.14);
 const capMat = new THREE.MeshStandardMaterial({
-  map: wallTex, color: 0x9db3cc, roughness: 0.55, metalness: 0.6
+  map: capTex, color: 0x9db3cc, roughness: 0.55, metalness: 0.6
 });
 const capShape = archShape(BW, BH, 0, 0.02);
 capShape.holes.push(archShape(BW, BH, 1.15, 0.75));
