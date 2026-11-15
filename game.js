@@ -394,9 +394,7 @@ function buildComputer(px, pz, ry) {
   g.add(chair);
 
   // свет от экрана
-  const gl = new THREE.PointLight(0x40c8ff, 12, 9, 2);
-  gl.position.set(-0.5, 2.2, 0.7);
-  g.add(gl);
+  addPointLight(0x40c8ff, 12, 9, -0.5, 2.2, 0.7, g);
 
   room.add(g);
   addObstacle(px, pz, 2.1, 1.0);
