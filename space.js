@@ -570,8 +570,11 @@ export function createSpace(opts) {
     for (let i = 0; i < LAS_MAX; i++) {
       dummy.position.set(0, 0, 0); dummy.scale.setScalar(0); dummy.updateMatrix();
       lasMesh.setMatrixAt(i, dummy.matrix);
+      lasMesh2.setMatrixAt(i, dummy.matrix);
     }
     lasMesh.instanceMatrix.needsUpdate = true;
+    lasMesh2.instanceMatrix.needsUpdate = true;
+    for (const r of rings) { r.life = 0; r.m.visible = false; }
   }
 
   function enter(level, up) {
