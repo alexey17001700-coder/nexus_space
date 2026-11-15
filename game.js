@@ -1226,9 +1226,17 @@ if (fsBtn) {
 const keys = {};
 addEventListener('keydown', e => {
   keys[e.code] = true;
+  if (MODE === 'space') {                       // в космосе пробел = огонь
+    if (e.code === 'Space') { e.preventDefault(); if (space) space.setFire(true); }
+    if (e.code === 'Escape' && space) { space.setFire(false); exitFlight(); }
+    return;
+  }
   if (e.code === 'KeyE' || e.code === 'Space') { e.preventDefault(); interact(); }
 });
-addEventListener('keyup', e => { keys[e.code] = false; });
+addEventListener('keyup', e => {
+  keys[e.code] = false;
+  if (e.code === 'Space' && space) space.setFire(false);
+});
 
 // кнопка взаимодействия
 const actBtn = document.getElementById('actBtn');
