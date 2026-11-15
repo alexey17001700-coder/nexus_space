@@ -472,8 +472,15 @@ const ribMat = new THREE.MeshStandardMaterial({
   color: 0x93a9c2, roughness: 0.36, metalness: 0.9,
   emissive: 0x1c3a58, emissiveIntensity: 0.5
 });
-const ribGeo  = new THREE.TorusGeometry(1, 0.075, 8, 30, Math.PI * 0.86);  // толстые арки
-const ribGeo2 = new THREE.TorusGeometry(1, 0.042, 6, 26, Math.PI * 0.86);  // внутренний поясок
+// v2.1: арки — только ДАЛЬНЯЯ дуга. Передняя дуга убрана, чтобы не перекрывать
+// вид на космонавта (открытый вид «как в Diablo»).
+// Дуга печётся в геометрию (rotateZ), чтобы масштабирование по X/Y не косило её.
+const RIB_A = Math.PI * 0.58;   // длина дуги (совпадает с обшивкой)
+const RIB_R = Math.PI * 0.42;   // старт дуги: чуть правее потолка → дальний пол
+const ribGeo  = new THREE.TorusGeometry(1, 0.075, 8, 24, RIB_A);  // толстые арки
+ribGeo.rotateZ(RIB_R);
+const ribGeo2 = new THREE.TorusGeometry(1, 0.042, 6, 22, RIB_A * 0.96);  // внутренний поясок
+ribGeo2.rotateZ(RIB_R + 0.03);
 const gapPanelMat = new THREE.MeshStandardMaterial({
   color: 0x2b3646, roughness: 0.74, metalness: 0.32,
   emissive: 0x0d1c2c, emissiveIntensity: 0.7
