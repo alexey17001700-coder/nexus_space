@@ -148,6 +148,30 @@
   #build{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:50%;
     transform:translateX(-50%);font-size:10px;letter-spacing:.22em;color:#3d6b88;z-index:11}
 
+  /* ---------- Главное меню ---------- */
+  .menu{display:flex;flex-direction:column;gap:12px;width:min(78vw,320px);margin-bottom:18px}
+  .mbtn{pointer-events:auto;cursor:pointer;border:1px solid rgba(0,200,255,.35);
+    border-radius:14px;padding:15px 20px;font-size:15px;font-weight:800;letter-spacing:.16em;
+    text-transform:uppercase;color:#dff2ff;text-align:left;
+    background:linear-gradient(90deg,rgba(0,120,200,.28),rgba(0,40,80,.12));
+    box-shadow:0 0 18px rgba(0,140,255,.16) inset,0 6px 20px rgba(0,0,0,.5);
+    transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}
+  .mbtn:active{transform:scale(.97)}
+  .mbtn:hover{border-color:rgba(120,230,255,.85);
+    box-shadow:0 0 26px rgba(0,190,255,.35) inset,0 6px 22px rgba(0,0,0,.55)}
+  .mbtn.primary{color:#00131f;text-align:center;
+    background:linear-gradient(180deg,#8ff0ff,#12a6e0 60%,#0a6ea8);
+    box-shadow:0 0 30px rgba(0,190,255,.55),0 8px 26px rgba(0,0,0,.6)}
+  .setrow{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    width:min(86vw,380px);padding:12px 16px;margin-bottom:10px;border-radius:12px;
+    background:rgba(6,18,34,.68);border:1px solid rgba(0,200,255,.28);font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;color:#bfe9ff}
+  .setrow input[type=range]{pointer-events:auto;width:140px;accent-color:#39c8ff}
+  .tgl{pointer-events:auto;cursor:pointer;border:1px solid rgba(0,200,255,.4);border-radius:10px;
+    padding:7px 14px;font-size:11px;font-weight:800;letter-spacing:.1em;color:#00131f;
+    background:linear-gradient(180deg,#9dffcf,#12c88a 60%,#0a8a5e)}
+  .tgl.off{color:#7a93a6;background:rgba(6,18,34,.7);border-color:rgba(120,150,170,.35)}
+
   /* ---------- Кнопка обновления ---------- */
   #upd{position:fixed;z-index:30;left:50%;top:calc(14px + env(safe-area-inset-top));
     transform:translateX(-50%);display:none;cursor:pointer;
