@@ -151,6 +151,34 @@ function makeWallTexture() {
   return t;
 }
 
+// звёздное небо для носового блистера
+function makeStarTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 512;
+  const g = c.getContext('2d');
+  const grd = g.createRadialGradient(256, 256, 20, 256, 256, 400);
+  grd.addColorStop(0, '#0a1830'); grd.addColorStop(1, '#03060f');
+  g.fillStyle = grd; g.fillRect(0, 0, 512, 512);
+  // туманности
+  for (let i = 0; i < 7; i++) {
+    const x = Math.random() * 512, y = Math.random() * 512, r = 60 + Math.random() * 150;
+    const rg = g.createRadialGradient(x, y, 0, x, y, r);
+    const col = ['80,120,255', '150,80,220', '60,180,220'][i % 3];
+    rg.addColorStop(0, `rgba(${col},0.18)`); rg.addColorStop(1, `rgba(${col},0)`);
+    g.fillStyle = rg; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+  }
+  // звёзды
+  for (let i = 0; i < 950; i++) {
+    const x = Math.random() * 512, y = Math.random() * 512;
+    const r = Math.random() * 1.6 + 0.3;
+    const a = 0.35 + Math.random() * 0.65;
+    g.fillStyle = `rgba(${200 + Math.random() * 55 | 0},${215 + Math.random() * 40 | 0},255,${a})`;
+    g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 /* ============================================================
    4. ОСВЕЩЕНИЕ (тусклое, атмосферное)
    ============================================================ */
