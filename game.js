@@ -184,7 +184,7 @@ function makeStarTexture() {
    ============================================================ */
 // Бюджет динамических источников света. Каждый источник в Three.js
 // считается для каждого пикселя — на телефоне их число жёстко ограничено.
-const MAX_POINT_LIGHTS = QUALITY === 'high' ? 99 : QUALITY === 'mid' ? 3 : 0;
+const MAX_POINT_LIGHTS = QUALITY === 'high' ? 99 : QUALITY === 'mid' ? 5 : 0;
 let pointLightsUsed = 0;
 function addPointLight(color, intensity, distance, x, y, z, parent) {
   if (pointLightsUsed >= MAX_POINT_LIGHTS) return null;
