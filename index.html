@@ -1227,6 +1227,12 @@ function updateCombat(dt){
     const mark = e.mesh.userData.mark;
     if (mark) mark.scale.setScalar((3.1 + Math.sin(elapsed * 9 + e.mesh.position.y) * 0.95) * inv);
 
+    // подсветка врага: пульсирует и усиливается при приближении
+    const lamp = e.mesh.userData.lamp;
+    if (lamp) lamp.intensity = (3.4 + near * 3.2) + Math.sin(elapsed * 11 + e.mesh.position.x) * 0.9;
+    const rim = e.mesh.userData.rim;
+    if (rim) rim.intensity = 1.8 + near * 1.6;
+
     // враги стреляют в ответ
     e.fireCd -= dt;
     if (e.fireCd <= 0 && dist < 300){
