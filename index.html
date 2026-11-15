@@ -452,6 +452,8 @@ function initScene(){
 
   clock = new THREE.Clock();
 
+  buildEnv();
+
   /* --- свет --- */
   scene.add(new THREE.AmbientLight(0x2a4a6e, 0.85));
   const hemi = new THREE.HemisphereLight(0x88bbff, 0x101828, 0.5);
