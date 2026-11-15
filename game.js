@@ -869,8 +869,11 @@ function buildHelm(px, pz, ry) {
   // свет
   addPointLight(0x4fd8ff, 16, 11, 0, 3.6, 0.6, g);
 
+  // v3.3: пульт управления уменьшен — раньше был выше космонавта
+  g.scale.setScalar(0.7);
+
   room.add(g);
-  addObstacle(px, pz, 1.7, 1.7);
+  addObstacle(px, pz, 1.2, 1.2);
   return g;
 }
 
