@@ -1384,6 +1384,12 @@ function makeBossPart(kind){
   halo.scale.set(26, 26, 1);
   grp.add(halo);
   grp.userData.halo = halo;
+
+  // подсветка уязвимой части — видно, куда бить
+  const lamp = new THREE.PointLight(0xff4466, 6, 60, 2);
+  lamp.position.set(0, 1.5, 0);
+  grp.add(lamp);
+  grp.userData.lamp = lamp;
   return grp;
 }
 
