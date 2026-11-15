@@ -1127,7 +1127,10 @@ function buildAstronaut() {
 
   g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
 
-  return { group: g, legL, legR, armL, armR, torso, helmet };
+  // v3.4: `helmet` больше не существует (шлем собран из helmParts) —
+  // возвращали неопределённую переменную, из-за этого падал весь модуль
+  // и загрузчик «ЗАГРУЗКА КОРАБЛЯ…» не скрывался.
+  return { group: g, legL, legR, armL, armR, torso, helmet: null };
 }
 
 const astro = buildAstronaut();
