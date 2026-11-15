@@ -192,29 +192,38 @@ export function createSpace(opts) {
   /* ============================================================
      1. ЗВЁЗДЫ (particle system, рециклится вокруг корабля)
      ============================================================ */
-  const STAR_N = LOW ? 900 : (MID ? 1400 : 1900);
   const SB = { x: 460, y: 300, z: 1000 };
-  const sPos = new Float32Array(STAR_N * 3);
-  const sCol = new Float32Array(STAR_N * 3);
-  const sSpd = new Float32Array(STAR_N);
-  const tmpC = new THREE.Color();
-  for (let i = 0; i < STAR_N; i++) {
-    sPos[i * 3]     = (Math.random() - 0.5) * SB.x;
-    sPos[i * 3 + 1] = (Math.random() - 0.5) * SB.y;
-    sPos[i * 3 + 2] = (Math.random() - 0.5) * SB.z - 250;
-    tmpC.setHSL(0.54 + Math.random() * 0.14, 0.55, 0.62 + Math.random() * 0.35);
-    sCol[i * 3] = tmpC.r; sCol[i * 3 + 1] = tmpC.g; sCol[i * 3 + 2] = tmpC.b;
-    sSpd[i] = 26 + Math.random() * 80;
+  /* 3 слоя: мелкие бело-голубые, средние голубые, крупные жёлтые.
+     Мерцание — плавное изменение прозрачности слоя (бесплатно для GPU). */
+  function makeStarLayer(n, size, hue0, hue1, sat, light, spdMin, spdMax) {
+    const pos = new Float32Array(n * 3);
+    const col = new Float32Array(n * 3);
+    const spd = new Float32Array(n);
+    const c = new THREE.Color();
+    for (let i = 0; i < n; i++) {
+      pos[i * 3]     = (Math.random() - 0.5) * SB.x;
+      pos[i * 3 + 1] = (Math.random() - 0.5) * SB.y;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * SB.z - 250;
+      c.setHSL(hue0 + Math.random() * (hue1 - hue0), sat, light + Math.random() * 0.3);
+      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+      spd[i] = spdMin + Math.random() * (spdMax - spdMin);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    const pts = new THREE.Points(geo, new THREE.PointsMaterial({
+      size: size, vertexColors: true, transparent: true, opacity: 0.95,
+      depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+    }));
+    pts.frustumCulled = false;
+    scene.add(pts);
+    return { pts, geo, pos, spd, n, ph: Math.random() * 6.283 };
   }
-  const starGeo = new THREE.BufferGeometry();
-  starGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
-  starGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
-  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
-    size: LOW ? 1.6 : 2.0, vertexColors: true, transparent: true, opacity: 0.95,
-    depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
-  }));
-  stars.frustumCulled = false;
-  scene.add(stars);
+  const starLayers = [
+    makeStarLayer(LOW ? 520 : (MID ? 800 : 1100), LOW ? 1.2 : 1.5, 0.55, 0.62, 0.35, 0.72, 20, 70),
+    makeStarLayer(LOW ? 300 : (MID ? 460 : 620),  LOW ? 2.0 : 2.4, 0.58, 0.66, 0.55, 0.68, 30, 95),
+    makeStarLayer(LOW ? 90  : (MID ? 140 : 190),  LOW ? 3.4 : 4.2, 0.10, 0.16, 0.45, 0.72, 40, 120)
+  ];
 
   /* ============================================================
      2. ТУМАННОСТИ (спрайты, рециклятся)
