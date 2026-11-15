@@ -1963,16 +1963,15 @@ function updateShip(dt){
   if (back){
     speed = -12;
   } else if (boss && bossDeath <= 0){
-    // бой с боссом: догоняем и держимся ЗА его кормой.
-    // Подтягивание включается ТОЛЬКО когда мы позади босса И смотрим на него.
-    // Если ушли вбок/вперёд или летим прочь — скорость обычная,
-    // поэтому «затягивания» внутрь босса при повороте экрана больше нет.
+    // Бой с боссом: догоняем и держимся ЗА его кормой.
+    // Зазор считаем ВДОЛЬ курса босса (а не «по прямой» до центра) —
+    // скорость зависит только от отставания, поэтому «затянуть» внутрь
+    // корпуса физически невозможно.
     _bsv.subVectors(shipRoot.position, boss.position);
-    const behind = _bsv.dot(bossCourse) < 0;   // мы позади босса
-    const facing = _bsv.dot(fwd) < 0;          // нос смотрит на босса
-    if (behind && facing){
-      const d = _bsv.length();
-      const corr = Math.max(-9, Math.min(14, (d - BOSS_HOLD_DIST) * 0.35));
+    const gap = -_bsv.dot(bossCourse);          // >0 — мы позади босса
+    const chasing = fwd.dot(bossCourse) > 0.2;  // летим примерно тем же курсом
+    if (chasing){
+      const corr = Math.max(-12, Math.min(16, (gap - BOSS_HOLD_DIST) * 0.3));
       speed = BOSS_SPEED + corr;
     } else {
       speed = 20;
