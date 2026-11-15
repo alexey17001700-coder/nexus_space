@@ -308,27 +308,47 @@ export function createSpace(opts) {
      3. КОРАБЛЬ ИГРОКА
      ============================================================ */
   const flames = [];
+  const engineGlows = [];
   function buildShip() {
     const g = new THREE.Group();
-    const body  = new THREE.MeshStandardMaterial({ color: 0xdfe9f5, roughness: 0.34, metalness: 0.32 });
-    const dark  = new THREE.MeshStandardMaterial({ color: 0x2b3646, roughness: 0.5, metalness: 0.5 });
-    const acc   = new THREE.MeshStandardMaterial({ color: 0x1a4a6a, emissive: 0x4fd8ff, emissiveIntensity: 2.3, roughness: 0.3 });
-    const glass = new THREE.MeshStandardMaterial({ color: 0x0a2233, emissive: 0x2a7fb8, emissiveIntensity: 0.9, roughness: 0.1, metalness: 0.2 });
+    /* металл: высокая metalness + низкая roughness — красиво ловит DirectionalLight */
+    const body  = new THREE.MeshStandardMaterial({ map: hullTex(), roughness: 0.18, metalness: 0.95 });
+    const dark  = new THREE.MeshStandardMaterial({ color: 0x232c3a, roughness: 0.28, metalness: 0.92 });
+    const acc   = new THREE.MeshStandardMaterial({ color: 0x0d3550, emissive: 0x4fd8ff, emissiveIntensity: 2.6, roughness: 0.25, metalness: 0.4 });
+    const glass = new THREE.MeshStandardMaterial({ color: 0x0a2233, emissive: 0x2a7fb8, emissiveIntensity: 1.1, roughness: 0.06, metalness: 0.3 });
+    const warn  = new THREE.MeshStandardMaterial({ color: 0xe8c33a, emissive: 0x6a4f00, emissiveIntensity: 0.6, roughness: 0.5, metalness: 0.3 });
 
     // фюзеляж (вдоль -Z)
-    const fus = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.8, 3.4, 14), body);
+    const fus = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.8, 3.4, 18), body);
     fus.rotation.x = Math.PI / 2; g.add(fus);
     // нос
-    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.62, 1.7, 14), body);
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.62, 1.7, 18), body);
     nose.rotation.x = -Math.PI / 2; nose.position.z = -2.5; g.add(nose);
     // кабина
-    const cab = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 12), glass);
+    const cab = new THREE.Mesh(new THREE.SphereGeometry(0.5, 20, 14), glass);
     cab.scale.set(0.85, 0.62, 1.55); cab.position.set(0, 0.44, -0.5); g.add(cab);
     // киль
     const fin = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.05, 1.25), body);
     fin.position.set(0, 0.62, 1.5); g.add(fin);
-    // неоновая полоса по борту
+    // предупреждающая полоса на киле
+    const fw = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.22, 1.28), warn);
+    fw.position.set(0, 0.98, 1.5); g.add(fw);
+    // кольца-сегменты корпуса
+    for (const zz of [-1.5, -0.6, 0.4, 1.2]) {
+      const rg2 = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.045, 6, 20), dark);
+      rg2.rotation.y = Math.PI / 2; rg2.position.z = zz; g.add(rg2);
+    }
+    // светящиеся иллюминаторы
+    for (const zz of [-1.15, 0.55]) {
+      for (const s of [-1, 1]) {
+        const p = new THREE.Mesh(new THREE.CircleGeometry(0.1, 12), acc);
+        p.position.set(s * 0.63, 0.16, zz);
+        p.rotation.y = s * Math.PI / 2;
+        g.add(p);
+      }
+    }
     for (const s of [-1, 1]) {
+      // неоновая полоса по борту
       const strip = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 2.6), acc);
       strip.position.set(s * 0.66, 0.05, -0.2); g.add(strip);
 
@@ -337,25 +357,44 @@ export function createSpace(opts) {
       w.position.set(s * 1.65, -0.05, 0.55);
       w.rotation.z = s * 0.13; w.rotation.y = -s * 0.22;
       g.add(w);
+      // предупреждающая полоса на крыле
+      const ws = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.17, 0.16), warn);
+      ws.position.set(s * 1.65, -0.02, 0.55);
+      ws.rotation.z = s * 0.13; ws.rotation.y = -s * 0.22;
+      g.add(ws);
       const tip = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.52, 1.05), acc);
       tip.position.set(s * 2.9, 0.16, 0.66); g.add(tip);
+      // пушка под крылом
+      const gun = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 1.5, 8), dark);
+      gun.rotation.x = Math.PI / 2; gun.position.set(s * 1.5, -0.16, -0.5); g.add(gun);
 
       // двигатель
-      const eng = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.42, 1.6, 12), dark);
+      const eng = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.42, 1.6, 14), dark);
       eng.rotation.x = Math.PI / 2; eng.position.set(s * 0.86, -0.1, 1.9); g.add(eng);
-      const noz = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.38, 0.3, 12), acc);
+      const noz = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.38, 0.3, 14), acc);
       noz.rotation.x = Math.PI / 2; noz.position.set(s * 0.86, -0.1, 2.72); g.add(noz);
 
-      // пламя сопла (аддитивное, без источника света)
+      // ФЕЙКОВЫЙ БЛУМ вокруг сопла (спрайт, аддитивный — без источника света)
+      const gl = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: GLOW, color: 0x8fe4ff, transparent: true, opacity: 0.5,
+        blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false
+      }));
+      gl.scale.set(2.6, 2.6, 1);
+      gl.position.set(s * 0.86, -0.1, 2.95);
+      g.add(gl);
+      engineGlows.push(gl);
+
+      // пламя сопла (пульсирующий конус, аддитивный)
       const fl = new THREE.Mesh(
-        new THREE.ConeGeometry(0.3, 1.7, 10),
+        new THREE.ConeGeometry(0.32, 2.1, 12, 1, true),
         new THREE.MeshBasicMaterial({
-          color: 0x8fe4ff, transparent: true, opacity: 0.5,
-          blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false
+          color: 0x9fe8ff, transparent: true, opacity: 0.55,
+          blending: THREE.AdditiveBlending, depthWrite: false,
+          side: THREE.DoubleSide, toneMapped: false
         })
       );
       fl.rotation.x = Math.PI / 2;
-      fl.position.set(s * 0.86, -0.1, 3.6);
+      fl.position.set(s * 0.86, -0.1, 3.75);
       g.add(fl);
       flames.push(fl);
     }
