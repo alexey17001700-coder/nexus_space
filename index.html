@@ -456,6 +456,52 @@
   <p>ЗАГРУЗКА КОРАБЛЯ…</p>
 </div>
 
+<script>
+/* ===== АВТООБНОВЛЕНИЕ (v1.6) =====
+   Проверяет version.json в обход кэша. Если на сервере сборка новее —
+   один раз автоматически перезагружает страницу с обходом кэша (?b=),
+   а также показывает кнопку «ОБНОВИТЬ» на случай ручного обновления. */
+(function(){
+  var BUILD = 7, VERSION = '1.6';
+  var btn = document.getElementById('updBtn');
+  var busy = false;
+
+  function show(v){
+    if (!btn) return;
+    btn.textContent = '⬆ НОВАЯ ВЕРСИЯ v' + v + ' — ОБНОВИТЬ';
+    btn.classList.add('on');
+  }
+
+  function check(){
+    if (busy) return;
+    busy = true;
+    fetch('version.json?t=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        busy = false;
+        if (!d || !d.build || d.build <= BUILD) return;
+        show(d.version || '');
+        var key = 'ns_seen_' + d.build;
+        try {
+          if (!sessionStorage.getItem(key)){
+            sessionStorage.setItem(key, '1');
+            location.replace(location.pathname + '?b=' + d.build + '&t=' + Date.now());
+          }
+        } catch(e){}
+      })
+      .catch(function(){ busy = false; });
+  }
+
+  if (btn) btn.addEventListener('click', function(){
+    location.replace(location.pathname + '?b=' + Date.now() + '&t=' + Date.now());
+  });
+
+  check();
+  setInterval(check, 20000);
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) check(); });
+  window.addEventListener('online', check);
+})();
+</script>
 <script type="importmap">
 {
   "imports": {
