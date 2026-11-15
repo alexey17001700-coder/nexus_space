@@ -434,13 +434,17 @@ const hullMat = new THREE.MeshStandardMaterial({
   map: wallTex, color: 0xa8bed6, roughness: 0.62, metalness: 0.45,
   side: THREE.BackSide
 });
+// v2.1: обшивка оставлена ТОЛЬКО на дальней стороне (напротив камеры).
+// Ближний борт и бок сняты — открытый вид «как в Diablo», обзор свободен.
+// a = 0 → дальний борт у пола, a = PI/2 → потолок.
+const SHELL_A = Math.PI * 0.58;
 function buildShellGeometry() {
   const ZS = 56, AS = 18, pos = [], uv = [], idx = [];
   for (let i = 0; i <= ZS; i++) {
     const z = HULL_Z0 + (i / ZS) * HULL_LEN;
     const w = hullHalf(z), h = hullHeight(z);
     for (let j = 0; j <= AS; j++) {
-      const a = (j / AS) * Math.PI;
+      const a = (j / AS) * SHELL_A;
       pos.push(-w * Math.cos(a), h * Math.sin(a), z);
       uv.push((j / AS) * 0.8, (i / ZS) * 4.2);
     }
