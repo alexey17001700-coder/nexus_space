@@ -502,18 +502,42 @@ for (const z of ribZs) {
   rib2.position.set(0, 0, z);
   room.add(rib2);
 }
-// тёмные панели в промежутках между арками — чтобы не было пустоты
-for (let i = 0; i < ribZs.length - 1; i++) {
-  const zc = (ribZs[i] + ribZs[i + 1]) / 2;
-  const w = hullHalf(zc), h = hullHeight(zc);
-  const ph = Math.max(1.6, h - 1.7);
-  for (const s of [-1]) {   // v2.1: панели только на дальнем борту
-    const p = new THREE.Mesh(new THREE.BoxGeometry(0.16, ph, 2.7), gapPanelMat);
-    p.position.set(s * (w - 0.42), ph / 2 + 0.28, zc);
-    p.rotation.y = s * 0.05;
-    p.receiveShadow = true;
-    room.add(p);
+/* --- 5.3b ИЗОГНУТЫЕ ПАНЕЛИ МЕЖДУ АРКАМИ (v2.6) ---
+   Раньше здесь стояли плоские BoxGeometry — прямоугольные куски ломали
+   эффект корабля. Теперь панель строится по ТОМУ ЖЕ профилю, что и обшивка
+   (cos/sin по сечению), поэтому она «натянута» на арки и повторяет изгиб
+   борта. Текстура тянется вдоль корпуса. */
+function buildCurvedPanel(z0, z1, inset, a0, a1) {
+  const ZS = 8, AS = 14, pos = [], uv = [], idx = [];
+  for (let i = 0; i <= ZS; i++) {
+    const z = z0 + (i / ZS) * (z1 - z0);
+    const w = Math.max(0.3, hullHalf(z) - inset);
+    const h = Math.max(0.3, hullHeight(z) - inset);
+    for (let j = 0; j <= AS; j++) {
+      const a = a0 + (j / AS) * (a1 - a0);
+      pos.push(-w * Math.cos(a), h * Math.sin(a), z);
+      uv.push((j / AS) * 0.55, (i / ZS) * 1.1);
+    }
   }
+  const row = AS + 1;
+  for (let i = 0; i < ZS; i++) for (let j = 0; j < AS; j++) {
+    const a = i * row + j, b = a + 1, c = a + row, d = c + 1;
+    idx.push(a, c, b, b, c, d);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  return g;
+}
+// панель идёт от дальнего борта у пола (a=0) вверх по изгибу к своду
+const PANEL_A0 = 0.02, PANEL_A1 = 0.80;
+for (let i = 0; i < ribZs.length - 1; i++) {
+  const z0 = ribZs[i] + 0.24, z1 = ribZs[i + 1] - 0.24;
+  const p = new THREE.Mesh(buildCurvedPanel(z0, z1, 0.07, PANEL_A0, PANEL_A1), gapPanelMat);
+  p.receiveShadow = true;
+  room.add(p);
 }
 
 /* --- 5.4 продольные стрингеры по бортам --- */
