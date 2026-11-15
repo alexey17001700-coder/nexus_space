@@ -169,6 +169,140 @@
   .btn.gold{border-color:rgba(255,210,120,.6);
     background:linear-gradient(180deg,rgba(220,160,50,.35),rgba(90,60,15,.5));color:#ffe9bd}
   .note{font-size:11.5px;color:#6f8ea6;line-height:1.7;margin-top:12px;text-align:center}
+
+  /* ============================================================
+     CRT-МОНИТОР (Компьютер) — v1.2
+     ============================================================ */
+  .screen{display:flex;flex-direction:column;flex:1;min-height:0;position:relative}
+  .crtTop,.crtPanel,.crtScan,.crtGlass,.crtBoot{display:none}
+
+  /* --- корпус --- */
+  #modal.crt .win{
+    width:min(1020px,97vw);height:min(90vh,800px);
+    background:linear-gradient(160deg,#dcd6c5,#c3bca8 45%,#a8a18d);
+    border:1px solid #8d8672;border-radius:28px;
+    padding:14px 14px 0;
+    box-shadow:0 34px 90px rgba(0,0,0,.78),0 0 0 1px rgba(255,255,255,.25) inset,
+               inset 0 2px 0 rgba(255,255,255,.55),inset 0 -4px 10px rgba(0,0,0,.28)}
+  #modal.crt .crtTop{display:flex;align-items:center;gap:10px;padding:0 8px 10px}
+  #modal.crt .crtBrand{font:700 12px/1 'Courier New',monospace;letter-spacing:3px;color:#4a4436}
+  #modal.crt .crtModel{flex:1;font:400 9.5px/1 'Courier New',monospace;letter-spacing:1.6px;color:#7d7663}
+  #modal.crt .crtLed{width:9px;height:9px;border-radius:50%;background:#3dff8a;
+    box-shadow:0 0 10px #3dff8a,inset 0 0 3px #fff;animation:ledPulse 2.4s ease-in-out infinite}
+  @keyframes ledPulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+  /* --- выпуклый экран со звёздами --- */
+  #modal.crt .screen{
+    border-radius:16px;overflow:hidden;border:3px solid #6f6a58;
+    background-color:#02060a;
+    background-image:
+      radial-gradient(1.6px 1.6px at 30px 40px,rgba(190,255,220,.9) 50%,transparent 51%),
+      radial-gradient(1.2px 1.2px at 130px 170px,rgba(180,230,255,.75) 50%,transparent 51%),
+      radial-gradient(1px 1px at 220px 90px,rgba(255,255,255,.6) 50%,transparent 51%),
+      radial-gradient(1.4px 1.4px at 300px 240px,rgba(200,255,230,.7) 50%,transparent 51%),
+      radial-gradient(1px 1px at 70px 300px,rgba(160,220,255,.6) 50%,transparent 51%),
+      radial-gradient(120% 120% at 50% 50%,rgba(18,58,42,.55),rgba(0,0,0,0) 72%);
+    background-size:360px 360px,360px 360px,360px 360px,360px 360px,360px 360px,100% 100%;
+    animation:crtStars 46s linear infinite;
+    box-shadow:inset 0 0 90px rgba(0,0,0,.95),inset 0 0 26px rgba(0,0,0,.85),
+               0 0 0 6px #3a3629,0 0 0 8px #7a7460}
+  @keyframes crtStars{
+    from{background-position:0 0,0 0,0 0,0 0,0 0,0 0}
+    to{background-position:-360px 360px,-360px 360px,-360px 360px,-360px 360px,-360px 360px,0 0}}
+
+  /* --- сканлайны + блик стекла --- */
+  #modal.crt .crtScan{display:block;position:absolute;inset:0;z-index:6;pointer-events:none;
+    background:repeating-linear-gradient(to bottom,rgba(0,0,0,.34) 0 1px,rgba(0,0,0,0) 1px 3px);
+    opacity:.8}
+  #modal.crt .crtScan::after{content:'';position:absolute;left:0;right:0;height:80px;
+    background:linear-gradient(to bottom,rgba(150,255,200,0),rgba(150,255,200,.075),rgba(150,255,200,0));
+    animation:crtSweep 7s linear infinite}
+  @keyframes crtSweep{from{top:-90px}to{top:100%}}
+  #modal.crt .crtGlass{display:block;position:absolute;inset:0;z-index:7;pointer-events:none;
+    border-radius:14px;
+    background:radial-gradient(62% 42% at 22% 10%,rgba(255,255,255,.17),rgba(255,255,255,0) 70%),
+               radial-gradient(130% 90% at 50% 122%,rgba(120,255,190,.08),rgba(0,0,0,0) 62%)}
+
+  /* --- включение кинескопа --- */
+  #modal.crt .crtBoot{display:block;position:absolute;inset:0;z-index:9;pointer-events:none;
+    background:#dfffe9;opacity:0;transform:scaleY(.006)}
+  #modal.crt.on .crtBoot{animation:crtBoot 1.1s cubic-bezier(.15,.85,.25,1) forwards}
+  @keyframes crtBoot{
+    0%{opacity:1;transform:scaleY(.008) scaleX(.15);filter:brightness(2.6)}
+    14%{opacity:1;transform:scaleY(.02) scaleX(1);filter:brightness(3)}
+    34%{opacity:.95;transform:scaleY(1) scaleX(1);filter:brightness(2.2)}
+    62%{opacity:.42;transform:scaleY(1) scaleX(1);filter:brightness(1.3)}
+    100%{opacity:0;transform:scaleY(1) scaleX(1);filter:brightness(1)}}
+  #modal.crt.on .screen{animation:crtFlash 1.2s ease-out}
+  @keyframes crtFlash{0%{filter:brightness(2.4) contrast(1.3)}32%{filter:brightness(1.5)}100%{filter:none}}
+
+  /* --- содержимое в стиле терминала --- */
+  #modal.crt .winHead{background:transparent;border-bottom:1px dashed rgba(120,255,180,.35);padding:10px 14px}
+  #modal.crt .winTitle{font:700 13px/1.25 'Courier New',monospace;letter-spacing:3px;color:#8dffb8;
+    text-shadow:0 0 8px rgba(80,255,150,.75),0 0 22px rgba(60,220,130,.4)}
+  #modal.crt .winTitle small{font:400 9.5px/1 'Courier New',monospace;letter-spacing:2px;color:#4fbf85;
+    text-shadow:0 0 6px rgba(70,220,140,.6)}
+  #modal.crt .winClose{background:rgba(255,90,90,.1);border-color:rgba(255,120,120,.5);color:#ff9c9c;
+    font-family:'Courier New',monospace;border-radius:4px}
+  #modal.crt .winClose:hover{background:rgba(255,80,80,.32)}
+  #modal.crt .winBody{padding:14px;font-family:'Courier New',monospace;color:#7dffb0;
+    text-shadow:0 0 6px rgba(70,240,140,.55)}
+
+  #modal.crt .tab{background:rgba(0,40,22,.45);border:1px solid rgba(110,255,170,.45);color:#63d99a;
+    font-family:'Courier New',monospace;letter-spacing:2px;border-radius:4px;
+    text-shadow:0 0 6px rgba(70,240,140,.5)}
+  #modal.crt .tab:hover{border-color:#8dffb8;color:#c9ffe0;box-shadow:0 0 16px rgba(70,240,140,.35)}
+  #modal.crt .tab.act{background:linear-gradient(180deg,rgba(90,255,160,.85),rgba(30,170,100,.8));
+    color:#03170c;border-color:#c9ffe0;text-shadow:none;box-shadow:0 0 22px rgba(80,255,150,.55)}
+
+  #modal.crt .stat{background:rgba(0,34,18,.5);border:1px solid rgba(110,255,170,.28);border-radius:4px}
+  #modal.crt .stat .nm{color:#7ee8ab}
+  #modal.crt .stat .vl{color:#c9ffe0;text-shadow:0 0 8px rgba(90,255,160,.7)}
+  #modal.crt .meter{background:rgba(110,255,170,.16);border-radius:2px}
+  #modal.crt .meter i{background:linear-gradient(90deg,#1f9c5e,#8dffb8);box-shadow:0 0 10px rgba(90,255,160,.6)}
+
+  #modal.crt .node{background:rgba(0,34,18,.55);border:1px solid rgba(110,255,170,.3);color:#4fbf85;
+    border-radius:4px}
+  #modal.crt .node.open{border-color:rgba(140,255,190,.75);color:#c9ffe0;background:rgba(0,60,32,.6)}
+  #modal.crt .node.sel{background:linear-gradient(180deg,rgba(90,255,160,.85),rgba(20,140,80,.85));
+    color:#03170c;border-color:#e6fff2;box-shadow:0 0 24px rgba(90,255,160,.6)}
+  #modal.crt .node.boss{border-color:rgba(255,150,120,.7)}
+  #modal.crt .node.boss.open{color:#ffd0b8}
+
+  #modal.crt .btn{background:rgba(0,44,24,.6);border:1px solid rgba(120,255,180,.6);color:#c9ffe0;
+    font-family:'Courier New',monospace;border-radius:4px;text-shadow:0 0 8px rgba(80,255,150,.6)}
+  #modal.crt .btn:hover{box-shadow:0 0 20px rgba(80,255,150,.5)}
+  #modal.crt .btn.big{background:linear-gradient(180deg,rgba(90,255,160,.85),rgba(20,140,80,.85));
+    color:#03170c;border-color:#c9ffe0;text-shadow:none}
+  #modal.crt .btn.gold{background:rgba(60,40,0,.55);border-color:rgba(255,215,130,.7);color:#ffe9bd}
+  #modal.crt .note{color:#4fbf85}
+
+  /* --- нижняя панель с кнопками и вентиляцией --- */
+  #modal.crt .crtPanel{display:flex;align-items:center;gap:14px;height:66px;padding:0 18px;
+    margin:0 -14px;border-radius:0 0 26px 26px;
+    background:linear-gradient(180deg,#cbc4b0,#a49d89);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.5),inset 0 -4px 8px rgba(0,0,0,.22)}
+  #modal.crt .crtBtns{display:flex;gap:8px}
+  #modal.crt .crtBtn{width:26px;height:16px;border-radius:3px;
+    background:linear-gradient(180deg,#efe9d8,#b3ab95);border:1px solid #8b8470;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 1px 2px rgba(0,0,0,.25)}
+  #modal.crt .crtBtn.wide{width:58px}
+  #modal.crt .crtVents{flex:1;height:22px;border-radius:3px;opacity:.55;
+    background:repeating-linear-gradient(to right,#8b8470 0 3px,rgba(0,0,0,0) 3px 9px)}
+  #modal.crt .crtKnobs{display:flex;gap:10px}
+  #modal.crt .crtKnobs span{width:20px;height:20px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#efe9d8,#9c9480);border:1px solid #7d7663;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 2px rgba(0,0,0,.3)}
+
+  /* --- Верстак: тот же терминальный стиль --- */
+  #modal.term .winBody{font-family:'Courier New',monospace}
+  #modal.term .winTitle{font-family:'Courier New',monospace;letter-spacing:3px}
+  #modal.term .up{background:rgba(0,34,18,.35);border:1px solid rgba(110,255,170,.25)}
+  #modal.term .up .nm{color:#c9ffe0}
+  #modal.term .up .ds{color:#4fbf85}
+  #modal.term .up .lv{color:#8dffb8}
+  #modal.term .btn{font-family:'Courier New',monospace}
+  #modal.term .note{color:#4fbf85}
 </style>
 </head>
 <body>
