@@ -3,8 +3,12 @@
    Изометрический 3D-экшен на Three.js
    ============================================================ */
 import * as THREE from 'three';
+import { EffectComposer }  from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
 
-const VERSION   = 'v1.9 · build 10';
+const VERSION   = 'v2.0 · build 11';
 const PLAYER_R  = 0.62;    // радиус космонавта
 const MOVE_SPEED = 6.4;
 
