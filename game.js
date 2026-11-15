@@ -117,10 +117,10 @@ function makeWallTexture() {
 /* ============================================================
    4. ОСВЕЩЕНИЕ (тусклое, атмосферное)
    ============================================================ */
-scene.add(new THREE.AmbientLight(0x4a6a92, 0.55));
-scene.add(new THREE.HemisphereLight(0x6fa8d8, 0x0d1420, 0.75));
+scene.add(new THREE.AmbientLight(0x6a8cb8, 0.85));
+scene.add(new THREE.HemisphereLight(0x9fd0ff, 0x18202e, 1.15));
 
-const keyLight = new THREE.DirectionalLight(0xbcd8ff, 1.15);
+const keyLight = new THREE.DirectionalLight(0xcfe4ff, 1.35);
 keyLight.position.set(14, 26, 10);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(2048, 2048);
