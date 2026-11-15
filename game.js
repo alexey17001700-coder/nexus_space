@@ -4,8 +4,7 @@
    ============================================================ */
 import * as THREE from 'three';
 
-const VERSION   = 'v1.5 · build 6';
-const ROOM_HALF = 19;      // половина стороны комнаты
+const VERSION   = 'v1.7 · build 8';
 const PLAYER_R  = 0.62;    // радиус космонавта
 const MOVE_SPEED = 6.4;
 
