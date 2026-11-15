@@ -80,6 +80,29 @@ camera.position.copy(CAM_OFFSET);
 camera.lookAt(camLook);
 
 /* ============================================================
+   2.1 ПОСТОБРАБОТКА — БЛУМ (мягкий ореол вокруг эмиссивных элементов)
+   Даёт «дорогой» вид без единого лишнего источника света.
+   На слабом устройстве выключен, при просадке FPS гасится на ходу.
+   ============================================================ */
+let composer = null, bloomPass = null;
+if (BLOOM_ON) {
+  try {
+    composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      QUALITY === 'high' ? 0.55 : 0.36,   // сила свечения
+      0.75,                                // радиус размытия
+      0.78                                 // порог яркости
+    );
+    composer.addPass(bloomPass);
+    composer.addPass(new OutputPass());
+    composer.setPixelRatio(renderer.getPixelRatio());
+    composer.setSize(window.innerWidth, window.innerHeight);
+  } catch (e) { composer = null; bloomPass = null; BLOOM_ON = false; }
+}
+
+/* ============================================================
    3. ТЕКСТУРЫ (генерируются на canvas — без внешних файлов)
    ============================================================ */
 function makeFloorTexture() {
