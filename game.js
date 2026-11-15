@@ -708,6 +708,8 @@ function animate() {
   if (keys['KeyW'] || keys['ArrowUp'])    iy -= 1;
   if (keys['KeyS'] || keys['ArrowDown'])  iy += 1;
 
+  if (uiPaused) { ix = 0; iy = 0; }
+
   const mag = Math.hypot(ix, iy);
   if (mag > 1) { ix /= mag; iy /= mag; }
 
