@@ -884,8 +884,11 @@ function buildHelm(px, pz, ry) {
   return g;
 }
 
-const ST_COMPUTER = buildComputer(-7.2, 7.0, 0.45);
-const ST_BENCH    = buildWorkbench(7.2, 7.0, -0.45);
+// v2.1: Компьютер и Верстак придвинуты ВПЛОТНУЮ к дальней стене (там, где
+// осталась обшивка) и развёрнуты ЛИЦОМ В КАМЕРУ — видно мониторы и верстак.
+const FAR_X = -(hullHalf(0) - 1.9);            // ≈ -9.3 — у дальнего борта
+const ST_COMPUTER = buildComputer(FAR_X, 5.2, Math.PI / 2);
+const ST_BENCH    = buildWorkbench(FAR_X, -4.6, Math.PI / 2);
 const ST_HELM     = buildHelm(0, -17.0, Math.PI);
 
 /* ---------- 6.4 Мелкий декор ---------- */
