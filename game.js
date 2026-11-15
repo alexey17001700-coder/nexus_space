@@ -668,7 +668,7 @@ const MAT = {
   screen3: new THREE.MeshStandardMaterial({ color: 0x0a2a1a, emissive: 0x3aff9a, emissiveIntensity: 1.0, roughness: 0.2 }),
   crate:   new THREE.MeshStandardMaterial({ color: 0x7a6a4a, roughness: 0.75, metalness: 0.25 }),
   crate2:  new THREE.MeshStandardMaterial({ color: 0x4a6a7a, roughness: 0.7, metalness: 0.35 }),
-  glow:    new THREE.MeshStandardMaterial({ color: 0x2a6a9a, emissive: 0x5fd0ff, emissiveIntensity: 1.6, roughness: 0.25 })
+  glow:    new THREE.MeshStandardMaterial({ color: 0x2a6a9a, emissive: 0x5fd0ff, emissiveIntensity: 2.4, roughness: 0.25 })
 };
 
 const obstacles = []; // AABB для коллизий {x,z,hw,hd}
