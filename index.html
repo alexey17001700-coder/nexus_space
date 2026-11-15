@@ -1965,18 +1965,28 @@ function updateShip(dt){
   shipModel.rotation.x = -input.y * 0.08;
 
   // движение — одна постоянная скорость вперёд; «◀ НАЗАД» даёт задний ход
+  fwd.set(0, 0, -1).applyQuaternion(shipRoot.quaternion);
   const back = reversing || keys[' '] || keys['shift'] || keys['x'];
   if (back){
     speed = -12;
   } else if (boss && bossDeath <= 0){
-    // бой с боссом: держимся ЗА его кормой на дистанции, а не влетаем в него
-    const d = boss.position.distanceTo(shipRoot.position);
-    const corr = Math.max(-9, Math.min(14, (d - BOSS_HOLD_DIST) * 0.35));
-    speed = BOSS_SPEED + corr;
+    // бой с боссом: догоняем и держимся ЗА его кормой.
+    // Подтягивание включается ТОЛЬКО когда мы позади босса И смотрим на него.
+    // Если ушли вбок/вперёд или летим прочь — скорость обычная,
+    // поэтому «затягивания» внутрь босса при повороте экрана больше нет.
+    _bsv.subVectors(shipRoot.position, boss.position);
+    const behind = _bsv.dot(bossCourse) < 0;   // мы позади босса
+    const facing = _bsv.dot(fwd) < 0;          // нос смотрит на босса
+    if (behind && facing){
+      const d = _bsv.length();
+      const corr = Math.max(-9, Math.min(14, (d - BOSS_HOLD_DIST) * 0.35));
+      speed = BOSS_SPEED + corr;
+    } else {
+      speed = 20;
+    }
   } else {
     speed = 20;
   }
-  fwd.set(0, 0, -1).applyQuaternion(shipRoot.quaternion);
   shipRoot.position.addScaledVector(fwd, speed * dt);
 
   // лёгкое покачивание
