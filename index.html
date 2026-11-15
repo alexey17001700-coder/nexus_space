@@ -556,5 +556,15 @@
     .catch(function(){ boot(0, null); });
 })();
 </script>
+<script>
+/* ===== SERVICE WORKER (v2.3) =====
+   Сеть в приоритете: index.html / game.js / version.json всегда тянутся
+   свежими, кэш браузера и CDN больше не мешают обновлениям. */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js', {scope: './'}).catch(function(){});
+  });
+}
+</script>
 </body>
 </html>
