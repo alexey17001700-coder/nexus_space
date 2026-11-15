@@ -2342,6 +2342,13 @@ function startGame(){
   playing = true;
   clock.getDelta();
   banner('УРОВЕНЬ 1');
+
+  // подсказка по управлению — показываем недолго и убираем,
+  // чтобы не закрывала полосы здоровья и щита
+  const h = $('hint');
+  h.classList.remove('hide');
+  if (hintTimer) clearTimeout(hintTimer);
+  hintTimer = setTimeout(() => h.classList.add('hide'), 6000);
 }
 
 function boot(){
