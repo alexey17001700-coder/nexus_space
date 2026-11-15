@@ -2213,6 +2213,7 @@ function refreshHUD(){
   const spct = Math.max(0, shieldHp) / maxShield * 100;
   $('shbar').style.width = spct + '%';
   $('shbar').classList.toggle('low', spct < 35);
+  $('lives').textContent = '❤'.repeat(Math.max(0, lives)) + '♡'.repeat(Math.max(0, BASE_LIVES - lives));
 }
 function updateHUD(dt){
   fpsAcc += dt; fpsFrames++;
