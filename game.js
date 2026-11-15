@@ -958,75 +958,149 @@ function buildAstronaut() {
     return m;
   };
 
-  // ноги
+  /* --- НОГИ: капсулы + сферические шарниры, ступни стоят на палубе --- */
   const legL = new THREE.Group(), legR = new THREE.Group();
-  legL.position.set(-0.19, 0.72, 0);
-  legR.position.set( 0.19, 0.72, 0);
+  legL.position.set(-0.20, 0.92, 0);
+  legR.position.set( 0.20, 0.92, 0);
   for (const [leg, sx] of [[legL, -1], [legR, 1]]) {
-    const thigh = cyl(0.13, 0.12, 0.72, suit, 0, -0.36, 0, 12);
+    // бедро — округлое, с плавным переходом в таз
+    const thigh = capsule(0.150, 0.30, suit, 18);
+    thigh.position.set(0, -0.22, 0);
     leg.add(thigh);
-    const shin = cyl(0.12, 0.11, 0.62, suit2, 0, -0.98, 0, 12);
-    leg.add(shin);
-    const boot = box(0.28, 0.18, 0.42, grey, 0, -1.34, 0.06);
-    leg.add(boot);
-    // коленный шарнир
-    const knee = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10), grey);
-    knee.position.set(0, -0.72, 0);
+    // набедренный карман
+    const pocket = ball(0.105, suit2, 14, 12);
+    pocket.position.set(sx * 0.125, -0.26, 0.03);
+    pocket.scale.set(0.62, 1.35, 0.95);
+    leg.add(pocket);
+    // коленный шарнир с наколенником
+    const knee = ball(0.148, grey, 18, 14);
+    knee.position.set(0, -0.46, 0.005);
+    knee.scale.set(1, 0.92, 1.06);
     leg.add(knee);
+    // голень
+    const shin = capsule(0.120, 0.24, suit2, 18);
+    shin.position.set(0, -0.68, 0);
+    leg.add(shin);
+    // манжета над ботинком
+    const cuff = ring(0.118, 0.032, grey, 18);
+    cuff.rotation.x = Math.PI / 2;
+    cuff.position.set(0, -0.86, 0);
+    leg.add(cuff);
+    // ботинок — округлый, с подошвой
+    const boot = ball(0.150, grey, 18, 14);
+    boot.position.set(0, -0.80, 0.055);
+    boot.scale.set(1.0, 0.82, 1.5);
+    leg.add(boot);
+    const sole = ball(0.150, dark, 16, 12);
+    sole.position.set(0, -0.875, 0.06);
+    sole.scale.set(1.06, 0.30, 1.56);
+    leg.add(sole);
   }
   g.add(legL, legR);
 
-  // корпус
-  const torso = cyl(0.36, 0.32, 0.95, suit, 0, 1.22, 0, 18);
+  /* --- КОРПУС: тело вращения по профилю (грудь, талия, бёдра) ---
+     LatheGeometry даёт плавный силуэт вместо цилиндра. Сечение сжато
+     по Z — торс овальный, как у человека, а не круглый в плане. */
+  const torsoProfile = [
+    [0.000, 0.84], [0.300, 0.86], [0.345, 0.94], [0.335, 1.04],
+    [0.355, 1.14], [0.395, 1.28], [0.415, 1.42], [0.400, 1.54],
+    [0.330, 1.64], [0.220, 1.71], [0.155, 1.76], [0.000, 1.78]
+  ].map(p => new THREE.Vector2(p[0], p[1]));
+  const torsoGeo = new THREE.LatheGeometry(torsoProfile, 26);
+  torsoGeo.translate(0, -0.92, 0);          // точка вращения — бёдра
+  const torso = new THREE.Mesh(torsoGeo, suit);
+  torso.position.y = 0.92;
+  torso.scale.set(1, 1, 0.82);
+  torso.castShadow = true; torso.receiveShadow = true;
   g.add(torso);
-  // грудная панель
-  const chest = box(0.42, 0.34, 0.14, dark, 0, 1.34, 0.3);
+
+  // жёсткий нагрудник — изогнутая пластина по груди (не плоский куб)
+  const chest = new THREE.Mesh(
+    new THREE.SphereGeometry(0.428, 24, 18, Math.PI / 2 - 0.55, 1.10, 1.15, 0.80), dark);
+  chest.position.y = 1.40;
+  chest.scale.set(1, 1, 0.84);
+  chest.castShadow = true; chest.receiveShadow = true;
   g.add(chest);
   for (let i = 0; i < 3; i++) {
     const l = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.05, 0.03), led);
-    l.position.set(-0.12 + i * 0.12, 1.4, 0.38);
+    l.position.set(-0.12 + i * 0.12, 1.45, 0.352);
     g.add(l);
   }
-  const l2 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.04, 0.03), led);
-  l2.position.set(0, 1.24, 0.38);
+  const l2 = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.04, 0.03), led);
+  l2.position.set(0, 1.26, 0.352);
   g.add(l2);
 
-  // пояс
-  const belt = cyl(0.34, 0.34, 0.14, grey, 0, 0.76, 0, 18);
+  // пояс — кольцо по талии
+  const belt = ring(0.352, 0.052, grey, 26);
+  belt.rotation.x = Math.PI / 2;
+  belt.position.set(0, 0.98, 0);
+  belt.scale.set(1, 0.85, 1);
   g.add(belt);
 
-  // рюкзак (система жизнеобеспечения)
-  const pack = box(0.56, 0.72, 0.3, suit2, 0, 1.3, -0.36);
+  /* --- РЮКЗАК (СЖО): округлый блок вместо куба --- */
+  const pack = ball(0.42, suit2, 22, 16);
+  pack.position.set(0, 1.30, -0.34);
+  pack.scale.set(0.74, 0.94, 0.44);
   g.add(pack);
-  const packTop = box(0.42, 0.12, 0.24, grey, 0, 1.7, -0.36);
+  const packTop = ball(0.30, grey, 18, 12);
+  packTop.position.set(0, 1.68, -0.33);
+  packTop.scale.set(0.72, 0.30, 0.50);
   g.add(packTop);
-  for (const sx of [-0.16, 0.16]) {
-    const tank = cyl(0.09, 0.09, 0.5, grey, sx, 1.3, -0.55, 10);
+  for (const sx of [-0.15, 0.15]) {
+    const tank = capsule(0.085, 0.30, grey, 14);
+    tank.position.set(sx, 1.28, -0.56);
     g.add(tank);
   }
 
-  // руки
+  /* --- РУКИ: капсулы + наплечники --- */
   const armL = new THREE.Group(), armR = new THREE.Group();
-  armL.position.set(-0.44, 1.6, 0);
-  armR.position.set( 0.44, 1.6, 0);
+  armL.position.set(-0.44, 1.50, 0);
+  armR.position.set( 0.44, 1.50, 0);
   for (const [arm, sx] of [[armL, -1], [armR, 1]]) {
-    const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 12), grey);
+    // наплечник
+    const shoulder = ball(0.185, suit, 20, 16);
+    shoulder.scale.set(1, 0.95, 1);
     arm.add(shoulder);
-    const upper = cyl(0.12, 0.11, 0.52, suit, 0, -0.3, 0, 12);
+    const shoulderTrim = ring(0.176, 0.030, grey, 20);
+    shoulderTrim.rotation.x = Math.PI / 2;
+    shoulderTrim.position.set(0, -0.09, 0);
+    arm.add(shoulderTrim);
+    // плечо
+    const upper = capsule(0.115, 0.24, suit, 18);
+    upper.position.set(0, -0.24, 0);
     arm.add(upper);
-    const elbow = new THREE.Mesh(new THREE.SphereGeometry(0.115, 12, 10), grey);
-    elbow.position.set(0, -0.58, 0);
+    // локоть
+    const elbow = ball(0.118, grey, 16, 12);
+    elbow.position.set(0, -0.47, 0);
     arm.add(elbow);
-    const fore = cyl(0.11, 0.1, 0.48, suit2, 0, -0.84, 0, 12);
+    // предплечье
+    const fore = capsule(0.100, 0.22, suit2, 18);
+    fore.position.set(0, -0.68, 0);
     arm.add(fore);
-    const glove = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10), grey);
-    glove.position.set(0, -1.12, 0);
+    // манжета перчатки
+    const gCuff = ring(0.098, 0.028, grey, 16);
+    gCuff.rotation.x = Math.PI / 2;
+    gCuff.position.set(0, -0.82, 0);
+    arm.add(gCuff);
+    // перчатка
+    const glove = ball(0.125, grey, 18, 14);
+    glove.position.set(0, -0.93, 0.01);
+    glove.scale.set(0.95, 1.15, 1.25);
     arm.add(glove);
+    // большой палец
+    const thumb = capsule(0.042, 0.06, grey, 10);
+    thumb.position.set(sx * 0.10, -0.94, 0.06);
+    thumb.rotation.z = sx * 0.6;
+    arm.add(thumb);
   }
   g.add(armL, armR);
 
-  // шея + шлем
-  g.add(cyl(0.15, 0.15, 0.14, grey, 0, 1.76, 0, 12));
+  // шея + герметичное кольцо шлема
+  g.add(cyl(0.145, 0.155, 0.16, grey, 0, 1.78, 0, 16));
+  const collar = ring(0.245, 0.050, grey, 26);
+  collar.rotation.x = Math.PI / 2;
+  collar.position.set(0, 1.78, 0);
+  g.add(collar);
 
   /* --- v3.2: ШЛЕМ С ПРОЗРАЧНЫМ СТЕКЛОМ И ЛИЦОМ ---
      Перед модели — это +Z, поэтому проём визора вырезан по phi вокруг PI/2.
