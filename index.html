@@ -1936,7 +1936,7 @@ function updateShip(dt){
   const thrust = back ? 0.3 : 1;
   engineGlowL.scale.set(pulse * thrust, (0.9 + pulse * 0.35) * thrust, pulse * thrust);
   engineGlowR.scale.set(pulse * thrust, (0.9 + pulse * 0.35) * thrust, pulse * thrust);
-  engineLight.intensity = (1.3 + pulse * 0.7) * thrust;
+  engineLight.intensity = (0.85 + pulse * 0.45) * thrust;
 
   // шлейф за кораблём убран — в вакууме остаётся только пламя из сопел
 
