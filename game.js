@@ -547,6 +547,16 @@ for (let z = HULL_Z0 + 6; z <= HULL_Z1 - 6; z += 6) {
   m.position.set(0, 0.05, z);
   room.add(m);
 }
+// v2.1: светящаяся кромка открытого (ближнего) борта — рамка обзора
+{
+  const pts = [];
+  for (let i = 0; i <= 20; i++) {
+    const z = HULL_Z0 + 3 + (i / 20) * (HULL_LEN - 6);
+    pts.push(new THREE.Vector3(hullHalf(z) - 0.25, 0.06, z));
+  }
+  room.add(new THREE.Mesh(
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 30, 0.07, 5, false), ringMat));
+}
 
 /* --- 5.6 носовой блистер: окно в космос --- */
 function archShape(w, h, inset, bottom) {
