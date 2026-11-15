@@ -843,6 +843,7 @@ export function createSpace(opts) {
             e.alive = false;
             state.score += 25;
             boom(e.x, e.y, e.z, LOW ? 28 : 50, [1.0, 0.42, 0.42], 18);
+            shock(e.x, e.y, e.z, 9, 0xffb0a0);            /* ударная волна */
             if (audio) audio.boom(false);
             kills++;
             if (speech && kills % 10 === 0) speech.say('Цель уничтожена');
