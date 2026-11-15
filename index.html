@@ -1892,8 +1892,9 @@ function updateShip(dt){
   shipModel.rotation.z = bank;
   shipModel.rotation.x = -input.y * 0.08;
 
-  // движение вперёд — ОДНА постоянная скорость, без разгона
-  speed = 20;
+  // движение — одна постоянная скорость вперёд; «◀ НАЗАД» даёт задний ход
+  const back = reversing || keys[' '] || keys['shift'] || keys['x'];
+  speed = back ? -12 : 20;
   fwd.set(0, 0, -1).applyQuaternion(shipRoot.quaternion);
   shipRoot.position.addScaledVector(fwd, speed * dt);
 
