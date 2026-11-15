@@ -997,17 +997,113 @@ function buildAstronaut() {
 
   // шея + шлем
   g.add(cyl(0.15, 0.15, 0.14, grey, 0, 1.76, 0, 12));
-  const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.34, 24, 20), suit);
-  helmet.position.set(0, 2.06, 0);
-  helmet.castShadow = true;
-  g.add(helmet);
-  // визор
-  const v = new THREE.Mesh(new THREE.SphereGeometry(0.3, 24, 20, -0.85, 1.7, 0.75, 1.5), visor);
-  v.position.set(0, 2.06, 0.02);
+
+  /* --- v3.2: ШЛЕМ С ПРОЗРАЧНЫМ СТЕКЛОМ И ЛИЦОМ ---
+     Перед модели — это +Z, поэтому проём визора вырезан по phi вокруг PI/2.
+     Шлем собран из трёх частей (верхняя шапка, нижняя часть, задняя полоса),
+     чтобы спереди остался ровный проём под стекло — без дыр и щелей. */
+  const HELM_R  = 0.34;
+  const VIS_HALF = 0.92;                 // половина угловой ширины проёма
+  const TH0 = 0.45, TH1 = 2.35;          // вертикальные границы проёма
+  const helmY = 2.06;
+
+  const helmParts = [
+    new THREE.SphereGeometry(HELM_R, 28, 10, 0, Math.PI * 2, 0, TH0),                       // верх
+    new THREE.SphereGeometry(HELM_R, 28, 10, 0, Math.PI * 2, TH1, Math.PI - TH1),           // низ
+    new THREE.SphereGeometry(HELM_R, 28, 16, Math.PI / 2 + VIS_HALF, Math.PI * 2 - VIS_HALF * 2, TH0, TH1 - TH0) // зад
+  ];
+  for (const hg of helmParts) {
+    const m = new THREE.Mesh(hg, suit);
+    m.position.set(0, helmY, 0);
+    m.castShadow = true;
+    g.add(m);
+  }
+
+  /* --- ЛИЦО внутри шлема --- */
+  const head = new THREE.Group();
+  head.position.set(0, helmY, 0);
+
+  const skull = new THREE.Mesh(new THREE.SphereGeometry(0.235, 22, 18), skin);
+  skull.scale.set(0.92, 1.06, 0.96);
+  head.add(skull);
+
+  // затылок и волосы (сзади, спереди остаётся лицо)
+  const hairM = new THREE.Mesh(
+    new THREE.SphereGeometry(0.243, 22, 16, Math.PI / 2 + 0.75, Math.PI * 2 - 1.5, 0, 1.45), hair);
+  hairM.scale.set(0.94, 1.05, 0.98);
+  head.add(hairM);
+
+  // челюсть
+  const jaw = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 12), skin);
+  jaw.position.set(0, -0.13, 0.045);
+  jaw.scale.set(1.0, 0.72, 0.95);
+  head.add(jaw);
+
+  // уши
+  for (const sx of [-1, 1]) {
+    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.055, 10, 8), skin);
+    ear.position.set(sx * 0.215, 0.01, 0);
+    ear.scale.set(0.5, 1, 0.8);
+    head.add(ear);
+  }
+
+  // глаза, зрачки, брови
+  for (const sx of [-1, 1]) {
+    const w = new THREE.Mesh(new THREE.SphereGeometry(0.045, 12, 10), eyeW);
+    w.position.set(sx * 0.082, 0.035, 0.185);
+    w.scale.set(1, 0.85, 0.6);
+    head.add(w);
+    const d = new THREE.Mesh(new THREE.SphereGeometry(0.024, 10, 8), eyeD);
+    d.position.set(sx * 0.082, 0.035, 0.212);
+    head.add(d);
+    const br = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.014, 0.02), hair);
+    br.position.set(sx * 0.082, 0.098, 0.198);
+    br.rotation.z = sx * 0.12;
+    head.add(br);
+  }
+
+  // нос
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.09, 8), skin);
+  nose.position.set(0, -0.02, 0.212);
+  nose.rotation.x = Math.PI / 2;
+  head.add(nose);
+
+  // рот
+  const mo = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.018, 0.02), mouth);
+  mo.position.set(0, -0.105, 0.198);
+  head.add(mo);
+
+  // гарнитура у щеки
+  const mic = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), dark);
+  mic.position.set(0.145, -0.13, 0.135);
+  head.add(mic);
+
+  g.add(head);
+
+  /* --- СТЕКЛО ВИЗОРА (прозрачное) --- */
+  const v = new THREE.Mesh(
+    new THREE.SphereGeometry(HELM_R - 0.005, 28, 16, Math.PI / 2 - VIS_HALF, VIS_HALF * 2, TH0, TH1 - TH0),
+    glassMat
+  );
+  v.position.set(0, helmY, 0);
+  v.renderOrder = 3;
   g.add(v);
+
+  // блик на стекле
+  const vSheen = new THREE.Mesh(
+    new THREE.SphereGeometry(HELM_R + 0.008, 20, 14, Math.PI / 2 - 0.5, 0.72, 0.72, 0.6),
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff, transparent: true, opacity: 0.14,
+      side: THREE.DoubleSide, depthWrite: false
+    })
+  );
+  vSheen.position.set(0, helmY, 0);
+  vSheen.renderOrder = 4;
+  g.add(vSheen);
+
   // обод визора
-  const vring = new THREE.Mesh(new THREE.TorusGeometry(0.29, 0.035, 8, 28), grey);
-  vring.position.set(0, 2.06, 0.16);
+  const vring = new THREE.Mesh(new THREE.TorusGeometry(0.30, 0.032, 8, 30), grey);
+  vring.position.set(0, helmY, 0.135);
   g.add(vring);
   // антенна
   const ant = cyl(0.015, 0.015, 0.3, grey, 0.22, 2.4, -0.1, 6);
