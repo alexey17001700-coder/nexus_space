@@ -1516,6 +1516,8 @@ function updateBoss(dt){
 
   const cg = boss.userData.coreGlow;
   if (cg) cg.material.opacity = 0.6 + Math.sin(elapsed * 9) * 0.25;
+  const bl = boss.userData.lamp;
+  if (bl) bl.intensity = 8 + Math.sin(elapsed * 5) * 2.4;
 
   // части: мировые координаты, маркеры, пламя
   let turrets = 0;
