@@ -504,6 +504,43 @@ export function createSpace(opts) {
   }
 
   /* ============================================================
+     7.5 УДАРНЫЕ ВОЛНЫ (расширяющиеся кольца, пул — без аллокаций)
+     ============================================================ */
+  const RING_N = LOW ? 6 : 10;
+  const ringGeo = new THREE.RingGeometry(0.55, 1.0, 40);
+  const rings = [];
+  for (let i = 0; i < RING_N; i++) {
+    const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({
+      color: 0xffd9a0, transparent: true, opacity: 0,
+      blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+      depthWrite: false, toneMapped: false
+    }));
+    m.visible = false;
+    scene.add(m);
+    rings.push({ m, life: 0, max: 1, size: 6 });
+  }
+  let ringHead = 0;
+  function shock(x, y, z, size, color) {
+    const r = rings[ringHead]; ringHead = (ringHead + 1) % RING_N;
+    r.m.position.set(x, y, z);
+    r.m.material.color.setHex(color || 0xffd9a0);
+    r.m.visible = true;
+    r.life = 0.55; r.max = 0.55; r.size = size || 6;
+    r.m.scale.setScalar(0.4);
+    r.m.material.opacity = 0.7;
+  }
+  function updateRings(dt) {
+    for (const r of rings) {
+      if (r.life <= 0) continue;
+      r.life -= dt;
+      const k = 1 - Math.max(0, r.life / r.max);
+      r.m.scale.setScalar(0.4 + k * r.size);
+      r.m.material.opacity = 0.7 * (1 - k);
+      if (r.life <= 0) r.m.visible = false;
+    }
+  }
+
+  /* ============================================================
      8. СОСТОЯНИЕ
      ============================================================ */
   const dummy = new THREE.Object3D();
