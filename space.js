@@ -321,6 +321,8 @@ export function createSpace(opts) {
     ship.rotation.set(0, 0, 0);
     camera.position.set(0, 3.8, 13);
     pushHud();
+    /* ЭТАП 4: бортовой компьютер объявляет уровень */
+    if (speech) speech.say('Уровень ' + level + '. Поехали!');
   }
 
   function exit() {
