@@ -248,9 +248,7 @@ for (const [sx, sz, ry] of sconcePos) {
   const s = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 0.22), sconceMat);
   s.position.set(sx, 4.3, sz); s.rotation.y = ry;
   room.add(s);
-  const sl = new THREE.PointLight(0xbfe8ff, 16, 15, 2);
-  sl.position.set(sx * 0.94, 4.1, sz * 0.94);
-  room.add(sl);
+  // без реального источника — светится материалом (экономия FPS)
 }
 
 // светящиеся полосы по полу (по периметру)
