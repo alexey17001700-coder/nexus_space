@@ -13,6 +13,9 @@ export function createSpace(opts) {
   const MID  = opts.quality === 'mid';
   const onHud = opts.onHud || function () {};
   const onEnd = opts.onEnd || function () {};
+  /* ЭТАП 4: звук (Web Audio) и голос компьютера (Web Speech) */
+  const audio  = opts.audio  || null;
+  const speech = opts.speech || null;
 
   /* ---------- сцена и камера ---------- */
   const scene = new THREE.Scene();
