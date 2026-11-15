@@ -1798,7 +1798,7 @@ function updateBoss(dt){
       if (rest > 0){
         hp -= rest;
         if (hp <= maxHp * 0.35) say('Критические повреждения');
-        if (hp <= 0){ hp = 0; endGame(false); return; }
+        if (hp <= 0){ hp = 0; loseLife(); return; }
       }
       invuln = 1.2;
       refreshHUD();
