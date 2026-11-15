@@ -639,7 +639,7 @@ const sidePanelMat = new THREE.MeshStandardMaterial({ color: 0x46566b, roughness
 const sideGlowMat  = new THREE.MeshStandardMaterial({
   color: 0x2a5f88, emissive: 0x5fc8ff, emissiveIntensity: 2.4, roughness: 0.3
 });
-for (const s of [-1, 1]) {
+for (const s of [-1]) {   // v2.1: бортовые панели только на дальнем борту
   for (let z = HULL_Z0 + 8; z <= HULL_Z1 - 8; z += 7) {
     const w = hullHalf(z);
     const p = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.5, 3.0), sidePanelMat);
