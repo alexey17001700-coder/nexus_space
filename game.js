@@ -812,7 +812,7 @@ function buildWorkbench(px, pz, ry) {
   g.add(lamp);
 
   room.add(g);
-  addObstacle(px, pz, 2.2, 1.1);
+  addObstacle(px, pz, 1.1, 2.2);   // v2.1: верстак развёрнут на 90° — габариты по Z
   addObstacle(px + Math.cos(ry) * 2.9, pz - Math.sin(ry) * 2.9, 0.8, 0.8);
   return g;
 }
