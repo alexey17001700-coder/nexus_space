@@ -1774,8 +1774,10 @@ function buy(key) {
   GAME.credits -= cost;
   GAME.up[key]++;
   setCredits();
+  SFX.ui();
   const nm = (UPGRADES.find(u => u.key === key) || {}).nm || key;
   showToast(`<b>УЛУЧШЕНИЕ УСТАНОВЛЕНО</b><small>${nm} → уровень ${GAME.up[key]}</small>`);
+  VOICE.say('Покупка совершена');
   renderUI();
 }
 
