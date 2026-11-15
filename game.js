@@ -1843,6 +1843,7 @@ function startFlight(level) {
     return;
   }
   closeUI();
+  SFX.resume();
   fadeEl.classList.add('on');
   setTimeout(() => {
     MODE = 'space';
