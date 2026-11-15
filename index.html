@@ -1264,6 +1264,13 @@ function updateCombat(dt){
     const mark = e.mesh.userData.mark;
     if (mark) mark.scale.setScalar((3.1 + Math.sin(elapsed * 9 + e.mesh.position.y) * 0.95) * inv);
 
+    // перекрёстный прицел: постоянный размер в мире, медленно вращается
+    const cross = e.mesh.userData.cross;
+    if (cross){
+      cross.scale.setScalar((8.4 + Math.sin(elapsed * 6 + e.mesh.position.x * 0.2) * 1.3) * inv);
+      cross.material.rotation += dt * 0.55;
+    }
+
     // подсветка врага: пульсирует и усиливается при приближении
     const lamp = e.mesh.userData.lamp;
     if (lamp) lamp.intensity = (3.4 + near * 3.2) + Math.sin(elapsed * 11 + e.mesh.position.x) * 0.9;
