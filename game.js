@@ -1586,6 +1586,7 @@ let uiTab    = 'state';
 
 function setCredits() {
   creditsEl.innerHTML = '💰 <b>' + GAME.credits + '</b> КРЕДИТОВ';
+  saveGame();          // ЭТАП 4: любой расход/доход сразу пишется в localStorage
 }
 
 function openUI(kind) {
