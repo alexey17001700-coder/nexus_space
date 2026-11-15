@@ -266,23 +266,25 @@ const termScreen = makeTerminalScreen();
 /* ============================================================
    4. ОСВЕЩЕНИЕ (тусклое, атмосферное)
    ============================================================ */
-// Бюджет динамических источников света. Каждый источник в Three.js
-// считается для каждого пикселя — на телефоне их число жёстко ограничено.
-const MAX_POINT_LIGHTS = QUALITY === 'high' ? 99 : QUALITY === 'mid' ? 5 : 0;
-let pointLightsUsed = 0;
-function addPointLight(color, intensity, distance, x, y, z, parent) {
-  if (pointLightsUsed >= MAX_POINT_LIGHTS) return null;
-  pointLightsUsed++;
-  const pl = new THREE.PointLight(color, intensity, distance, 2);
-  pl.position.set(x, y, z);
-  (parent || room).add(pl);
-  return pl;
-}
+/* --- БЮДЖЕТ СВЕТА (v2.0): ТОЛЬКО 2 РЕАЛЬНЫХ ИСТОЧНИКА ---
+   Каждый PointLight/SpotLight в Three.js считается для КАЖДОГО пикселя
+   и роняет FPS на телефоне. Поэтому реальных источников ровно два:
+     1) AmbientLight   — общий фон,
+     2) DirectionalLight — главный свет с тенями.
+   Всё остальное «свечение» — фейковое (fake lighting):
+     • emissive-материалы (панели, лампы, мониторы, разметка),
+     • выпеченные в текстуру световые пятна на полу (lightmap),
+     • блум (UnrealBloomPass) для мягкого ореола.
+   Ни одного нового источника света — GPU почти не нагружается. */
 
-scene.add(new THREE.AmbientLight(0x7a9cc8, QUALITY === 'high' ? 1.05 : 1.3));
-scene.add(new THREE.HemisphereLight(0x9fd0ff, 0x1e2836, QUALITY === 'high' ? 1.35 : 1.55));
+// заглушка: раньше здесь создавались PointLight. Теперь их нет вообще.
+function addPointLight() { return null; }
 
-const keyLight = new THREE.DirectionalLight(0xcfe4ff, 1.35);
+// 1) общий фон (единственный AmbientLight)
+scene.add(new THREE.AmbientLight(0x8fb4dd, QUALITY === 'high' ? 1.55 : 1.8));
+
+// 2) главный свет + тени (единственный DirectionalLight)
+const keyLight = new THREE.DirectionalLight(0xd6e8ff, 1.8);
 keyLight.position.set(14, 26, 10);
 keyLight.castShadow = SHADOWS;
 keyLight.shadow.mapSize.set(SHADOWS ? 1024 : 512, SHADOWS ? 1024 : 512);
@@ -291,10 +293,6 @@ keyLight.shadow.camera.top = 26;   keyLight.shadow.camera.bottom = -26;
 keyLight.shadow.camera.far = 70;
 keyLight.shadow.bias = -0.0009;
 scene.add(keyLight);
-
-const rimLight = new THREE.DirectionalLight(0x3f7fd0, 0.5);
-rimLight.position.set(-14, 12, -12);
-scene.add(rimLight);
 
 /* ============================================================
    5. КОРПУС КОРАБЛЯ — интерьер отсека (не квадратная комната)
