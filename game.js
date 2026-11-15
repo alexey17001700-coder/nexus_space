@@ -1351,7 +1351,7 @@ function renderComputer() {
   }
   if (uiTab === 'fly') {
     winBodyEl.querySelector('#startBtn').onclick = () => {
-      alert(`Запуск уровня ${GAME.selected}... Скоро здесь будет космос!`);
+      startFlight(GAME.selected);
     };
   }
 }
