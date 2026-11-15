@@ -1864,7 +1864,7 @@ const fwd = new THREE.Vector3();
 function updateShip(dt){
   // двигатель теперь отвечает за манёвренность (скорость постоянна)
   const agility = 1 + (upg.engine - 1) * 0.12;
-  const yawRate = 1.5 * agility, pitchRate = 1.25 * agility;
+  const yawRate = 1.5 * agility * sens, pitchRate = 1.25 * agility * sens;
   yaw   -= input.x * yawRate   * dt;
   pitch += input.y * pitchRate * dt;
   pitch = Math.max(-0.95, Math.min(0.95, pitch));
