@@ -595,7 +595,8 @@ function buildComputer(px, pz, ry) {
   // монитор
   const mon = box(2.3, 1.35, 0.12, MAT.dark, -0.5, 2.25, 0);
   g.add(mon);
-  const scr = new THREE.Mesh(new THREE.PlaneGeometry(2.05, 1.12), MAT.screen);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(2.05, 1.12),
+    new THREE.MeshBasicMaterial({ map: termScreen.tex, toneMapped: false }));
   scr.position.set(-0.5, 2.25, 0.075);
   g.add(scr);
   // рамка-подсветка
