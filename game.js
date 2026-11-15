@@ -937,6 +937,27 @@ function buildAstronaut() {
     color: 0x0a2030, emissive: 0x4fd8ff, emissiveIntensity: 2.0, roughness: 0.3
   });
 
+  /* --- v3.6: РЕАЛИСТИЧНЫЕ КОНТУРЫ ---
+     Раньше тело собиралось из цилиндров и кубов — силуэт был «рубленый»,
+     с острыми стыками. Теперь всё строится из капсул (округлые концы),
+     сфер-шарниров и тела вращения (LatheGeometry) — обводы плавные,
+     как у настоящего скафандра. */
+  const capsule = (r, len, mat, seg = 18) => {
+    const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 6, seg), mat);
+    m.castShadow = true; m.receiveShadow = true;
+    return m;
+  };
+  const ball = (r, mat, w = 18, h = 14) => {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(r, w, h), mat);
+    m.castShadow = true; m.receiveShadow = true;
+    return m;
+  };
+  const ring = (r, t, mat, seg = 20) => {
+    const m = new THREE.Mesh(new THREE.TorusGeometry(r, t, 8, seg), mat);
+    m.castShadow = true; m.receiveShadow = true;
+    return m;
+  };
+
   // ноги
   const legL = new THREE.Group(), legR = new THREE.Group();
   legL.position.set(-0.19, 0.72, 0);
