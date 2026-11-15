@@ -693,9 +693,22 @@ function stickMove(e) {
   stick.x = dx / MAXR;
   stick.y = dy / MAXR;
 }
+function placeStick(x, y) {
+  const w = stickBase.offsetWidth || 132, h = stickBase.offsetHeight || 132;
+  stickBase.style.left   = (x - w / 2) + 'px';
+  stickBase.style.top    = (y - h / 2) + 'px';
+  stickBase.style.bottom = 'auto';
+}
+function resetStickPos() {
+  stickBase.style.left = '';
+  stickBase.style.top = '';
+  stickBase.style.bottom = '';
+}
+
 stickBase.addEventListener('pointerdown', e => {
+  e.preventDefault();
   stickId = e.pointerId;
-  stickBase.setPointerCapture(e.pointerId);
+  try { stickBase.setPointerCapture(e.pointerId); } catch (_) {}
   stickMove(e);
 });
 stickBase.addEventListener('pointermove', stickMove);
@@ -704,9 +717,38 @@ function stickEnd(e) {
   stickId = null;
   stickKnob.style.transform = 'translate(0,0)';
   stick.x = 0; stick.y = 0;
+  resetStickPos();
 }
 stickBase.addEventListener('pointerup', stickEnd);
 stickBase.addEventListener('pointercancel', stickEnd);
+
+// Плавающий джойстик: касание в левой половине экрана переносит базу под палец.
+// Так на телефоне не нужно целиться в фиксированный кружок.
+if (IS_TOUCH) {
+  renderer.domElement.addEventListener('pointerdown', e => {
+    if (uiPaused || stickId !== null) return;
+    if (e.clientX > window.innerWidth * 0.55) return;
+    placeStick(e.clientX, e.clientY);
+    stickId = e.pointerId;
+    try { stickBase.setPointerCapture(e.pointerId); } catch (_) {}
+    stickMove(e);
+  });
+}
+
+// Полноэкранный режим — на телефоне скрывает адресную строку и ускоряет рендер
+const fsBtn = document.getElementById('fsBtn');
+if (fsBtn) {
+  const canFs = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+  if (!canFs) fsBtn.style.display = 'none';
+  fsBtn.addEventListener('click', () => {
+    const el = document.documentElement;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    }
+  });
+}
 
 // клавиатура
 const keys = {};
