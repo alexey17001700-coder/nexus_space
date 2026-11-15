@@ -8,9 +8,15 @@ import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
 
-const VERSION   = 'v3.4 · build 25';
+const VERSION   = 'v3.5 · build 26';
 const PLAYER_R  = 0.62;    // радиус космонавта
 const MOVE_SPEED = 6.4;
+
+// тег сборки берём из адреса самого game.js (?b=26) — чтобы модуль космоса
+// тоже подтягивался свежим, а не из кэша
+const BUILD_TAG = (new URL(import.meta.url).searchParams.get('b')) || '0';
+// режим: 'room' — отсек с космонавтом, 'space' — полёт
+let MODE = 'room';
 
 /* ============================================================
    0. УСТРОЙСТВО И КАЧЕСТВО ГРАФИКИ
