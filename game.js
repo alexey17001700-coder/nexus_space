@@ -703,6 +703,9 @@ function openUI(kind) {
     winTitleEl.innerHTML = 'ШТУРВАЛ<small>НАВИГАЦИЯ И ПОЛЁТ</small>';
   }
   renderUI();
+  // CRT-корпус только у компьютера; верстак/штурвал — терминальная перекраска
+  modalEl.classList.toggle('crt', kind === 'computer');
+  modalEl.classList.toggle('term', kind !== 'computer');
   modalEl.classList.add('on');
   // сброс джойстика, чтобы космонавт не «уехал» после закрытия
   stickId = null;
