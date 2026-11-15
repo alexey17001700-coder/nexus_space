@@ -23,6 +23,9 @@ const CORES     = navigator.hardwareConcurrency || 4;
 const QUALITY   = !IS_MOBILE ? 'high' : (CORES <= 4 ? 'low' : 'mid');
 const PR_CAP    = QUALITY === 'low' ? 1.0 : QUALITY === 'mid' ? 1.25 : 1.5;
 const SHADOWS   = QUALITY === 'high';
+// Блум (UnrealBloomPass) даёт «дорогое» свечение, но это 3 полноэкранных прохода.
+// Включаем только там, где GPU тянет; при просадке FPS гасится на ходу.
+let BLOOM_ON    = QUALITY !== 'low';
 
 /* ============================================================
    1. РЕНДЕР
