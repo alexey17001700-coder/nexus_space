@@ -1806,6 +1806,19 @@ function bindControls(){
     if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase())) e.preventDefault();
   });
   addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+  // кнопка заднего хода (удерживать)
+  const revBtn = $('rev');
+  const revOn  = e => { reversing = true;  revBtn.classList.add('act');    if (e.cancelable) e.preventDefault(); };
+  const revOff = () => { reversing = false; revBtn.classList.remove('act'); };
+  revBtn.addEventListener('touchstart', revOn, { passive: false });
+  revBtn.addEventListener('touchend', revOff);
+  revBtn.addEventListener('touchcancel', revOff);
+  revBtn.addEventListener('mousedown', revOn);
+  addEventListener('mouseup', revOff);
+  addEventListener('blur', revOff);
+
+  const joy = $('joy'), knob = $('knob');
   const R = 58;
 
   function start(x, y, id){
