@@ -663,7 +663,7 @@ const MAT = {
   metal:   new THREE.MeshStandardMaterial({ color: 0x8fa2b8, roughness: 0.42, metalness: 0.85 }),
   dark:    new THREE.MeshStandardMaterial({ color: 0x2a3444, roughness: 0.55, metalness: 0.6 }),
   panel:   new THREE.MeshStandardMaterial({ color: 0x4a5a70, roughness: 0.5, metalness: 0.7 }),
-  screen:  new THREE.MeshStandardMaterial({ color: 0x0a2a3a, emissive: 0x35d0ff, emissiveIntensity: 1.4, roughness: 0.15, metalness: 0.2 }),
+  screen:  new THREE.MeshStandardMaterial({ color: 0x0a2a3a, emissive: 0x35d0ff, emissiveIntensity: 1.9, roughness: 0.15, metalness: 0.2 }),
   screen2: new THREE.MeshStandardMaterial({ color: 0x2a1a0a, emissive: 0xffa63a, emissiveIntensity: 1.1, roughness: 0.2 }),
   screen3: new THREE.MeshStandardMaterial({ color: 0x0a2a1a, emissive: 0x3aff9a, emissiveIntensity: 1.0, roughness: 0.2 }),
   crate:   new THREE.MeshStandardMaterial({ color: 0x7a6a4a, roughness: 0.75, metalness: 0.25 }),
