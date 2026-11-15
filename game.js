@@ -1258,7 +1258,7 @@ function showToast(html, ms = 2600) {
 }
 
 function interact() {
-  if (uiPaused || !nearStation) return;
+  if (MODE !== 'room' || uiPaused || !nearStation) return;
   if (nearStation.name === 'КОМПЬЮТЕР')      openUI('computer');
   else if (nearStation.name === 'ВЕРСТАК')   openUI('bench');
   else                                       openUI('helm');
