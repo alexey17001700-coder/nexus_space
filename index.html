@@ -472,8 +472,8 @@
     btn.classList.add('on');
   }
 
-  /* Жёсткая перезагрузка: чистим Cache Storage (если есть) и грузим
-     страницу по уникальному адресу — кэш браузера и CDN обойти нельзя. */
+  /* Жёсткая перезагрузка: чистим Cache Storage и грузим страницу
+     по уникальному адресу — кэш браузера и CDN обойти нельзя. */
   function hardReload(){
     var url = location.pathname + '?b=' + Date.now() + '&t=' + Date.now();
     function go(){ location.replace(url); }
@@ -482,11 +482,54 @@
         caches.keys().then(function(ks){
           return Promise.all(ks.map(function(k){ return caches.delete(k); }));
         }).then(go).catch(go);
-        setTimeout(go, 700);           /* страховка, если caches подвиснет */
+        setTimeout(go, 900);           /* страховка, если caches подвиснет */
         return;
       }
     } catch(e){}
     go();
+  }
+
+  /* ===== ОБНОВЛЕНИЕ ЧЕРЕЗ SERVICE WORKER =====
+     Обычный location.reload() бесполезен: старый SW снова отдаёт
+     свой кэш. Поэтому:
+       1) просим воркер проверить себя (reg.update)
+       2) если появился новый воркер — активируем его (SKIP_WAITING)
+       3) ждём controllerchange и только потом перезагружаем страницу
+     Если SW нет — просто жёсткая перезагрузка. */
+  function forceUpdate(){
+    if (!('serviceWorker' in navigator) || !navigator.serviceWorker.getRegistration){
+      hardReload(); return;
+    }
+    var done = false;
+    function finish(){ if (done) return; done = true; hardReload(); }
+
+    try { navigator.serviceWorker.addEventListener('controllerchange', finish); } catch(e){}
+    setTimeout(finish, 3000);          /* страховка на случай тишины */
+
+    function kick(reg){
+      if (!reg) return;
+      if (reg.waiting){
+        try { reg.waiting.postMessage({type:'SKIP_WAITING'}); } catch(e){}
+      }
+      if (reg.installing){
+        reg.installing.addEventListener('statechange', function(){
+          if (this.state === 'installed'){
+            try { this.postMessage({type:'SKIP_WAITING'}); } catch(e){}
+          }
+        });
+      }
+    }
+
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if (!reg){ finish(); return; }
+      kick(reg);
+      reg.update().then(function(){
+        kick(reg);
+        setTimeout(function(){
+          if (!navigator.serviceWorker.controller) finish();
+        }, 1200);
+      }).catch(finish);
+    }).catch(finish);
   }
 
   function check(){
@@ -502,16 +545,16 @@
         try {
           if (!sessionStorage.getItem(key)){
             sessionStorage.setItem(key, '1');
-            hardReload();
+            forceUpdate();
           }
-        } catch(e){ hardReload(); }
+        } catch(e){ forceUpdate(); }
       })
       .catch(function(){ busy = false; });
   }
 
   if (btn) btn.addEventListener('click', function(){
     btn.textContent = '⏳ ОБНОВЛЯЮ…';
-    hardReload();
+    forceUpdate();
   });
 
   check();
