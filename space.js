@@ -532,7 +532,14 @@ export function createSpace(opts) {
         if (dx * dx + dy * dy + dz * dz < 6.5) {
           l.alive = false;
           e.hp -= laserDmg;
-,
+          if (e.hp <= 0) {
+            e.alive = false;
+            state.score += 25;
+            boom(e.x, e.y, e.z, LOW ? 28 : 50, [1.0, 0.42, 0.42], 18);
+            if (audio) audio.boom(false);
+            kills++;
+            if (speech && kills % 10 === 0) speech.say('Цель уничтожена');
+          } else {
             boom(l.x, l.y, l.z, 5, [1.0, 0.8, 0.5], 7);
           }
           break;
