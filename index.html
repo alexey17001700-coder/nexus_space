@@ -342,6 +342,7 @@ const input = { x: 0, y: 0 };       // сглаженный ввод -1..1
 const raw   = { x: 0, y: 0 };       // сырой ввод
 const keys  = {};
 let joyActive = false, joyId = null, joyStart = { x: 0, y: 0 }, joyVec = { x: 0, y: 0 };
+let sens = 1;                       // чувствительность управления (настройки)
 
 const $ = id => document.getElementById(id);
 
