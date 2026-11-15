@@ -513,9 +513,7 @@ function buildHelm(px, pz, ry) {
   g.add(holoEdge);
 
   // свет
-  const hl = new THREE.PointLight(0x4fd8ff, 16, 11, 2);
-  hl.position.set(0, 3.6, 0.6);
-  g.add(hl);
+  addPointLight(0x4fd8ff, 16, 11, 0, 3.6, 0.6, g);
 
   room.add(g);
   addObstacle(px, pz, 1.7, 1.7);
