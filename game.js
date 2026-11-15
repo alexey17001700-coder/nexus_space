@@ -468,47 +468,17 @@ const shell = new THREE.Mesh(buildShellGeometry(), hullMat);
 shell.receiveShadow = true;
 room.add(shell);
 
-/* --- 5.3 шпангоуты (рёбра корпуса) --- */
-const ribMat = new THREE.MeshStandardMaterial({
-  color: 0x93a9c2, roughness: 0.36, metalness: 0.9,
-  emissive: 0x1c3a58, emissiveIntensity: 0.5
-});
-// v2.1: арки — только ДАЛЬНЯЯ дуга. Передняя дуга убрана, чтобы не перекрывать
-// вид на космонавта (открытый вид «как в Diablo»).
-// Дуга печётся в геометрию (rotateZ), чтобы масштабирование по X/Y не косило её.
-const RIB_A = Math.PI * 0.58;   // длина дуги (совпадает с обшивкой)
-const RIB_R = Math.PI * 0.42;   // старт дуги: чуть правее потолка → дальний пол
-const ribGeo  = new THREE.TorusGeometry(1, 0.095, 8, 26, RIB_A);  // толстые арки
-ribGeo.rotateZ(RIB_R);
-const ribGeo2 = new THREE.TorusGeometry(1, 0.05, 6, 24, RIB_A * 0.96);  // внутренний поясок
-ribGeo2.rotateZ(RIB_R + 0.03);
+/* --- 5.3 СПЛОШНАЯ ИЗОГНУТАЯ СТЕНА (v2.7) ---
+   Арки (шпангоуты) убраны — вместо них сплошная стена по всей длине корпуса.
+   Поверхность строится по ТОМУ ЖЕ профилю, что и обшивка (cos/sin по сечению),
+   поэтому стена «натянута» на корпус и повторяет его изгиб.
+   Текстура тянется вдоль корабля. */
 const gapPanelMat = new THREE.MeshStandardMaterial({
-  color: 0x2b3646, roughness: 0.74, metalness: 0.32,
-  emissive: 0x0d1c2c, emissiveIntensity: 0.7, side: THREE.DoubleSide
+  color: 0x33404f, roughness: 0.7, metalness: 0.38,
+  emissive: 0x0e1e2e, emissiveIntensity: 0.8, side: THREE.DoubleSide
 });
-const ribZs = [];
-for (let z = HULL_Z0 + 3.2; z <= HULL_Z1 - 3.2; z += 3.6) ribZs.push(z);
-
-for (const z of ribZs) {
-  const w = hullHalf(z), h = hullHeight(z);
-  const rib = new THREE.Mesh(ribGeo, ribMat);
-  rib.scale.set(w - 0.10, h - 0.10, 1);
-  rib.position.set(0, 0, z);
-  rib.castShadow = true;
-  room.add(rib);
-  // второй, тонкий внутренний поясок — обшивка выглядит «богаче»
-  const rib2 = new THREE.Mesh(ribGeo2, ribMat);
-  rib2.scale.set(w - 0.58, h - 0.58, 1);
-  rib2.position.set(0, 0, z);
-  room.add(rib2);
-}
-/* --- 5.3b ИЗОГНУТЫЕ ПАНЕЛИ МЕЖДУ АРКАМИ (v2.6) ---
-   Раньше здесь стояли плоские BoxGeometry — прямоугольные куски ломали
-   эффект корабля. Теперь панель строится по ТОМУ ЖЕ профилю, что и обшивка
-   (cos/sin по сечению), поэтому она «натянута» на арки и повторяет изгиб
-   борта. Текстура тянется вдоль корпуса. */
-function buildCurvedPanel(z0, z1, inset, a0, a1) {
-  const ZS = 8, AS = 14, pos = [], uv = [], idx = [];
+function buildCurvedPanel(z0, z1, inset, a0, a1, ZS = 8) {
+  const AS = 14, pos = [], uv = [], idx = [];
   for (let i = 0; i <= ZS; i++) {
     const z = z0 + (i / ZS) * (z1 - z0);
     const w = Math.max(0.3, hullHalf(z) - inset);
