@@ -1730,6 +1730,7 @@ function onResize() {
   fitCamera();
   renderer.setSize(window.innerWidth, window.innerHeight);
   if (composer) composer.setSize(window.innerWidth, window.innerHeight);
+  if (space) space.resize();
 }
 addEventListener('resize', onResize);
 addEventListener('orientationchange', () => setTimeout(onResize, 260));
