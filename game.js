@@ -1821,6 +1821,8 @@ import('./space.js?b=' + BUILD_TAG).then(m => {
   space = m.createSpace({
     renderer: renderer,
     quality: QUALITY,
+    audio: SFX,        // ЭТАП 4: синтезированные звуки (Web Audio)
+    speech: VOICE,     // ЭТАП 4: голос бортового компьютера
     onHud: updateSpaceHud,
     onEnd: onSpaceEnd
   });
