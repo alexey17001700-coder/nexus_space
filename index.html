@@ -2182,9 +2182,7 @@ function onResize(){
 
 /* ---------------- Старт ---------------- */
 function startGame(){
-  $('start').classList.add('hide');
-  $('over').classList.add('hide');
-  $('shop').classList.add('hide');
+  ['start','over','shop','how','set','about'].forEach(s => $(s).classList.add('hide'));
   resetGame();
   shipRoot.position.set(0, 0, 0);
   shipRoot.rotation.set(0, 0, 0);
