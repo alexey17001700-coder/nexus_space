@@ -464,9 +464,20 @@ shell.receiveShadow = true;
 room.add(shell);
 
 /* --- 5.3 шпангоуты (рёбра корпуса) --- */
-const ribMat = new THREE.MeshStandardMaterial({ color: 0x74879e, roughness: 0.42, metalness: 0.88 });
-const ribGeo = new THREE.TorusGeometry(1, 0.03, 6, 26, Math.PI * 0.86);
-for (let z = HULL_Z0 + 3.2; z <= HULL_Z1 - 3.2; z += 3.6) {
+const ribMat = new THREE.MeshStandardMaterial({
+  color: 0x93a9c2, roughness: 0.36, metalness: 0.9,
+  emissive: 0x1c3a58, emissiveIntensity: 0.5
+});
+const ribGeo  = new THREE.TorusGeometry(1, 0.075, 8, 30, Math.PI * 0.86);  // толстые арки
+const ribGeo2 = new THREE.TorusGeometry(1, 0.042, 6, 26, Math.PI * 0.86);  // внутренний поясок
+const gapPanelMat = new THREE.MeshStandardMaterial({
+  color: 0x2b3646, roughness: 0.74, metalness: 0.32,
+  emissive: 0x0d1c2c, emissiveIntensity: 0.7
+});
+const ribZs = [];
+for (let z = HULL_Z0 + 3.2; z <= HULL_Z1 - 3.2; z += 3.6) ribZs.push(z);
+
+for (const z of ribZs) {
   const w = hullHalf(z), h = hullHeight(z);
   const rib = new THREE.Mesh(ribGeo, ribMat);
   rib.scale.set(w - 0.14, h - 0.14, 1);
@@ -474,6 +485,25 @@ for (let z = HULL_Z0 + 3.2; z <= HULL_Z1 - 3.2; z += 3.6) {
   rib.position.set(0, 0, z);
   rib.castShadow = true;
   room.add(rib);
+  // второй, тонкий внутренний поясок — обшивка выглядит «богаче»
+  const rib2 = new THREE.Mesh(ribGeo2, ribMat);
+  rib2.scale.set(w - 0.62, h - 0.62, 1);
+  rib2.rotation.z = Math.PI * 0.07;
+  rib2.position.set(0, 0, z);
+  room.add(rib2);
+}
+// тёмные панели в промежутках между арками — чтобы не было пустоты
+for (let i = 0; i < ribZs.length - 1; i++) {
+  const zc = (ribZs[i] + ribZs[i + 1]) / 2;
+  const w = hullHalf(zc), h = hullHeight(zc);
+  const ph = Math.max(1.6, h - 1.7);
+  for (const s of [-1, 1]) {
+    const p = new THREE.Mesh(new THREE.BoxGeometry(0.16, ph, 2.7), gapPanelMat);
+    p.position.set(s * (w - 0.42), ph / 2 + 0.28, zc);
+    p.rotation.y = s * 0.05;
+    p.receiveShadow = true;
+    room.add(p);
+  }
 }
 
 /* --- 5.4 продольные стрингеры по бортам --- */
