@@ -60,6 +60,17 @@
   #reticle:before{left:50%;top:0;width:1px;height:14px;margin-left:-.5px;box-shadow:0 50px 0 rgba(0,220,255,.55)}
   #reticle:after{top:50%;left:0;height:1px;width:14px;margin-top:-.5px;box-shadow:50px 0 0 rgba(0,220,255,.55)}
 
+  /* ---------- Маркеры целей за экраном ---------- */
+  #markers{position:fixed;inset:0;pointer-events:none;z-index:11;overflow:hidden}
+  .mk{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;
+    display:none;font-size:24px;line-height:30px;text-align:center;
+    color:#ff3a5c;text-shadow:0 0 10px rgba(255,60,90,.95),0 0 22px rgba(255,60,90,.6);
+    transform-origin:50% 50%;animation:mkPulse .9s ease-in-out infinite}
+  .mk.on{display:block}
+  .mk.boss{color:#ffd24a;text-shadow:0 0 10px rgba(255,210,74,.95),0 0 24px rgba(255,180,40,.6)}
+  .mk.ast{color:#c9b48a;font-size:20px;text-shadow:0 0 8px rgba(200,180,140,.8)}
+  @keyframes mkPulse{0%,100%{opacity:.7}50%{opacity:1}}
+
   /* ---------- Магазин ---------- */
   .shopgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
     width:100%;max-width:540px;margin-bottom:20px}
