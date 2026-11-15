@@ -220,10 +220,21 @@
 
 <div class="screen" id="start">
   <h1>NEXUS SPACE</h1>
-  <div class="sub">Этап 9 · прицелы на врагах</div>
-  <button class="btn" id="play">Старт</button>
-  <div class="keys">
-    <b>Тяни палец</b> по экрану — управление кораблём<br>
+  <div class="sub">3D космический бой</div>
+  <div class="menu">
+    <button class="mbtn primary" id="play">▶ Играть</button>
+    <button class="mbtn" id="mHow">📖 Как играть</button>
+    <button class="mbtn" id="mSet">⚙ Настройки</button>
+    <button class="mbtn" id="mAbout">ℹ Об игре</button>
+  </div>
+  <div class="keys">Версия: <b>v5.6 (build 20)</b></div>
+</div>
+
+<div class="screen hide" id="how">
+  <h1>КАК ИГРАТЬ</h1>
+  <div class="sub">Управление и правила</div>
+  <div class="keys" style="margin-top:0">
+    <b>Тяни палец</b> по экрану — корабль летит за пальцем<br>
     <b>Огонь</b> — автоматический, целься корпусом<br>
     <b>WASD / ←↑↓→</b> — на компьютере<br>
     <b>Магазин</b> — между уровнями, за кредиты<br>
@@ -231,10 +242,41 @@
     <b>Супер-босс</b> — на 2 и 4 уровне, бей по частям корпуса<br>
     <b>Щит</b> — синяя сфера, гасит урон и восстанавливается<br>
     <b>Маркеры</b> — стрелка у края экрана укажет, где враг<br>
-    <b>Подсветка</b> — враги светятся красным, видно издалека<br>
-    <b>Прицел</b> — перекрёстие на каждом враге и части босса<br>
-    Версия: <b>v5.5 (build 19)</b>
+    <b>Прицел</b> — перекрёстие на каждом враге и части босса
   </div>
+  <button class="btn" id="howBack" style="margin-top:22px">Назад</button>
+</div>
+
+<div class="screen hide" id="set">
+  <h1>НАСТРОЙКИ</h1>
+  <div class="sub">Звук и управление</div>
+  <div class="setrow">
+    <span>🔊 Голос компьютера</span>
+    <button class="tgl" id="setVoice">Вкл</button>
+  </div>
+  <div class="setrow">
+    <span>🎯 Чувствительность</span>
+    <input type="range" id="setSens" min="40" max="180" value="100">
+  </div>
+  <div class="setrow">
+    <span>📊 Значение</span>
+    <b id="sensVal" style="color:#fff">100%</b>
+  </div>
+  <button class="btn" id="setBack" style="margin-top:22px">Назад</button>
+</div>
+
+<div class="screen hide" id="about">
+  <h1>ОБ ИГРЕ</h1>
+  <div class="sub">NEXUS SPACE</div>
+  <div class="keys" style="margin-top:0">
+    <b>Жанр:</b> 3D-космический шутер от третьего лица<br>
+    <b>Движок:</b> Three.js (WebGL)<br>
+    <b>Озвучка:</b> Web Speech API (бортовой компьютер)<br>
+    <b>Уровней:</b> 4 · супер-босс на 2 и 4<br>
+    <b>Прокачка:</b> оружие, щиты, двигатель<br>
+    <b>Версия:</b> v5.6 (build 20)
+  </div>
+  <button class="btn" id="aboutBack" style="margin-top:22px">Назад</button>
 </div>
 
 <div class="screen hide" id="shop">
