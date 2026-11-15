@@ -1817,6 +1817,79 @@ function recycle(dt){
   if (sunSprite) wrap(sunSprite, sunSprite.userData.spread);
 }
 
+/* ---------------- Маркеры целей за экраном ----------------
+   Если враг/астероид/часть босса ушёл за кадр — у края экрана
+   появляется стрелка, которая показывает, где он.                */
+const mkPool = [];
+const _mkV = new THREE.Vector3(), _mkC = new THREE.Vector3();
+function getMk(i){
+  let el = mkPool[i];
+  if (!el){
+    el = document.createElement('div');
+    el.className = 'mk';
+    el.textContent = '▲';
+    $('markers').appendChild(el);
+    mkPool[i] = el;
+  }
+  return el;
+}
+function updateMarkers(){
+  const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
+  let n = 0;
+
+  if (playing && camera){
+    camera.updateMatrixWorld();
+    camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+
+    const list = [];
+    for (const e of enemies){
+      if (!e.alive) continue;
+      if (e.mesh.position.distanceTo(shipRoot.position) > 460) continue;
+      list.push([e.mesh.position, '']);
+    }
+    for (const a of asteroids){
+      if (!a.alive || a.radius < 3.4) continue;
+      if (a.mesh.position.distanceTo(shipRoot.position) > 460) continue;
+      list.push([a.mesh.position, 'ast']);
+    }
+    if (boss) for (const p of bossParts){
+      if (p.alive) list.push([p.world, 'boss']);
+    }
+
+    for (const item of list){
+      if (n >= 14) break;
+      const pos = item[0], cls = item[1];
+
+      _mkC.copy(pos).applyMatrix4(camera.matrixWorldInverse);
+      const behind = _mkC.z > 0;               // цель за спиной камеры
+      _mkV.copy(pos).project(camera);
+      let x = _mkV.x, y = _mkV.y;
+      if (behind){ x = -x; y = -y; }
+
+      // цель на экране — стрелка не нужна
+      if (!behind && Math.abs(x) < 0.88 && Math.abs(y) < 0.88) continue;
+
+      // прижимаем к краю кадра
+      const m = Math.max(Math.abs(x), Math.abs(y)) || 1;
+      const k = 0.88 / m;
+      x *= k; y *= k;
+
+      const sx = (x * 0.5 + 0.5) * W;
+      const sy = (-y * 0.5 + 0.5) * H;
+      const ang = Math.atan2(sy - cy, sx - cx) * 180 / Math.PI + 90;
+
+      const el = getMk(n);
+      el.className = 'mk on' + (cls ? ' ' + cls : '');
+      el.style.left = sx + 'px';
+      el.style.top  = sy + 'px';
+      el.style.transform = 'rotate(' + ang + 'deg)';
+      n++;
+    }
+  }
+
+  for (let i = n; i < mkPool.length; i++) mkPool[i].className = 'mk';
+}
+
 /* ---------------- HUD ---------------- */
 let hudTick = 0;
 function refreshHUD(){
