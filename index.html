@@ -1643,11 +1643,8 @@ function updateBoss(dt){
   if (dist > 0.001) _v1.normalize(); else _v1.set(0, 0, -1);
   bossCourse.lerp(_v1, 1 - Math.pow(0.25, dt)).normalize();
 
-  // босс держит дистанцию: не даёт себя обогнать и не уходит слишком далеко
-  let bs = 20;
-  if (dist > 150) bs = 26;
-  else if (dist < 55) bs = 22;
-  boss.position.addScaledVector(bossCourse, bs * dt);
+  // босс идёт с постоянной скоростью — игрок догоняет его и держится вровень
+  boss.position.addScaledVector(bossCourse, BOSS_SPEED * dt);
 
   // корма развёрнута к игроку
   _v2.copy(boss.position).add(bossCourse);
