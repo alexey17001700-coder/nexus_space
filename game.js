@@ -478,13 +478,13 @@ const ribMat = new THREE.MeshStandardMaterial({
 // Дуга печётся в геометрию (rotateZ), чтобы масштабирование по X/Y не косило её.
 const RIB_A = Math.PI * 0.58;   // длина дуги (совпадает с обшивкой)
 const RIB_R = Math.PI * 0.42;   // старт дуги: чуть правее потолка → дальний пол
-const ribGeo  = new THREE.TorusGeometry(1, 0.075, 8, 24, RIB_A);  // толстые арки
+const ribGeo  = new THREE.TorusGeometry(1, 0.095, 8, 26, RIB_A);  // толстые арки
 ribGeo.rotateZ(RIB_R);
-const ribGeo2 = new THREE.TorusGeometry(1, 0.042, 6, 22, RIB_A * 0.96);  // внутренний поясок
+const ribGeo2 = new THREE.TorusGeometry(1, 0.05, 6, 24, RIB_A * 0.96);  // внутренний поясок
 ribGeo2.rotateZ(RIB_R + 0.03);
 const gapPanelMat = new THREE.MeshStandardMaterial({
   color: 0x2b3646, roughness: 0.74, metalness: 0.32,
-  emissive: 0x0d1c2c, emissiveIntensity: 0.7
+  emissive: 0x0d1c2c, emissiveIntensity: 0.7, side: THREE.DoubleSide
 });
 const ribZs = [];
 for (let z = HULL_Z0 + 3.2; z <= HULL_Z1 - 3.2; z += 3.6) ribZs.push(z);
