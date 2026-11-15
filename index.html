@@ -99,6 +99,17 @@
   #credits{top:calc(42px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));color:#ffd98a;font-weight:600}
   #credits b{color:#fff}
 
+  /* ---------- Кнопка обновления ---------- */
+  #updBtn{position:absolute;top:calc(74px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));
+    padding:9px 13px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.6px;
+    font-family:inherit;color:#04170c;cursor:pointer;pointer-events:auto;
+    background:linear-gradient(180deg,#8dffb8,#2fbf74);border:1px solid #c9ffe0;
+    box-shadow:0 0 22px rgba(80,255,150,.55);opacity:0;transform:translateY(-8px) scale(.9);
+    transition:all .25s ease;animation:updPulse 1.6s ease-in-out infinite}
+  #updBtn.on{opacity:1;transform:none}
+  #updBtn:active{transform:scale(.94)}
+  @keyframes updPulse{0%,100%{box-shadow:0 0 16px rgba(80,255,150,.4)}50%{box-shadow:0 0 30px rgba(80,255,150,.9)}}
+
   /* ---------- Модальные окна ---------- */
   #modal{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
     padding:16px;background:rgba(3,7,14,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
