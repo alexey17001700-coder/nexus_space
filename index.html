@@ -600,12 +600,15 @@
 })();
 </script>
 <script>
-/* ===== SERVICE WORKER (v2.3) =====
+/* ===== SERVICE WORKER (v2.8) =====
    Сеть в приоритете: index.html / game.js / version.json всегда тянутся
-   свежими, кэш браузера и CDN больше не мешают обновлениям. */
+   свежими, кэш браузера и CDN больше не мешают обновлениям.
+   updateViaCache:'none' — сам sw.js тоже не кэшируется. */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js', {scope: './'}).catch(function(){});
+    navigator.serviceWorker.register('sw.js', {scope: './', updateViaCache: 'none'})
+      .then(function(reg){ try { reg.update(); } catch(e){} })
+      .catch(function(){});
   });
 }
 </script>
