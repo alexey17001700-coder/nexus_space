@@ -462,7 +462,7 @@
    один раз автоматически перезагружает страницу с обходом кэша (?b=),
    а также показывает кнопку «ОБНОВИТЬ» на случай ручного обновления. */
 (function(){
-  var BUILD = 7, VERSION = '1.6';
+  var BUILD = 9, VERSION = '1.8';
   var btn = document.getElementById('updBtn');
   var busy = false;
 
@@ -470,6 +470,23 @@
     if (!btn) return;
     btn.textContent = '⬆ НОВАЯ ВЕРСИЯ v' + v + ' — ОБНОВИТЬ';
     btn.classList.add('on');
+  }
+
+  /* Жёсткая перезагрузка: чистим Cache Storage (если есть) и грузим
+     страницу по уникальному адресу — кэш браузера и CDN обойти нельзя. */
+  function hardReload(){
+    var url = location.pathname + '?b=' + Date.now() + '&t=' + Date.now();
+    function go(){ location.replace(url); }
+    try {
+      if (window.caches && caches.keys){
+        caches.keys().then(function(ks){
+          return Promise.all(ks.map(function(k){ return caches.delete(k); }));
+        }).then(go).catch(go);
+        setTimeout(go, 700);           /* страховка, если caches подвиснет */
+        return;
+      }
+    } catch(e){}
+    go();
   }
 
   function check(){
@@ -485,15 +502,16 @@
         try {
           if (!sessionStorage.getItem(key)){
             sessionStorage.setItem(key, '1');
-            location.replace(location.pathname + '?b=' + d.build + '&t=' + Date.now());
+            hardReload();
           }
-        } catch(e){}
+        } catch(e){ hardReload(); }
       })
       .catch(function(){ busy = false; });
   }
 
   if (btn) btn.addEventListener('click', function(){
-    location.replace(location.pathname + '?b=' + Date.now() + '&t=' + Date.now());
+    btn.textContent = '⏳ ОБНОВЛЯЮ…';
+    hardReload();
   });
 
   check();
