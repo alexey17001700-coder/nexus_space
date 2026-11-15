@@ -73,7 +73,7 @@ function fitCamera() {
   const w = window.innerWidth, h = window.innerHeight;
   const aspect = w / h;
   const k = aspect < 1 ? Math.min(1.3, 0.98 / Math.max(aspect, 0.58)) : 1;
-  CAM_OFFSET.set(4.0 * k, 4.6 * (0.9 + 0.1 * k), 4.0 * k);
+  CAM_OFFSET.set(6.4 * k, 7.36 * (0.9 + 0.1 * k), 6.4 * k);
   camera.aspect = aspect;
   camera.fov = aspect < 1 ? 44 : 40;
   camera.updateProjectionMatrix();
