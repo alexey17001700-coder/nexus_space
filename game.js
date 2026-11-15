@@ -609,7 +609,7 @@ room.add(hatchGlow);
 
 /* --- 5.8 потолочные светильники по оси корпуса --- */
 const lampMat = new THREE.MeshStandardMaterial({
-  color: 0x9fd8ff, emissive: 0x9fd8ff, emissiveIntensity: 2.2, roughness: 0.2
+  color: 0x9fd8ff, emissive: 0x9fd8ff, emissiveIntensity: 2.8, roughness: 0.2
 });
 const lampHousMat = new THREE.MeshStandardMaterial({ color: 0x8ea6c0, roughness: 0.45, metalness: 0.75 });
 for (let lz = HULL_Z0 + 6; lz <= HULL_Z1 - 6; lz += 5.5) {
