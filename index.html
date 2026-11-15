@@ -1383,11 +1383,11 @@ function updateCombat(dt){
     // ореол, ядро и маркер держим одного размера в мире (компенсируем масштаб)
     const inv = 1 / sc;
     const halo = e.mesh.userData.halo;
-    if (halo) halo.scale.setScalar((25.6 + Math.sin(elapsed * 7 + e.mesh.position.x * 0.3) * 4.3) * inv);
+    if (halo) halo.scale.setScalar((38 + Math.sin(elapsed * 7 + e.mesh.position.x * 0.3) * 6) * inv);
     const core = e.mesh.userData.core;
-    if (core) core.scale.setScalar((10.3 + Math.sin(elapsed * 5 + e.mesh.position.z * 0.2) * 1.9) * inv);
+    if (core) core.scale.setScalar((15 + Math.sin(elapsed * 5 + e.mesh.position.z * 0.2) * 2.6) * inv);
     const mark = e.mesh.userData.mark;
-    if (mark) mark.scale.setScalar((3.1 + Math.sin(elapsed * 9 + e.mesh.position.y) * 0.95) * inv);
+    if (mark) mark.scale.setScalar((4.4 + Math.sin(elapsed * 9 + e.mesh.position.y) * 1.2) * inv);
 
     // перекрёстный прицел: постоянный размер в мире, медленно вращается
     const cross = e.mesh.userData.cross;
