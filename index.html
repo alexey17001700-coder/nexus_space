@@ -1591,7 +1591,7 @@ function updateBossBar(){
 function spawnBoss(){
   boss = buildBossMesh();
   boss.scale.setScalar(BOSS_SCALE);
-  boss.position.copy(shipRoot.position).addScaledVector(fwd, 180);
+  boss.position.copy(shipRoot.position).addScaledVector(fwd, 240);
   bossCourse.copy(fwd);
   scene.add(boss);
 
