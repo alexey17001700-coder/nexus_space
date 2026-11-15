@@ -252,7 +252,7 @@ function buildFloorGeometry() {
     const z = HULL_Z0 + (i / ZS) * HULL_LEN;
     const w = hullHalf(z) - 0.03;
     pos.push(-w, 0, z, w, 0, z);
-    uv.push(0, (i / ZS) * 12, 2.6, (i / ZS) * 12);
+    uv.push(0, (i / ZS) * 1.31, 0.6, (i / ZS) * 1.31);
   }
   for (let i = 0; i < ZS; i++) {
     const a = i * 2, b = a + 1, c = a + 2, d = a + 3;
