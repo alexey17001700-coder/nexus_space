@@ -1450,7 +1450,7 @@ function renderHelm() {
     <div class="note">Штурвал запускает полёт на выбранный уровень</div>
   </div>`;
   winBodyEl.querySelector('#flyBtn').onclick = () => {
-    alert(`Запуск уровня ${GAME.selected}... Скоро здесь будет космос!`);
+    startFlight(GAME.selected);
   };
 }
 
