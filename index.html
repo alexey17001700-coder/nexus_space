@@ -1959,9 +1959,10 @@ function updateShip(dt){
   if (back){
     speed = -12;
   } else if (boss && bossDeath <= 0){
-    // бой с боссом: догоняем, затем идём вровень с ним до победы или смерти
+    // бой с боссом: держимся ЗА его кормой на дистанции, а не влетаем в него
     const d = boss.position.distanceTo(shipRoot.position);
-    speed = d > BOSS_CATCH_DIST ? BOSS_SPEED + 12 : BOSS_SPEED;
+    const corr = Math.max(-9, Math.min(14, (d - BOSS_HOLD_DIST) * 0.35));
+    speed = BOSS_SPEED + corr;
   } else {
     speed = 20;
   }
