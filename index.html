@@ -1736,7 +1736,7 @@ function updateBoss(dt){
   _bq.copy(boss.quaternion).invert();
   _bl.copy(shipRoot.position).sub(boss.position).applyQuaternion(_bq);
   const HX = 32, HY = 9, HZ = 32;      // габариты корпуса (мир)
-  const MIN_GAP = 48;                  // ближе этого зазора за кормой не подпускаем
+  const MIN_GAP = 92;                  // ближе этого зазора за кормой не подпускаем
   let hardHit = false, nudged = false;
   if (Math.abs(_bl.x) < HX && Math.abs(_bl.y) < HY && Math.abs(_bl.z) < HZ){
     // внутри корпуса — выталкиваем по оси наименьшего проникновения
