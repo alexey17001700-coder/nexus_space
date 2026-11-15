@@ -1730,14 +1730,20 @@ function updateBoss(dt){
     });
   }
 
-  // ЖЁСТКИЙ БАРЬЕР: сквозь корпус босса не пролететь — он всегда впереди
-  // ВАЖНО: срабатывает только когда игрок РЕАЛЬНО внутри габаритов кормы,
-  // а не «где-то сзади» (раньше условие _bl.z < -20 ловило игрока сразу
-  // после спавна и телепортировало его в корму босса — отсюда «спавн внутри»)
+  // ЖЁСТКИЙ БАРЬЕР: внутрь корпуса босса не попасть.
+  // Габариты считаем в системе координат босса и выталкиваем игрока
+  // по оси НАИМЕНЬШЕГО проникновения — так корабль не «затягивает»
+  // и не телепортирует в корму (раньше всегда кидало в z = -28).
   _bq.copy(boss.quaternion).invert();
   _bl.copy(shipRoot.position).sub(boss.position).applyQuaternion(_bq);
-  if (Math.abs(_bl.x) < 9.5 && Math.abs(_bl.y) < 7.5 && _bl.z > -26 && _bl.z < 3){
-    _bl.z = -28;
+  const HX = 30, HY = 8.5, HZ = 27;
+  if (Math.abs(_bl.x) < HX && Math.abs(_bl.y) < HY && Math.abs(_bl.z) < HZ){
+    const px = HX - Math.abs(_bl.x);
+    const py = HY - Math.abs(_bl.y);
+    const pz = HZ - Math.abs(_bl.z);
+    if (px <= py && px <= pz)      _bl.x = (_bl.x < 0 ? -1 : 1) * (HX + 0.6);
+    else if (py <= pz)             _bl.y = (_bl.y < 0 ? -1 : 1) * (HY + 0.6);
+    else                           _bl.z = (_bl.z < 0 ? -1 : 1) * (HZ + 0.6);
     shipRoot.position.copy(_bl.applyQuaternion(boss.quaternion)).add(boss.position);
     explode(shipRoot.position, 9, 0xff8844);
     shake = 1.1;
