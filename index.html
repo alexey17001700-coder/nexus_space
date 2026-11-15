@@ -1581,6 +1581,11 @@ function updateBoss(dt){
     p.grp.getWorldPosition(p.world);
     const m = p.grp.userData.mark;
     if (m) m.scale.setScalar((9 + Math.sin(elapsed * 8 + p.world.x * 0.2) * 2.4) * inv);
+    const cx = p.grp.userData.cross;
+    if (cx){
+      cx.scale.setScalar((17 + Math.sin(elapsed * 6 + p.world.z * 0.2) * 2.6) * inv);
+      cx.material.rotation += dt * 0.45;
+    }
     const h = p.grp.userData.halo;
     if (h) h.scale.setScalar((26 + Math.sin(elapsed * 6 + p.world.z * 0.15) * 5) * inv);
     const fl = p.grp.userData.flame;
