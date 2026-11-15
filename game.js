@@ -185,131 +185,256 @@ rimLight.position.set(-14, 12, -12);
 scene.add(rimLight);
 
 /* ============================================================
-   5. КОМНАТА КОРАБЛЯ
+   5. КОРПУС КОРАБЛЯ — интерьер отсека (не квадратная комната)
+   Корпус вытянут по оси Z: узкий нос → широкий мидель → корма.
    ============================================================ */
 const room = new THREE.Group();
 scene.add(room);
 
+const HULL_LEN = 48;
+const HULL_Z0  = -HULL_LEN / 2;   // нос (там блистер-окно)
+const HULL_Z1  =  HULL_LEN / 2;   // корма
+const smooth01 = f => f * f * (3 - 2 * f);
+
+// полуширина корпуса в сечении z
+function hullHalf(z) {
+  const t = (z - HULL_Z0) / HULL_LEN;
+  const bow   = smooth01(Math.min(1, Math.max(0, t / 0.30)));
+  const stern = smooth01(Math.min(1, Math.max(0, (1 - t) / 0.26)));
+  return 5.0 + 6.2 * Math.min(bow, stern);      // 5.0 .. 11.2
+}
+// высота потолка в сечении z
+function hullHeight(z) {
+  const t = (z - HULL_Z0) / HULL_LEN;
+  const bow   = smooth01(Math.min(1, Math.max(0, t / 0.30)));
+  const stern = smooth01(Math.min(1, Math.max(0, (1 - t) / 0.26)));
+  return 4.2 + 3.0 * Math.min(bow, stern);      // 4.2 .. 7.2
+}
+
 const floorTex = makeFloorTexture();
 const wallTex  = makeWallTexture();
+const starTex  = makeStarTexture();
 
+/* --- 5.1 палуба (пол по форме корпуса) --- */
 const floorMat = new THREE.MeshStandardMaterial({
   map: floorTex, color: 0xc2d4e8, roughness: 0.58, metalness: 0.42
 });
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_HALF * 2, ROOM_HALF * 2), floorMat);
-floor.rotation.x = -Math.PI / 2;
+function buildFloorGeometry() {
+  const ZS = 56, pos = [], uv = [], idx = [];
+  for (let i = 0; i <= ZS; i++) {
+    const z = HULL_Z0 + (i / ZS) * HULL_LEN;
+    const w = hullHalf(z) - 0.03;
+    pos.push(-w, 0, z, w, 0, z);
+    uv.push(0, (i / ZS) * 12, 2.6, (i / ZS) * 12);
+  }
+  for (let i = 0; i < ZS; i++) {
+    const a = i * 2, b = a + 1, c = a + 2, d = a + 3;
+    idx.push(a, c, b, b, c, d);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  return g;
+}
+const floor = new THREE.Mesh(buildFloorGeometry(), floorMat);
 floor.receiveShadow = true;
 room.add(floor);
 
-// центральная разметка
-const ringMat = new THREE.MeshStandardMaterial({
-  color: 0x2c6f9c, emissive: 0x1d5f8c, emissiveIntensity: 0.9, roughness: 0.4, metalness: 0.3
+/* --- 5.2 обшивка бортов и потолка (видна только изнутри) --- */
+const hullMat = new THREE.MeshStandardMaterial({
+  map: wallTex, color: 0xa8bed6, roughness: 0.62, metalness: 0.45,
+  side: THREE.BackSide
 });
-const ring = new THREE.Mesh(new THREE.RingGeometry(3.4, 3.62, 64), ringMat);
-ring.rotation.x = -Math.PI / 2; ring.position.y = 0.012;
-room.add(ring);
-
-const ring2 = new THREE.Mesh(new THREE.RingGeometry(5.6, 5.72, 64), ringMat.clone());
-ring2.material.emissiveIntensity = 0.5;
-ring2.rotation.x = -Math.PI / 2; ring2.position.y = 0.012;
-room.add(ring2);
-
-// стены
-const wallMat = new THREE.MeshStandardMaterial({
-  map: wallTex, color: 0xa8bed6, roughness: 0.7, metalness: 0.35, side: THREE.DoubleSide
-});
-const WALL_H = 7.2;
-function addWall(w, x, z, ry) {
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, WALL_H), wallMat);
-  m.position.set(x, WALL_H / 2, z);
-  m.rotation.y = ry;
-  m.receiveShadow = true;
-  room.add(m);
-  return m;
+function buildShellGeometry() {
+  const ZS = 56, AS = 18, pos = [], uv = [], idx = [];
+  for (let i = 0; i <= ZS; i++) {
+    const z = HULL_Z0 + (i / ZS) * HULL_LEN;
+    const w = hullHalf(z), h = hullHeight(z);
+    for (let j = 0; j <= AS; j++) {
+      const a = (j / AS) * Math.PI;
+      pos.push(-w * Math.cos(a), h * Math.sin(a), z);
+      uv.push((j / AS) * 3.0, (i / ZS) * 14.0);
+    }
+  }
+  const row = AS + 1;
+  for (let i = 0; i < ZS; i++) {
+    for (let j = 0; j < AS; j++) {
+      const a = i * row + j, b = a + 1, c = a + row, d = c + 1;
+      idx.push(a, c, b, b, c, d);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  return g;
 }
-addWall(ROOM_HALF * 2, 0, -ROOM_HALF, 0);
-addWall(ROOM_HALF * 2, 0,  ROOM_HALF, Math.PI);
-addWall(ROOM_HALF * 2, -ROOM_HALF, 0, Math.PI / 2);
-addWall(ROOM_HALF * 2,  ROOM_HALF, 0, -Math.PI / 2);
+const shell = new THREE.Mesh(buildShellGeometry(), hullMat);
+shell.receiveShadow = true;
+room.add(shell);
 
-// светящиеся полосы по стенам (атмосфера)
-const stripMat = new THREE.MeshStandardMaterial({
-  color: 0x2a5f88, emissive: 0x4fb8ff, emissiveIntensity: 1.5, roughness: 0.3
-});
-function addStrip(x, z, ry, len) {
-  const s = new THREE.Mesh(new THREE.BoxGeometry(len, 0.14, 0.14), stripMat);
-  s.position.set(x, 5.6, z); s.rotation.y = ry;
-  room.add(s);
+/* --- 5.3 шпангоуты (рёбра корпуса) --- */
+const ribMat = new THREE.MeshStandardMaterial({ color: 0x74879e, roughness: 0.42, metalness: 0.88 });
+const ribGeo = new THREE.TorusGeometry(1, 0.03, 6, 26, Math.PI * 0.86);
+for (let z = HULL_Z0 + 3.2; z <= HULL_Z1 - 3.2; z += 3.6) {
+  const w = hullHalf(z), h = hullHeight(z);
+  const rib = new THREE.Mesh(ribGeo, ribMat);
+  rib.scale.set(w - 0.14, h - 0.14, 1);
+  rib.rotation.z = Math.PI * 0.07;
+  rib.position.set(0, 0, z);
+  rib.castShadow = true;
+  room.add(rib);
 }
-addStrip(0, -ROOM_HALF + 0.12, 0, ROOM_HALF * 1.9);
-addStrip(0,  ROOM_HALF - 0.12, 0, ROOM_HALF * 1.9);
-addStrip(-ROOM_HALF + 0.12, 0, Math.PI / 2, ROOM_HALF * 1.9);
-addStrip( ROOM_HALF - 0.12, 0, Math.PI / 2, ROOM_HALF * 1.9);
 
-// угловые колонны-стойки
-const pillarMat = new THREE.MeshStandardMaterial({ color: 0x5c6f85, roughness: 0.5, metalness: 0.75 });
-for (const sx of [-1, 1]) {
-  for (const sz of [-1, 1]) {
-    const p = new THREE.Mesh(new THREE.BoxGeometry(1.1, WALL_H, 1.1), pillarMat);
-    p.position.set(sx * (ROOM_HALF - 0.6), WALL_H / 2, sz * (ROOM_HALF - 0.6));
-    p.castShadow = true; p.receiveShadow = true;
-    room.add(p);
+/* --- 5.4 продольные стрингеры по бортам --- */
+const stringerMat = new THREE.MeshStandardMaterial({ color: 0x5e7089, roughness: 0.45, metalness: 0.85 });
+for (const s of [-1, 1]) {
+  for (const yy of [1.7, 3.3]) {
+    const pts = [];
+    for (let i = 0; i <= 24; i++) {
+      const z = HULL_Z0 + 2 + (i / 24) * (HULL_LEN - 4);
+      pts.push(new THREE.Vector3(s * (hullHalf(z) - 0.3), yy, z));
+    }
+    const curve = new THREE.CatmullRomCurve3(pts);
+    room.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 36, 0.085, 6, false), stringerMat));
   }
 }
 
-// потолочные лампы (источники света)
+/* --- 5.5 центральная палуба: светящаяся разметка --- */
+const ringMat = new THREE.MeshStandardMaterial({
+  color: 0x2c6f9c, emissive: 0x4fb8ff, emissiveIntensity: 1.2, roughness: 0.35, metalness: 0.4
+});
+for (const s of [-1, 1]) {
+  const pts = [];
+  for (let i = 0; i <= 20; i++) {
+    const z = HULL_Z0 + 3 + (i / 20) * (HULL_LEN - 6);
+    pts.push(new THREE.Vector3(s * 2.6, 0.05, z));
+  }
+  const curve = new THREE.CatmullRomCurve3(pts);
+  room.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 30, 0.07, 5, false), ringMat));
+}
+for (let z = HULL_Z0 + 6; z <= HULL_Z1 - 6; z += 6) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.05, 0.14), ringMat);
+  m.position.set(0, 0.05, z);
+  room.add(m);
+}
+
+/* --- 5.6 носовой блистер: окно в космос --- */
+function archShape(w, h, inset, bottom) {
+  const s = new THREE.Shape();
+  const N = 26;
+  for (let i = 0; i <= N; i++) {
+    const a = (i / N) * Math.PI;
+    const x = -(w - inset) * Math.cos(a);
+    const y = bottom + (h - inset - bottom) * Math.sin(a);
+    if (i === 0) s.moveTo(x, y); else s.lineTo(x, y);
+  }
+  return s;
+}
+const BW = hullHalf(HULL_Z0 + 0.8), BH = hullHeight(HULL_Z0 + 0.8);
+const capMat = new THREE.MeshStandardMaterial({
+  map: wallTex, color: 0x9db3cc, roughness: 0.55, metalness: 0.6
+});
+const capShape = archShape(BW, BH, 0, 0.02);
+capShape.holes.push(archShape(BW, BH, 1.15, 0.75));
+const bowCap = new THREE.Mesh(new THREE.ShapeGeometry(capShape, 20), capMat);
+bowCap.position.z = HULL_Z0 + 0.8;
+bowCap.receiveShadow = true;
+room.add(bowCap);
+
+// стекло — вид на звёзды
+const glass = new THREE.Mesh(
+  new THREE.ShapeGeometry(archShape(BW, BH, 1.15, 0.75), 20),
+  new THREE.MeshBasicMaterial({ map: starTex, side: THREE.DoubleSide })
+);
+glass.position.z = HULL_Z0 + 0.5;
+room.add(glass);
+
+// переплёт окна
+const mullMat = new THREE.MeshStandardMaterial({ color: 0x6d8098, roughness: 0.4, metalness: 0.9 });
+const winH = BH - 1.9;
+const mullV = new THREE.Mesh(new THREE.BoxGeometry(0.2, winH, 0.22), mullMat);
+mullV.position.set(0, 0.75 + winH / 2, HULL_Z0 + 0.75);
+room.add(mullV);
+const mullH = new THREE.Mesh(new THREE.BoxGeometry((BW - 1.15) * 1.8, 0.2, 0.22), mullMat);
+mullH.position.set(0, 0.75 + winH * 0.55, HULL_Z0 + 0.75);
+room.add(mullH);
+
+// блик на стекле
+const sheen = new THREE.Mesh(
+  new THREE.PlaneGeometry((BW - 1.15) * 1.6, winH * 0.5),
+  new THREE.MeshBasicMaterial({ color: 0x9fd8ff, transparent: true, opacity: 0.07, side: THREE.DoubleSide })
+);
+sheen.position.set(0, 0.75 + winH * 0.62, HULL_Z0 + 0.95);
+sheen.rotation.z = -0.22;
+room.add(sheen);
+
+/* --- 5.7 кормовая переборка с грузовым люком --- */
+const SW = hullHalf(HULL_Z1 - 0.8), SH = hullHeight(HULL_Z1 - 0.8);
+const sternCap = new THREE.Mesh(new THREE.ShapeGeometry(archShape(SW, SH, 0, 0.02), 20), capMat);
+sternCap.position.z = HULL_Z1 - 0.8;
+sternCap.rotation.y = Math.PI;
+room.add(sternCap);
+
+const hatch = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.0, 0.22),
+  new THREE.MeshStandardMaterial({ color: 0x3d4b5e, roughness: 0.5, metalness: 0.75 }));
+hatch.position.set(0, 1.5, HULL_Z1 - 1.0);
+room.add(hatch);
+const hatchGlow = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.12, 0.1),
+  new THREE.MeshStandardMaterial({ color: 0x2a6a9a, emissive: 0x5fd0ff, emissiveIntensity: 1.6 }));
+hatchGlow.position.set(0, 2.6, HULL_Z1 - 1.12);
+room.add(hatchGlow);
+
+/* --- 5.8 потолочные светильники по оси корпуса --- */
 const lampMat = new THREE.MeshStandardMaterial({
   color: 0x9fd8ff, emissive: 0x9fd8ff, emissiveIntensity: 2.2, roughness: 0.2
 });
-const lampPos = [];
-for (let ix = -1; ix <= 1; ix++) {
-  for (let iz = -1; iz <= 1; iz++) lampPos.push([ix * 11, iz * 11]);
-}
-for (const [lx, lz] of lampPos) {
-  // корпус светильника
-  const hous = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.22, 0.9),
-    new THREE.MeshStandardMaterial({ color: 0x8ea6c0, roughness: 0.45, metalness: 0.75 }));
-  hous.position.set(lx, 6.62, lz);
+const lampHousMat = new THREE.MeshStandardMaterial({ color: 0x8ea6c0, roughness: 0.45, metalness: 0.75 });
+for (let lz = HULL_Z0 + 6; lz <= HULL_Z1 - 6; lz += 5.5) {
+  const h = hullHeight(lz);
+  const hous = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.2, 2.6), lampHousMat);
+  hous.position.set(0, h - 0.28, lz);
   room.add(hous);
-  // светящаяся панель
-  const lamp = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.16, 0.72), lampMat);
-  lamp.position.set(lx, 6.48, lz);
+  const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.14, 2.3), lampMat);
+  lamp.position.set(0, h - 0.42, lz);
   room.add(lamp);
-  // сам источник — только 4 реальных (по углам), остальные светятся материалом
-  if (Math.abs(lx) === 11 && Math.abs(lz) === 11) {
-    addPointLight(0xbfe2ff, 52, 34, lx, 6.1, lz);
+}
+// реальные источники — только 2 (экономия FPS на телефоне)
+addPointLight(0xbfe2ff, 60, 40, 0, 5.4, -8);
+addPointLight(0xbfe2ff, 60, 40, 0, 5.4, 8);
+
+/* --- 5.9 бортовые панели и трубопроводы --- */
+const sidePanelMat = new THREE.MeshStandardMaterial({ color: 0x46566b, roughness: 0.5, metalness: 0.7 });
+const sideGlowMat  = new THREE.MeshStandardMaterial({
+  color: 0x2a5f88, emissive: 0x5fc8ff, emissiveIntensity: 1.5, roughness: 0.3
+});
+for (const s of [-1, 1]) {
+  for (let z = HULL_Z0 + 8; z <= HULL_Z1 - 8; z += 7) {
+    const w = hullHalf(z);
+    const p = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.5, 3.0), sidePanelMat);
+    p.position.set(s * (w - 0.55), 1.0, z);
+    p.rotation.y = s * 0.06;
+    p.castShadow = true; p.receiveShadow = true;
+    room.add(p);
+    const gl = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 2.4), sideGlowMat);
+    gl.position.set(s * (w - 0.82), 1.5, z);
+    room.add(gl);
   }
 }
 
-// настенные бра (по 2 на стену)
-const sconceMat = new THREE.MeshStandardMaterial({
-  color: 0x9fd8ff, emissive: 0xbfe8ff, emissiveIntensity: 2.0, roughness: 0.25
-});
-const sconcePos = [];
-for (const d of [-6.5, 6.5]) {
-  sconcePos.push([d, -ROOM_HALF + 0.25, 0]);
-  sconcePos.push([d,  ROOM_HALF - 0.25, Math.PI]);
-  sconcePos.push([-ROOM_HALF + 0.25, d, Math.PI / 2]);
-  sconcePos.push([ ROOM_HALF - 0.25, d, -Math.PI / 2]);
-}
-for (const [sx, sz, ry] of sconcePos) {
-  const s = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 0.22), sconceMat);
-  s.position.set(sx, 4.3, sz); s.rotation.y = ry;
-  room.add(s);
-  // без реального источника — светится материалом (экономия FPS)
-}
-
-// светящиеся полосы по полу (по периметру)
-const floorStripMat = new THREE.MeshStandardMaterial({
-  color: 0x2a5f88, emissive: 0x5fc8ff, emissiveIntensity: 1.6, roughness: 0.3
-});
+const pipeMat = new THREE.MeshStandardMaterial({ color: 0x6a7c92, roughness: 0.45, metalness: 0.8 });
 for (const s of [-1, 1]) {
-  const a = new THREE.Mesh(new THREE.BoxGeometry(ROOM_HALF * 1.8, 0.06, 0.3), floorStripMat);
-  a.position.set(0, 0.03, s * (ROOM_HALF - 1.2));
-  room.add(a);
-  const b = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.06, ROOM_HALF * 1.8), floorStripMat);
-  b.position.set(s * (ROOM_HALF - 1.2), 0.03, 0);
-  room.add(b);
+  const pts = [];
+  for (let i = 0; i <= 20; i++) {
+    const z = HULL_Z0 + 3 + (i / 20) * (HULL_LEN - 6);
+    const w = hullHalf(z), h = hullHeight(z);
+    pts.push(new THREE.Vector3(s * (w * 0.42), h - 0.55, z));
+  }
+  const curve = new THREE.CatmullRomCurve3(pts);
+  room.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 30, 0.16, 8, false), pipeMat));
 }
 
 /* ============================================================
