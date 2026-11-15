@@ -653,9 +653,205 @@ function showToast(html, ms = 2600) {
 }
 
 function interact() {
-  if (!nearStation) return;
-  showToast(`<b>${nearStation.name}</b><small>${nearStation.desc}<br>Интерфейс появится на Этапе 2</small>`);
+  if (uiPaused || !nearStation) return;
+  if (nearStation.name === 'КОМПЬЮТЕР')      openUI('computer');
+  else if (nearStation.name === 'ВЕРСТАК')   openUI('bench');
+  else                                       openUI('helm');
 }
+
+/* ============================================================
+   9.1 ИНТЕРФЕЙСЫ (ЭТАП 2)
+   ============================================================ */
+const modalEl    = document.getElementById('modal');
+const winTitleEl = document.getElementById('winTitle');
+const winBodyEl  = document.getElementById('winBody');
+const creditsEl  = document.getElementById('credits');
+
+const GAME = {
+  credits: 500,
+  totalLevels: 15,
+  unlocked: 1,
+  selected: 1,
+  up: { hull: 1, shield: 1, weapon: 1, engine: 1 }
+};
+const UPGRADES = [
+  { key: 'hull',   ic: '🛡', nm: 'КОРПУС',    ds: 'Прочность корпуса и живучесть' },
+  { key: 'shield', ic: '🔵', nm: 'ЩИТЫ',      ds: 'Ёмкость энергетического щита' },
+  { key: 'weapon', ic: '🔫', nm: 'ОРУЖИЕ',    ds: 'Урон и скорострельность' },
+  { key: 'engine', ic: '🚀', nm: 'ДВИГАТЕЛИ', ds: 'Скорость и манёвренность' }
+];
+const MAX_LV = 5;
+const costOf = (k) => 100 * GAME.up[k];
+
+let uiPaused = false;
+let uiKind   = null;
+let uiTab    = 'state';
+
+function setCredits() {
+  creditsEl.innerHTML = '💰 <b>' + GAME.credits + '</b> КРЕДИТОВ';
+}
+
+function openUI(kind) {
+  uiKind = kind;
+  uiPaused = true;
+  if (kind === 'computer') {
+    uiTab = 'state';
+    winTitleEl.innerHTML = 'БОРТОВОЙ КОМПЬЮТЕР<small>ТЕРМИНАЛ · NEXUS-7</small>';
+  } else if (kind === 'bench') {
+    winTitleEl.innerHTML = 'ВЕРСТАК<small>МОДУЛЬ УЛУЧШЕНИЙ</small>';
+  } else {
+    winTitleEl.innerHTML = 'ШТУРВАЛ<small>НАВИГАЦИЯ И ПОЛЁТ</small>';
+  }
+  renderUI();
+  modalEl.classList.add('on');
+  // сброс джойстика, чтобы космонавт не «уехал» после закрытия
+  stickId = null;
+  stick.x = 0; stick.y = 0;
+  stickKnob.style.transform = 'translate(0,0)';
+}
+
+function closeUI() {
+  modalEl.classList.remove('on');
+  uiPaused = false;
+  uiKind = null;
+}
+
+function renderUI() {
+  if (uiKind === 'computer')     renderComputer();
+  else if (uiKind === 'bench')   renderBench();
+  else                           renderHelm();
+}
+
+/* ---------- Компьютер ---------- */
+function renderComputer() {
+  const tabs = [['state', 'СОСТОЯНИЕ'], ['map', 'КАРТА'], ['fly', 'ПОЛЁТ']];
+  let h = '<div class="tabs">';
+  for (const [k, n] of tabs) h += `<button class="tab${uiTab === k ? ' act' : ''}" data-tab="${k}">${n}</button>`;
+  h += '</div>';
+  if (uiTab === 'state')      h += paneState();
+  else if (uiTab === 'map')   h += paneMap();
+  else                        h += paneFly();
+  winBodyEl.innerHTML = h;
+
+  winBodyEl.querySelectorAll('.tab').forEach(b => {
+    b.onclick = () => { uiTab = b.dataset.tab; renderUI(); };
+  });
+  if (uiTab === 'map') {
+    winBodyEl.querySelectorAll('.node.open').forEach(n => {
+      n.onclick = () => { GAME.selected = +n.dataset.lv; renderUI(); };
+    });
+  }
+  if (uiTab === 'fly') {
+    winBodyEl.querySelector('#startBtn').onclick = () => {
+      alert(`Запуск уровня ${GAME.selected}... Скоро здесь будет космос!`);
+    };
+  }
+}
+
+function paneState() {
+  const rows = [
+    ['🛡', 'КОРПУС',    GAME.up.hull,   'Прочность'],
+    ['🔵', 'ЩИТЫ',      GAME.up.shield, 'Энергощит'],
+    ['🔫', 'ОРУЖИЕ',    GAME.up.weapon, 'Урон'],
+    ['🚀', 'ДВИГАТЕЛИ', GAME.up.engine, 'Тяга']
+  ];
+  let h = '';
+  for (const [ic, nm, lv, sub] of rows) {
+    h += `<div class="stat"><div class="ic">${ic}</div><div style="flex:1">
+      <div class="nm">${nm} <span style="color:#5f7f99">· ${sub}</span></div>
+      <div class="meter"><i style="width:${lv / MAX_LV * 100}%"></i></div>
+    </div><div class="vl">УР. ${lv}</div></div>`;
+  }
+  h += `<div class="note">Кредиты: <b style="color:#ffd98a">${GAME.credits}</b> · Улучшения — на Верстаке<br>
+    Открыто уровней: ${GAME.unlocked} из ${GAME.totalLevels}</div>`;
+  return `<div class="pane">${h}</div>`;
+}
+
+function paneMap() {
+  let h = '<div class="pane"><div class="mapWrap">';
+  for (let i = 1; i <= GAME.totalLevels; i++) {
+    const open = i <= GAME.unlocked;
+    const boss = i % 5 === 0;
+    const sel  = i === GAME.selected;
+    h += `<div class="node ${open ? 'open' : 'lock'}${sel ? ' sel' : ''}${boss ? ' boss' : ''}" data-lv="${i}">
+      <div class="n">${i}</div><div class="lk">${open ? (boss ? 'БОСС' : '◆') : '🔒'}</div></div>`;
+  }
+  h += '</div>';
+  h += `<div class="note">Выбран уровень: <b style="color:#8fe4ff">${GAME.selected}</b> · открыт только 1-й<br>
+    Остальные откроются по мере прохождения</div></div>`;
+  return h;
+}
+
+function paneFly() {
+  return `<div class="pane">
+    <div class="stat"><div class="ic">🎯</div><div style="flex:1"><div class="nm">ЦЕЛЬ ПОЛЁТА</div></div>
+      <div class="vl">УРОВЕНЬ ${GAME.selected}</div></div>
+    <div class="stat"><div class="ic">💰</div><div style="flex:1"><div class="nm">КРЕДИТЫ НА БОРТУ</div></div>
+      <div class="vl">${GAME.credits}</div></div>
+    <div class="stat"><div class="ic">🛠</div><div style="flex:1"><div class="nm">ГОТОВНОСТЬ КОРАБЛЯ</div></div>
+      <div class="vl">100%</div></div>
+    <button class="btn big" id="startBtn" style="margin-top:14px">НАЧАТЬ ИГРУ</button>
+    <div class="note">Уровень можно выбрать на вкладке «КАРТА»</div>
+  </div>`;
+}
+
+/* ---------- Верстак ---------- */
+function renderBench() {
+  let h = '<div class="pane">';
+  for (const u of UPGRADES) {
+    const lv   = GAME.up[u.key];
+    const max  = lv >= MAX_LV;
+    const cost = costOf(u.key);
+    h += `<div class="up">
+      <div class="ic">${u.ic}</div>
+      <div class="info">
+        <div class="nm">${u.nm}</div>
+        <div class="ds">${u.ds}</div>
+        <div class="lv">УРОВЕНЬ ${lv} → ${max ? 'МАКС' : lv + 1}</div>
+      </div>
+      <button class="btn gold" data-up="${u.key}" ${max ? 'disabled' : ''}>
+        ${max ? 'МАКС' : 'УЛУЧШИТЬ · ' + cost + '💰'}</button>
+    </div>`;
+  }
+  h += `<div class="note">Кредиты: <b style="color:#ffd98a">${GAME.credits}</b> · Максимальный уровень: ${MAX_LV}</div></div>`;
+  winBodyEl.innerHTML = h;
+  winBodyEl.querySelectorAll('[data-up]').forEach(b => { b.onclick = () => buy(b.dataset.up); });
+}
+
+function buy(key) {
+  if (GAME.up[key] >= MAX_LV) return;
+  const cost = costOf(key);
+  if (GAME.credits < cost) {
+    showToast(`<b>НЕДОСТАТОЧНО КРЕДИТОВ</b><small>Нужно ${cost} 💰</small>`);
+    return;
+  }
+  GAME.credits -= cost;
+  GAME.up[key]++;
+  setCredits();
+  const nm = (UPGRADES.find(u => u.key === key) || {}).nm || key;
+  showToast(`<b>УЛУЧШЕНИЕ УСТАНОВЛЕНО</b><small>${nm} → уровень ${GAME.up[key]}</small>`);
+  renderUI();
+}
+
+/* ---------- Штурвал ---------- */
+function renderHelm() {
+  winBodyEl.innerHTML = `<div class="pane">
+    <div class="stat"><div class="ic">🧭</div><div style="flex:1"><div class="nm">КУРС</div></div>
+      <div class="vl">УРОВЕНЬ ${GAME.selected}</div></div>
+    <button class="btn big" id="flyBtn" style="margin-top:14px">НАЧАТЬ ПОЛЁТ</button>
+    <div class="note">Штурвал запускает полёт на выбранный уровень</div>
+  </div>`;
+  winBodyEl.querySelector('#flyBtn').onclick = () => {
+    alert(`Запуск уровня ${GAME.selected}... Скоро здесь будет космос!`);
+  };
+}
+
+/* ---------- Слушатели окна ---------- */
+document.getElementById('winClose').onclick = closeUI;
+modalEl.addEventListener('pointerdown', e => { if (e.target === modalEl) closeUI(); });
+addEventListener('keydown', e => { if (e.code === 'Escape' && uiPaused) closeUI(); });
+
+setCredits();
 
 /* ============================================================
    10. КОЛЛИЗИИ
