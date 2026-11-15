@@ -1606,6 +1606,19 @@ function animate() {
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(), 0.05);
 
+  /* --- режим КОСМОСА: своя сцена и камера, комната не считается --- */
+  if (MODE === 'space' && space) {
+    space.setInput(stick.x, stick.y);
+    space.update(dt);
+    space.render();
+    fpsAcc += dt; fpsFrames++;
+    if (fpsAcc >= 0.5) {
+      fpsEl.textContent = Math.round(fpsFrames / fpsAcc) + ' FPS';
+      fpsAcc = 0; fpsFrames = 0;
+    }
+    return;
+  }
+
   /* --- ввод --- */
   let ix = stick.x, iy = stick.y;
   if (keys['KeyA'] || keys['ArrowLeft'])  ix -= 1;
