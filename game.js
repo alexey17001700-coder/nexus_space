@@ -848,22 +848,7 @@ function buildHelm(px, pz, ry) {
     g.add(b);
   }
 
-  // штурвал (тор)
-  const wheel = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.09, 12, 32), MAT.metal);
-  wheel.position.set(0, 2.85, 0.15);
-  wheel.rotation.x = -0.5;
-  wheel.castShadow = true;
-  g.add(wheel);
-  // спицы
-  for (let i = 0; i < 3; i++) {
-    const sp = new THREE.Mesh(new THREE.BoxGeometry(0.09, 1.35, 0.09), MAT.metal);
-    sp.position.set(0, 2.85, 0.15);
-    sp.rotation.x = -0.5;
-    sp.rotation.z = i * Math.PI / 3;
-    g.add(sp);
-  }
-  // ступица
-  g.add(cyl(0.16, 0.16, 0.22, MAT.dark, 0, 2.85, 0.15, 14));
+  // v2.5: рулевое колесо (тор со спицами) убрано — осталась консоль с кнопками
 
   // голографический дисплей
   const holo = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.4),
