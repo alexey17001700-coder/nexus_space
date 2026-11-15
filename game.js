@@ -912,9 +912,17 @@ function buildAstronaut() {
   const suit2 = new THREE.MeshStandardMaterial({ color: 0xc3cedd, roughness: 0.6, metalness: 0.2 });
   const grey  = new THREE.MeshStandardMaterial({ color: 0x8b98aa, roughness: 0.5, metalness: 0.55 });
   const dark  = new THREE.MeshStandardMaterial({ color: 0x232c3a, roughness: 0.45, metalness: 0.65 });
-  const visor = new THREE.MeshStandardMaterial({
-    color: 0x0a1e30, roughness: 0.06, metalness: 0.95,
-    emissive: 0x1a4a6a, emissiveIntensity: 0.8
+  // v3.2: материалы лица — видно через прозрачное стекло шлема
+  const skin  = new THREE.MeshStandardMaterial({ color: 0xe8b48c, roughness: 0.72, metalness: 0.02 });
+  const hair  = new THREE.MeshStandardMaterial({ color: 0x3a2a20, roughness: 0.85, metalness: 0.0 });
+  const eyeW  = new THREE.MeshStandardMaterial({ color: 0xf4f7fb, roughness: 0.35, metalness: 0.0 });
+  const eyeD  = new THREE.MeshStandardMaterial({ color: 0x22303f, roughness: 0.25, metalness: 0.0 });
+  const mouth = new THREE.MeshStandardMaterial({ color: 0xa85a52, roughness: 0.6, metalness: 0.0 });
+  // прозрачное стекло визора
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color: 0xcfeaff, roughness: 0.05, metalness: 0.0,
+    transparent: true, opacity: 0.2, side: THREE.DoubleSide,
+    depthWrite: false, emissive: 0x1a4a6a, emissiveIntensity: 0.3
   });
   const led   = new THREE.MeshStandardMaterial({
     color: 0x0a2030, emissive: 0x4fd8ff, emissiveIntensity: 2.0, roughness: 0.3
