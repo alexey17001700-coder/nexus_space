@@ -211,14 +211,57 @@ for (const sx of [-1, 1]) {
 const lampMat = new THREE.MeshStandardMaterial({
   color: 0x9fd8ff, emissive: 0x9fd8ff, emissiveIntensity: 2.2, roughness: 0.2
 });
-const lampPos = [[-9, -9], [9, -9], [-9, 9], [9, 9], [0, 0]];
+const lampPos = [];
+for (let ix = -1; ix <= 1; ix++) {
+  for (let iz = -1; iz <= 1; iz++) lampPos.push([ix * 11, iz * 11]);
+}
 for (const [lx, lz] of lampPos) {
-  const lamp = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.16, 0.7), lampMat);
-  lamp.position.set(lx, 6.5, lz);
+  // корпус светильника
+  const hous = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.22, 0.9),
+    new THREE.MeshStandardMaterial({ color: 0x8ea6c0, roughness: 0.45, metalness: 0.75 }));
+  hous.position.set(lx, 6.62, lz);
+  room.add(hous);
+  // светящаяся панель
+  const lamp = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.16, 0.72), lampMat);
+  lamp.position.set(lx, 6.48, lz);
   room.add(lamp);
-  const pl = new THREE.PointLight(0x9fd0ff, 26, 24, 2);
+  // сам источник
+  const pl = new THREE.PointLight(0xbfe2ff, 42, 30, 2);
   pl.position.set(lx, 6.1, lz);
   room.add(pl);
+}
+
+// настенные бра (по 2 на стену)
+const sconceMat = new THREE.MeshStandardMaterial({
+  color: 0x9fd8ff, emissive: 0xbfe8ff, emissiveIntensity: 2.0, roughness: 0.25
+});
+const sconcePos = [];
+for (const d of [-6.5, 6.5]) {
+  sconcePos.push([d, -ROOM_HALF + 0.25, 0]);
+  sconcePos.push([d,  ROOM_HALF - 0.25, Math.PI]);
+  sconcePos.push([-ROOM_HALF + 0.25, d, Math.PI / 2]);
+  sconcePos.push([ ROOM_HALF - 0.25, d, -Math.PI / 2]);
+}
+for (const [sx, sz, ry] of sconcePos) {
+  const s = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 0.22), sconceMat);
+  s.position.set(sx, 4.3, sz); s.rotation.y = ry;
+  room.add(s);
+  const sl = new THREE.PointLight(0xbfe8ff, 16, 15, 2);
+  sl.position.set(sx * 0.94, 4.1, sz * 0.94);
+  room.add(sl);
+}
+
+// светящиеся полосы по полу (по периметру)
+const floorStripMat = new THREE.MeshStandardMaterial({
+  color: 0x2a5f88, emissive: 0x5fc8ff, emissiveIntensity: 1.6, roughness: 0.3
+});
+for (const s of [-1, 1]) {
+  const a = new THREE.Mesh(new THREE.BoxGeometry(ROOM_HALF * 1.8, 0.06, 0.3), floorStripMat);
+  a.position.set(0, 0.03, s * (ROOM_HALF - 1.2));
+  room.add(a);
+  const b = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.06, ROOM_HALF * 1.8), floorStripMat);
+  b.position.set(s * (ROOM_HALF - 1.2), 0.03, 0);
+  room.add(b);
 }
 
 /* ============================================================
