@@ -375,6 +375,60 @@ const floor = new THREE.Mesh(buildFloorGeometry(), floorMat);
 floor.receiveShadow = true;
 room.add(floor);
 
+/* --- 5.1b ВЫПЕЧКА СВЕТА (lightmap) ---
+   Светлые пятна нарисованы прямо в текстуру под потолочными панелями.
+   Это картинка, а не расчёт физики: выглядит как падающий свет,
+   но не стоит GPU ни одного лишнего источника. */
+function makeLightPoolTexture() {
+  const W = 256, H = 1024;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+  g.globalCompositeOperation = 'lighter';
+
+  // мягкая световая дорожка вдоль палубы
+  const lane = g.createLinearGradient(0, 0, W, 0);
+  lane.addColorStop(0.00, 'rgba(0,0,0,0)');
+  lane.addColorStop(0.28, 'rgba(64,112,164,0.26)');
+  lane.addColorStop(0.50, 'rgba(118,176,232,0.5)');
+  lane.addColorStop(0.72, 'rgba(64,112,164,0.26)');
+  lane.addColorStop(1.00, 'rgba(0,0,0,0)');
+  g.fillStyle = lane; g.fillRect(0, 0, W, H);
+
+  // пятна строго под светильниками (те же z, что и у ламп на потолке)
+  for (let lz = HULL_Z0 + 6; lz <= HULL_Z1 - 6; lz += 5.5) {
+    const cy = (lz - HULL_Z0) / HULL_LEN * H;
+    g.save();
+    g.translate(W / 2, cy);
+    g.scale(1, 1.85);
+    const r = 76;
+    const rg = g.createRadialGradient(0, 0, 0, 0, 0, r);
+    rg.addColorStop(0.00, 'rgba(196,228,255,0.85)');
+    rg.addColorStop(0.34, 'rgba(122,182,240,0.4)');
+    rg.addColorStop(0.70, 'rgba(58,108,168,0.13)');
+    rg.addColorStop(1.00, 'rgba(0,0,0,0)');
+    g.fillStyle = rg;
+    g.beginPath(); g.arc(0, 0, r, 0, 7); g.fill();
+    g.restore();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.minFilter = THREE.LinearFilter;
+  t.generateMipmaps = false;
+  return t;
+}
+const poolMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(24, HULL_LEN),
+  new THREE.MeshBasicMaterial({
+    map: makeLightPoolTexture(), transparent: true, opacity: 0.5,
+    blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false
+  })
+);
+poolMesh.rotation.x = -Math.PI / 2;
+poolMesh.position.y = 0.045;
+poolMesh.renderOrder = 2;
+room.add(poolMesh);
+
 /* --- 5.2 обшивка бортов и потолка (видна только изнутри) --- */
 const hullMat = new THREE.MeshStandardMaterial({
   map: wallTex, color: 0xa8bed6, roughness: 0.62, metalness: 0.45,
