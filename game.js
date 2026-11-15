@@ -1625,18 +1625,38 @@ function renderUI() {
 
 /* ---------- Компьютер ---------- */
 function renderComputer() {
-  const tabs = [['state', 'СОСТОЯНИЕ'], ['map', 'КАРТА'], ['fly', 'ПОЛЁТ']];
+  const tabs = [['state', 'СОСТОЯНИЕ'], ['map', 'КАРТА'], ['fly', 'ПОЛЁТ'], ['set', 'НАСТРОЙКИ']];
   let h = '<div class="tabs">';
   for (const [k, n] of tabs) h += `<button class="tab${uiTab === k ? ' act' : ''}" data-tab="${k}">${n}</button>`;
   h += '</div>';
   if (uiTab === 'state')      h += paneState();
   else if (uiTab === 'map')   h += paneMap();
+  else if (uiTab === 'set')   h += paneSet();
   else                        h += paneFly();
   winBodyEl.innerHTML = h;
 
   winBodyEl.querySelectorAll('.tab').forEach(b => {
-    b.onclick = () => { uiTab = b.dataset.tab; renderUI(); };
+    b.onclick = () => { uiTab = b.dataset.tab; SFX.ui(); renderUI(); };
   });
+  if (uiTab === 'set') {
+    winBodyEl.querySelectorAll('[data-set]').forEach(b => {
+      b.onclick = () => {
+        const k = b.dataset.set;
+        if (k === 'sound') {
+          SOUND_ON = !SOUND_ON;
+          if (SOUND_ON) SFX.ui();
+        } else if (k === 'voice') {
+          VOICE_ON = !VOICE_ON;
+          if (VOICE_ON) VOICE.say('Голос включён'); else VOICE.stop();
+        } else if (k === 'reset') {
+          resetProgress();
+          return;
+        }
+        saveGame();
+        renderUI();
+      };
+    });
+  }
   if (uiTab === 'map') {
     winBodyEl.querySelectorAll('.node.open').forEach(n => {
       n.onclick = () => { GAME.selected = +n.dataset.lv; renderUI(); };
