@@ -1892,8 +1892,11 @@ function updateShip(dt){
   const yawRate = 1.5 * agility * sens, pitchRate = 1.25 * agility * sens;
   yaw   -= input.x * yawRate   * dt;
   pitch += input.y * pitchRate * dt;
-  pitch = Math.max(-0.95, Math.min(0.95, pitch));
-  yaw   = Math.max(-1.25, Math.min(1.25, yaw));
+  // вертикаль — почти до «зенита/надира»
+  pitch = Math.max(-1.45, Math.min(1.45, pitch));
+  // ГОРИЗОНТ: полный разворот на 360° — «невидимой стены» слева больше нет
+  if (yaw >  Math.PI) yaw -= Math.PI * 2;
+  if (yaw < -Math.PI) yaw += Math.PI * 2;
 
   shipRoot.rotation.set(pitch, yaw, 0);
 
