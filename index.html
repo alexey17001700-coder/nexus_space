@@ -1806,8 +1806,6 @@ function bindControls(){
     if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase())) e.preventDefault();
   });
   addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-
-  const joy = $('joy'), knob = $('knob');
   const R = 58;
 
   function start(x, y, id){
