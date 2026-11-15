@@ -144,7 +144,7 @@ const floorTex = makeFloorTexture();
 const wallTex  = makeWallTexture();
 
 const floorMat = new THREE.MeshStandardMaterial({
-  map: floorTex, color: 0x9fb4cc, roughness: 0.62, metalness: 0.55
+  map: floorTex, color: 0xc2d4e8, roughness: 0.58, metalness: 0.42
 });
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_HALF * 2, ROOM_HALF * 2), floorMat);
 floor.rotation.x = -Math.PI / 2;
