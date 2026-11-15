@@ -1398,9 +1398,9 @@ function updateCombat(dt){
 
     // подсветка врага: пульсирует и усиливается при приближении
     const lamp = e.mesh.userData.lamp;
-    if (lamp) lamp.intensity = (3.4 + near * 3.2) + Math.sin(elapsed * 11 + e.mesh.position.x) * 0.9;
+    if (lamp) lamp.intensity = (5.5 + near * 4.5) + Math.sin(elapsed * 11 + e.mesh.position.x) * 1.2;
     const rim = e.mesh.userData.rim;
-    if (rim) rim.intensity = 1.8 + near * 1.6;
+    if (rim) rim.intensity = 2.8 + near * 2.4;
 
     // враги стреляют в ответ
     e.fireCd -= dt;
