@@ -423,6 +423,8 @@ export function createSpace(opts) {
     if (state.time <= 0) {
       state.time = 0;
       state.over = true;
+      if (audio) audio.boom(false);
+      if (speech) speech.say('Уровень пройден. Миссия выполнена');
       onEnd({ win: true, score: state.score, level: state.level, credits: 150 + state.level * 50 });
       return;
     }
