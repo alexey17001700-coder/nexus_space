@@ -297,8 +297,17 @@ export function createSpace(opts) {
     state.time = 60;
     state.over = false;
     state.shake = 0;
-    worldSpd = 24 + (up.engine - 1) * 3;
-    laserDmg = 1 + (up.weapon - 1) * 0.5;
+    /* --- ЭТАП 4: улучшения из комнаты влияют на геймплей ---
+       ОРУЖИЕ 2+ → стрельба ДВУМЯ лазерами одновременно,
+       каждый уровень оружия ещё и ускоряет перезарядку.
+       ДВИГАТЕЛИ → выше скорость мира и резче манёвр. */
+    weaponLv = Math.max(1, up.weapon || 1);
+    engineLv = Math.max(1, up.engine || 1);
+    dualGun  = weaponLv >= 2;
+    fireRate = Math.max(0.07, 0.14 - (weaponLv - 1) * 0.015);
+    worldSpd = 24 + (engineLv - 1) * 4;
+    laserDmg = 1 + (weaponLv - 1) * 0.5;
+    kills = 0; critSaid = false;
     shipX = 0; shipY = 0; shipVX = 0; shipVY = 0;
     inputX = 0; inputY = 0; firing = false;
     fireCd = 0; enCd = 1.2; asCd = 0.6; hudCd = 0; t = 0;
