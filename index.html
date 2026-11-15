@@ -1009,6 +1009,16 @@ function makeEnemy(){
   g.add(mark);
   g.userData.mark = mark;
 
+  // ЭТАП 9: перекрёстный прицел прямо на корпусе врага
+  const cross = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: CROSS, color: 0xff5566, transparent: true, opacity: 0.95,
+    blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false
+  }));
+  cross.scale.set(8, 8, 1);
+  cross.renderOrder = 6;
+  g.add(cross);
+  g.userData.cross = cross;
+
   // ЭТАП 8: подсветка врага — красный источник света,
   // чтобы корпус был виден даже на фоне планеты и туманности
   const lamp = new THREE.PointLight(0xff3355, 4.2, 46, 2);
