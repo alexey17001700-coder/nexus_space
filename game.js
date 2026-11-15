@@ -1012,6 +1012,7 @@ function resolveCollisions(p) {
    11. ЦИКЛ
    ============================================================ */
 const clock = new THREE.Clock();
+const _hiddenReset = () => { clock.getDelta(); };
 let walkPhase = 0;
 let fpsAcc = 0, fpsFrames = 0;
 const fpsEl = document.getElementById('fps');
