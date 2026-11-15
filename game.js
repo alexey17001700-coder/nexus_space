@@ -1465,7 +1465,7 @@ function animate() {
   /* --- пульсация --- */
   const t = clock.elapsedTime;
   ringMat.emissiveIntensity = 0.7 + Math.sin(t * 1.6) * 0.3;
-  MAT.screen.emissiveIntensity = 1.2 + Math.sin(t * 3.1) * 0.25;
+  MAT.screen.emissiveIntensity = 1.7 + Math.sin(t * 3.1) * 0.3;
   MAT.screen3.emissiveIntensity = 0.85 + Math.sin(t * 2.3 + 1) * 0.2;
   termScreen.update(dt);
 
