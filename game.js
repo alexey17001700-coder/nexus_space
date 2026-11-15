@@ -1491,14 +1491,13 @@ function animate() {
 /* ============================================================
    12. RESIZE + СТАРТ
    ============================================================ */
-addEventListener('resize', () => {
+function onResize() {
   fitCamera();
   renderer.setSize(window.innerWidth, window.innerHeight);
-});
-addEventListener('orientationchange', () => setTimeout(() => {
-  fitCamera();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}, 260));
+  if (composer) composer.setSize(window.innerWidth, window.innerHeight);
+}
+addEventListener('resize', onResize);
+addEventListener('orientationchange', () => setTimeout(onResize, 260));
 
 // Свернули браузер — сбрасываем ввод и время, чтобы при возврате не было рывка
 document.addEventListener('visibilitychange', () => {
