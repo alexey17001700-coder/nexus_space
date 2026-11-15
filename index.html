@@ -1146,13 +1146,13 @@ function makeEnemy(){
 
   // ЭТАП 8: подсветка врага — красный источник света,
   // чтобы корпус был виден даже на фоне планеты и туманности
-  const lamp = new THREE.PointLight(0xff3355, 4.2, 46, 2);
+  const lamp = new THREE.PointLight(0xff3355, 6.5, 72, 2);
   lamp.position.set(0, 0.4, 0.6);
   g.add(lamp);
   g.userData.lamp = lamp;
 
   // тёплый «контровой» свет снизу — читается силуэт
-  const rim = new THREE.PointLight(0xffd0a0, 2.2, 34, 2);
+  const rim = new THREE.PointLight(0xffd0a0, 3.4, 52, 2);
   rim.position.set(0, -1.6, -1.2);
   g.add(rim);
   g.userData.rim = rim;
