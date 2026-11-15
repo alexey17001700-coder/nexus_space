@@ -628,7 +628,7 @@ addPointLight(0xbfe2ff, 60, 40, 0, 5.4, 8);
 /* --- 5.9 бортовые панели и трубопроводы --- */
 const sidePanelMat = new THREE.MeshStandardMaterial({ color: 0x46566b, roughness: 0.5, metalness: 0.7 });
 const sideGlowMat  = new THREE.MeshStandardMaterial({
-  color: 0x2a5f88, emissive: 0x5fc8ff, emissiveIntensity: 1.5, roughness: 0.3
+  color: 0x2a5f88, emissive: 0x5fc8ff, emissiveIntensity: 2.4, roughness: 0.3
 });
 for (const s of [-1, 1]) {
   for (let z = HULL_Z0 + 8; z <= HULL_Z1 - 8; z += 7) {
