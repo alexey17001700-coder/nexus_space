@@ -922,9 +922,9 @@ actBtn.addEventListener('pointerdown', e => { e.preventDefault(); interact(); })
    9. СТАНЦИИ / ВЗАИМОДЕЙСТВИЕ
    ============================================================ */
 const stations = [
-  { name: 'КОМПЬЮТЕР',  desc: 'Статы · карта 15 уровней · выбор уровня · СТАРТ', pos: new THREE.Vector3(-9.5, 0, -8.2), r: 4.2 },
-  { name: 'ВЕРСТАК',    desc: 'Улучшения: корпус · щиты · оружие · двигатели',   pos: new THREE.Vector3(9.5, 0, -8.2),  r: 4.2 },
-  { name: 'ШТУРВАЛ',    desc: 'Переход в полёт',                                 pos: new THREE.Vector3(0, 0, 9.6),     r: 4.0 }
+  { name: 'КОМПЬЮТЕР',  desc: 'Статы · карта 15 уровней · выбор уровня · СТАРТ', pos: new THREE.Vector3(-7.2, 0, 8.6),  r: 4.4 },
+  { name: 'ВЕРСТАК',    desc: 'Улучшения: корпус · щиты · оружие · двигатели',   pos: new THREE.Vector3(7.2, 0, 8.6),   r: 4.4 },
+  { name: 'ШТУРВАЛ',    desc: 'Переход в полёт',                                 pos: new THREE.Vector3(0, 0, -14.6),   r: 4.4 }
 ];
 let nearStation = null;
 
