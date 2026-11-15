@@ -10,7 +10,7 @@
    сразу (clients.claim). Поэтому кнопка «ОБНОВИТЬ» реально
    сбрасывает кэш, а не отдаёт старые файлы.
    ============================================================ */
-const CACHE_NAME = 'nexus_space_v2_9';
+const CACHE_NAME = 'nexus_space_v3_0';
 
 /* ---------- УСТАНОВКА: новый SW вступает в силу сразу ---------- */
 self.addEventListener('install', function (event) {
