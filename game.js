@@ -178,6 +178,84 @@ function makeStarTexture() {
   return t;
 }
 
+// экран монитора на столе: бегущие логи терминала (анимированная canvas-текстура)
+function makeTerminalScreen() {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 288;
+  const g = c.getContext('2d');
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.minFilter = THREE.LinearFilter;
+  tex.generateMipmaps = false;
+
+  const MAXL = 13;
+  const lines = [];
+  const W = ['SCAN','NAV','HULL','PWR','O2','CRYO','SYS','NET','GYRO','SHLD','THR','COMM','AI','MAP','FUEL','DOCK'];
+  const pad = (n, l) => String(n).padStart(l, '0');
+  const rnd = () => (Math.random() * 9999 | 0);
+  function newLine() {
+    const w = W[Math.random() * W.length | 0];
+    const r = Math.random();
+    if (r < 0.30) return '> ' + w + '_' + pad(rnd(), 4) + ' OK ' + (Math.random() * 100).toFixed(1) + '%';
+    if (r < 0.48) return '> ' + w + ' ' + (Math.random() * 9).toFixed(3) + ' ' + (Math.random() * 9).toFixed(3);
+    if (r < 0.64) return '> 0x' + (Math.random() * 0xffffff | 0).toString(16).toUpperCase().padStart(6, '0') + ' :: ' + w;
+    if (r < 0.76) return '> ЧТЕНИЕ ПАМЯТИ ' + pad(rnd(), 4) + ' БАЙТ';
+    if (r < 0.86) return '> ' + w + ' · НОРМА · Δ ' + (Math.random() * 2).toFixed(2);
+    if (r < 0.94) return '> ПРОВЕРКА СЕКТОРА ' + pad(rnd(), 3) + ' ... OK';
+    return '> ' + w + ' ERR ' + pad(rnd(), 3) + ' → СБРОС';
+  }
+  for (let i = 0; i < MAXL; i++) lines.push(newLine());
+
+  let scan = 0, tmr = 0, acc = 0;
+  function draw() {
+    g.fillStyle = '#04140c'; g.fillRect(0, 0, 512, 288);
+    // сетка
+    g.strokeStyle = 'rgba(60,255,150,0.055)'; g.lineWidth = 1;
+    for (let x = 0; x < 512; x += 32) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 288); g.stroke(); }
+    for (let y = 0; y < 288; y += 24) { g.beginPath(); g.moveTo(0, y); g.lineTo(512, y); g.stroke(); }
+    // шапка
+    g.fillStyle = '#8dffb8';
+    g.font = 'bold 15px "Courier New",monospace';
+    g.fillText('NEXUS-7 // БОРТОВОЙ ТЕРМИНАЛ', 10, 19);
+    g.fillStyle = 'rgba(120,255,180,0.6)';
+    g.font = '11px "Courier New",monospace';
+    g.fillText('UPTIME ' + (performance.now() / 1000).toFixed(1) + 's   MEM ' +
+      (Math.random() * 60 + 30 | 0) + '%   CPU ' + (Math.random() * 40 + 20 | 0) + '%', 10, 34);
+    g.strokeStyle = 'rgba(120,255,180,0.35)';
+    g.beginPath(); g.moveTo(8, 41); g.lineTo(504, 41); g.stroke();
+    // строки лога
+    g.font = '13px "Courier New",monospace';
+    for (let i = 0; i < lines.length; i++) {
+      const a = 0.32 + 0.68 * (i / (lines.length - 1));
+      g.fillStyle = 'rgba(110,255,170,' + a.toFixed(2) + ')';
+      g.fillText(lines[i], 10, 60 + i * 17);
+    }
+    // мигающий курсор
+    if ((performance.now() / 400 | 0) % 2 === 0) {
+      g.fillStyle = '#9dffc8';
+      g.fillRect(10, 60 + lines.length * 17 - 11, 8, 12);
+    }
+    // бегущая полоса развёртки
+    g.fillStyle = 'rgba(180,255,210,0.09)';
+    g.fillRect(0, scan, 512, 18);
+    scan = (scan + 4) % 288;
+    tex.needsUpdate = true;
+  }
+  draw();
+  return {
+    tex,
+    update(dt) {
+      acc += dt;
+      if (acc < 0.1) return;            // ~10 кадров/с — хватает и почти бесплатно
+      acc = 0;
+      tmr += 0.1;
+      if (tmr > 0.5) { tmr = 0; lines.shift(); lines.push(newLine()); }
+      draw();
+    }
+  };
+}
+const termScreen = makeTerminalScreen();
+
 /* ============================================================
    4. ОСВЕЩЕНИЕ (тусклое, атмосферное)
    ============================================================ */
