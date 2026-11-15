@@ -478,6 +478,38 @@ function initScene(){
   addEventListener('resize', onResize);
 }
 
+/* ---------------- Карта окружения — чтобы металл не был чёрным ---------------- */
+function buildEnv(){
+  try {
+    const w = 512, h = 256, cv = document.createElement('canvas');
+    cv.width = w; cv.height = h;
+    const ctx = cv.getContext('2d');
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0,    '#2a4f86');
+    g.addColorStop(0.42, '#0d1c33');
+    g.addColorStop(0.58, '#050a14');
+    g.addColorStop(1,    '#16283f');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    const spots = [['#ffd9a0', 0.62, 0.28, 90], ['#7fc8ff', 0.18, 0.36, 70],
+                   ['#b98cff', 0.86, 0.55, 80], ['#ffffff', 0.44, 0.14, 40]];
+    spots.forEach(function(s){
+      const rg = ctx.createRadialGradient(s[1] * w, s[2] * h, 0, s[1] * w, s[2] * h, s[3]);
+      rg.addColorStop(0, s[0]);
+      rg.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.globalAlpha = 0.55;
+      ctx.fillStyle = rg; ctx.fillRect(0, 0, w, h);
+      ctx.globalAlpha = 1;
+    });
+    const tex = new THREE.CanvasTexture(cv);
+    tex.mapping = THREE.EquirectangularReflectionMapping;
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    if (pmrem.compileEquirectangularShader) pmrem.compileEquirectangularShader();
+    scene.environment = pmrem.fromEquirectangular(tex).texture;
+    tex.dispose();
+    pmrem.dispose();
+  } catch(e){ console.warn('env map failed', e); }
+}
+
 /* ---------------- Звёзды (particle system, 3 слоя) ---------------- */
 function starLayer(count, spread, size, colorA, colorB, opacity){
   const pos = new Float32Array(count * 3);
