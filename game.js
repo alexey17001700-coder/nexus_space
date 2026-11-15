@@ -655,10 +655,12 @@ function buildAstronaut() {
   lampGlow.position.set(0, 2.3, 0.32); lampGlow.rotation.x = -0.5;
   g.add(lampGlow);
 
-  const spot = new THREE.SpotLight(0xfff0c8, 6, 12, 0.5, 0.6, 1.5);
-  spot.position.set(0, 2.3, 0.3);
-  spot.target.position.set(0, 0, 6);
-  g.add(spot, spot.target);
+  if (QUALITY === 'high') {
+    const spot = new THREE.SpotLight(0xfff0c8, 6, 12, 0.5, 0.6, 1.5);
+    spot.position.set(0, 2.3, 0.3);
+    spot.target.position.set(0, 0, 6);
+    g.add(spot, spot.target);
+  }
 
   g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
 
