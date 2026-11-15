@@ -1730,24 +1730,31 @@ function updateBoss(dt){
     });
   }
 
-  // ЖЁСТКИЙ БАРЬЕР: внутрь корпуса босса не попасть.
-  // Габариты считаем в системе координат босса и выталкиваем игрока
-  // по оси НАИМЕНЬШЕГО проникновения — так корабль не «затягивает»
-  // и не телепортирует в корму (раньше всегда кидало в z = -28).
+  // --- не даём влететь внутрь корпуса босса ---
+  // Работаем в системе координат босса: +Z — нос (по курсу), игрок должен
+  // быть на -Z (за кормой). Никаких «затягиваний» — только выталкивание НАРУЖУ.
   _bq.copy(boss.quaternion).invert();
   _bl.copy(shipRoot.position).sub(boss.position).applyQuaternion(_bq);
-  const HX = 30, HY = 8.5, HZ = 27;
+  const HX = 32, HY = 9, HZ = 32;      // габариты корпуса (мир)
+  const MIN_GAP = 48;                  // ближе этого зазора за кормой не подпускаем
+  let hardHit = false, nudged = false;
   if (Math.abs(_bl.x) < HX && Math.abs(_bl.y) < HY && Math.abs(_bl.z) < HZ){
-    const px = HX - Math.abs(_bl.x);
-    const py = HY - Math.abs(_bl.y);
-    const pz = HZ - Math.abs(_bl.z);
+    // внутри корпуса — выталкиваем по оси наименьшего проникновения
+    const px = HX - Math.abs(_bl.x), py = HY - Math.abs(_bl.y), pz = HZ - Math.abs(_bl.z);
     if (px <= py && px <= pz)      _bl.x = (_bl.x < 0 ? -1 : 1) * (HX + 0.6);
     else if (py <= pz)             _bl.y = (_bl.y < 0 ? -1 : 1) * (HY + 0.6);
     else                           _bl.z = (_bl.z < 0 ? -1 : 1) * (HZ + 0.6);
+    hardHit = true;
+  } else if (Math.abs(_bl.x) < 10 && Math.abs(_bl.y) < 7 && _bl.z < -HZ && _bl.z > -MIN_GAP){
+    // позади кормы, но слишком близко — мягко отодвигаем на безопасный зазор
+    _bl.z += (-MIN_GAP - _bl.z) * Math.min(1, dt * 8);
+    nudged = true;
+  }
+  if (hardHit || nudged){
     shipRoot.position.copy(_bl.applyQuaternion(boss.quaternion)).add(boss.position);
     explode(shipRoot.position, 9, 0xff8844);
     shake = 1.1;
-    if (invuln <= 0){
+    if (hardHit && invuln <= 0){
       const rest = absorbShield(14);
       if (rest > 0){
         hp -= rest;
