@@ -673,9 +673,9 @@ function buildHelm(px, pz, ry) {
   return g;
 }
 
-const ST_COMPUTER = buildComputer(-9.5, -9.5, 0.35);
-const ST_BENCH    = buildWorkbench(9.5, -9.5, -0.35);
-const ST_HELM     = buildHelm(0, 11.5, Math.PI);
+const ST_COMPUTER = buildComputer(-7.2, 7.0, 0.45);
+const ST_BENCH    = buildWorkbench(7.2, 7.0, -0.45);
+const ST_HELM     = buildHelm(0, -17.0, Math.PI);
 
 /* ---------- 6.4 Мелкий декор ---------- */
 // грузовые ящики вдоль левого борта у кормы
