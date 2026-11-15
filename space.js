@@ -739,6 +739,13 @@ export function createSpace(opts) {
       f.material.opacity = fp;
       f.scale.set(1, 0.85 + Math.sin(t * 31) * 0.18, 1);
     }
+    /* фейковый bloom у сопел — пульсирует вместе с пламенем */
+    const gp = 0.42 + Math.sin(t * 26) * 0.16;
+    for (const gl of engineGlows) {
+      gl.material.opacity = gp;
+      const gs = 2.4 + Math.sin(t * 31) * 0.35;
+      gl.scale.set(gs, gs, 1);
+    }
 
     /* --- стрельба --- */
     fireCd -= dt;
