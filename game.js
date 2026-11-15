@@ -594,7 +594,7 @@ let stickId = null;
 const stick = { x: 0, y: 0 };
 
 function stickMove(e) {
-  if (e.pointerId !== stickId) return;
+  if (e.pointerId !== stickId || uiPaused) return;
   const r = stickBase.getBoundingClientRect();
   let dx = e.clientX - (r.left + r.width / 2);
   let dy = e.clientY - (r.top + r.height / 2);
