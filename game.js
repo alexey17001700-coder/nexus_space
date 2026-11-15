@@ -1027,21 +1027,9 @@ function buildAstronaut() {
   lampGlow.position.set(0, 2.3, 0.32); lampGlow.rotation.x = -0.5;
   g.add(lampGlow);
 
-  // фонарь на шлеме — ФЕЙКОВЫЙ свет: аддитивный конус вместо SpotLight
-  const beam = new THREE.Mesh(
-    new THREE.ConeGeometry(1.5, 6, 16, 1, true),
-    new THREE.MeshBasicMaterial({
-      color: 0xfff0c8, transparent: true, opacity: 0.06,
-      blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
-    })
-  );
-  beam.position.set(0, 2.3, 3.3);
-  beam.rotation.x = -Math.PI / 2;
-  g.add(beam);
+  // v2.4: конус-фонарь убран — световое пятно на полу больше не рисуется
 
   g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-  // конус фонаря — только свечение, тени он отбрасывать не должен
-  beam.castShadow = false; beam.receiveShadow = false;
 
   return { group: g, legL, legR, armL, armR, torso, helmet };
 }
