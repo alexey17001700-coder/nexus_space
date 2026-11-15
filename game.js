@@ -61,7 +61,8 @@ scene.background = new THREE.Color(0x070a12);
 scene.fog = new THREE.FogExp2(0x0b1220, 0.008);
 
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 400);
-const CAM_OFFSET = new THREE.Vector3(12.5, 14.5, 12.5);
+// v2.2: камера придвинута на 20% ближе (12.5/14.5 → 10/11.6)
+const CAM_OFFSET = new THREE.Vector3(10.0, 11.6, 10.0);
 const camLook = new THREE.Vector3(0, 1.1, 0);
 
 // Изометрия подстраивается под пропорции экрана:
