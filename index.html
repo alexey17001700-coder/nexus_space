@@ -1417,7 +1417,7 @@ function updateCombat(dt){
 
     // ПЕРСПЕКТИВА: чем ближе враг — тем крупнее он становится
     const near = Math.max(0, Math.min(1, (ENEMY_GROW_DIST - dist) / ENEMY_GROW_DIST));
-    const sc = ENEMY_SCALE * (1 + near * 1.0);
+    const sc = ENEMY_SCALE * (1 + near * 1.15);
     e.mesh.scale.setScalar(sc);
     e.radius = ENEMY_R_PER_SCALE * sc;
 
