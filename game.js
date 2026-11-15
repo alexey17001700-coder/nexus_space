@@ -439,9 +439,7 @@ function buildWorkbench(px, pz, ry) {
   }
 
   // искры-подсветка
-  const wl = new THREE.PointLight(0xffa63a, 14, 10, 2);
-  wl.position.set(0, 2.4, 0.6);
-  g.add(wl);
+  addPointLight(0xffa63a, 14, 10, 0, 2.4, 0.6, g);
 
   // лампа над верстаком
   const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.42, 0.3, 16),
