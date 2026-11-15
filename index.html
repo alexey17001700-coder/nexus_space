@@ -1429,6 +1429,16 @@ function makeBossPart(kind){
   grp.add(mark);
   grp.userData.mark = mark;
 
+  // перекрёстный прицел на уязвимой части босса
+  const cross = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: CROSS, color: 0xffe066, transparent: true, opacity: 0.95,
+    blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false
+  }));
+  cross.scale.set(16, 16, 1);
+  cross.renderOrder = 6;
+  grp.add(cross);
+  grp.userData.cross = cross;
+
   const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: DOT, color: 0xff2a4e,
     transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
   halo.scale.set(26, 26, 1);
