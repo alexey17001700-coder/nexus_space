@@ -225,10 +225,12 @@ for (const [lx, lz] of lampPos) {
   const lamp = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.16, 0.72), lampMat);
   lamp.position.set(lx, 6.48, lz);
   room.add(lamp);
-  // сам источник
-  const pl = new THREE.PointLight(0xbfe2ff, 42, 30, 2);
-  pl.position.set(lx, 6.1, lz);
-  room.add(pl);
+  // сам источник — только 4 реальных (по углам), остальные светятся материалом
+  if (Math.abs(lx) === 11 && Math.abs(lz) === 11) {
+    const pl = new THREE.PointLight(0xbfe2ff, 52, 34, 2);
+    pl.position.set(lx, 6.1, lz);
+    room.add(pl);
+  }
 }
 
 // настенные бра (по 2 на стену)
