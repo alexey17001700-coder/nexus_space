@@ -1799,6 +1799,7 @@ document.getElementById('winClose').onclick = closeUI;
 modalEl.addEventListener('pointerdown', e => { if (e.target === modalEl) closeUI(); });
 addEventListener('keydown', e => { if (e.code === 'Escape' && uiPaused) closeUI(); });
 
+loadSave();     // ЭТАП 4: поднимаем сохранённый прогресс из localStorage
 setCredits();
 
 /* ============================================================
