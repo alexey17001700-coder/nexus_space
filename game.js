@@ -123,7 +123,7 @@ scene.add(new THREE.HemisphereLight(0x9fd0ff, 0x18202e, 1.15));
 const keyLight = new THREE.DirectionalLight(0xcfe4ff, 1.35);
 keyLight.position.set(14, 26, 10);
 keyLight.castShadow = true;
-keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.mapSize.set(1024, 1024);
 keyLight.shadow.camera.left = -26; keyLight.shadow.camera.right = 26;
 keyLight.shadow.camera.top = 26;   keyLight.shadow.camera.bottom = -26;
 keyLight.shadow.camera.far = 70;
