@@ -603,7 +603,7 @@ const hatch = new THREE.Mesh(new THREE.BoxGeometry(3.2, 3.0, 0.22),
 hatch.position.set(0, 1.5, HULL_Z1 - 1.0);
 room.add(hatch);
 const hatchGlow = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.12, 0.1),
-  new THREE.MeshStandardMaterial({ color: 0x2a6a9a, emissive: 0x5fd0ff, emissiveIntensity: 1.6 }));
+  new THREE.MeshStandardMaterial({ color: 0x2a6a9a, emissive: 0x5fd0ff, emissiveIntensity: 2.4 }));
 hatchGlow.position.set(0, 2.6, HULL_Z1 - 1.12);
 room.add(hatchGlow);
 
