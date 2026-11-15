@@ -53,7 +53,7 @@
   #prompt b{color:#fff}
 
   /* ---------- Кнопка действия ---------- */
-  #actBtn{position:absolute;right:26px;bottom:150px;width:96px;height:96px;border-radius:50%;
+  #actBtn{position:absolute;right:calc(22px + env(safe-area-inset-right));bottom:calc(140px + env(safe-area-inset-bottom));width:96px;height:96px;border-radius:50%;
     background:radial-gradient(circle at 35% 30%,rgba(90,220,255,.35),rgba(10,30,50,.85));
     border:2px solid rgba(110,220,255,.7);color:#d8f6ff;font-size:12px;font-weight:700;
     letter-spacing:.5px;display:flex;align-items:center;justify-content:center;text-align:center;
