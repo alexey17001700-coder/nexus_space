@@ -1695,6 +1695,16 @@ function updateBoss(dt){
   _v2.copy(boss.position).add(bossCourse);
   boss.lookAt(_v2);
 
+  // держим игрока строго ЗА кормой: ближе минимума не подпускаем,
+  // чтобы корабль не оказывался «в точке босса»
+  const dNow = boss.position.distanceTo(shipRoot.position);
+  if (dNow < BOSS_MIN_DIST){
+    _v2.subVectors(shipRoot.position, boss.position);
+    if (_v2.lengthSq() < 1) _v2.copy(bossCourse).multiplyScalar(-1);
+    _v2.normalize();
+    shipRoot.position.copy(boss.position).addScaledVector(_v2, BOSS_MIN_DIST);
+  }
+
   const cg = boss.userData.coreGlow;
   if (cg) cg.material.opacity = 0.6 + Math.sin(elapsed * 9) * 0.25;
   const bl = boss.userData.lamp;
