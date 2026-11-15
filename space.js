@@ -867,6 +867,7 @@ export function createSpace(opts) {
             r.alive = false;
             state.score += 10;
             boom(r.x, r.y, r.z, LOW ? 20 : 36, [0.9, 0.75, 0.55], 14);
+            if (r.sc > 2.4) shock(r.x, r.y, r.z, 7, 0xffd9a0);   /* волна у крупных глыб */
             if (audio) audio.boom(false);
           } else {
             boom(l.x, l.y, l.z, 5, [0.9, 0.8, 0.6], 7);
