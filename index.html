@@ -1240,6 +1240,35 @@ function updateExplosions(dt){
   }
 }
 
+/* --- потеря корпуса: тратим жизнь и восстанавливаемся --- */
+function loseLife(){
+  if (lives > 0) lives--;
+  refreshHUD();
+  if (lives <= 0){ endGame(false); return; }
+
+  hp = maxHp;
+  shieldHp = maxShield;
+  shieldRegenDelay = 0;
+  invuln = 3.2;
+  shake = 1.4;
+  explode(shipRoot.position, 22, 0x66ccff);
+  explode(shipRoot.position, 14, 0xffaa44);
+
+  // расчищаем пространство вокруг — чтобы не погибнуть сразу снова
+  asteroids.forEach(a => {
+    if (a.mesh.position.distanceTo(shipRoot.position) < 95){ a.alive = false; a.mesh.visible = false; }
+  });
+  enemies.forEach(e => {
+    if (e.mesh.position.distanceTo(shipRoot.position) < 95){ e.alive = false; e.mesh.visible = false; }
+  });
+  eBullets.forEach(b => {
+    if (b.alive && b.mesh.position.distanceTo(shipRoot.position) < 130){ b.alive = false; b.mesh.visible = false; }
+  });
+
+  banner('ЖИЗНЕЙ: ' + lives);
+  refreshHUD();
+}
+
 /* --- урон --- */
 function damageObject(obj, dmg){
   obj.hp -= dmg;
