@@ -1462,6 +1462,99 @@ addEventListener('keydown', e => { if (e.code === 'Escape' && uiPaused) closeUI(
 setCredits();
 
 /* ============================================================
+   9.2 КОСМОС (ЭТАП 3) — отдельный модуль space.js
+   Комната и космонавт НЕ трогаются: у космоса своя сцена и камера,
+   модуль подключается динамически и рендерит тем же renderer'ом.
+   ============================================================ */
+const fadeEl    = document.getElementById('fade');
+const spaceHud  = document.getElementById('spaceHud');
+const spHpEl    = document.getElementById('spHp');
+const spShEl    = document.getElementById('spSh');
+const spScoreEl = document.getElementById('spScore');
+const spLvlEl   = document.getElementById('spLvl');
+const fireBtn   = document.getElementById('fireBtn');
+const exitBtn   = document.getElementById('exitBtn');
+
+let space = null;
+
+import('./space.js?b=' + BUILD_TAG).then(m => {
+  space = m.createSpace({
+    renderer: renderer,
+    quality: QUALITY,
+    onHud: updateSpaceHud,
+    onEnd: onSpaceEnd
+  });
+}).catch(e => { console.warn('модуль космоса не загрузился', e); });
+
+function updateSpaceHud(s) {
+  spHpEl.style.width = Math.max(0, s.hp / s.maxHp * 100) + '%';
+  spShEl.style.width = Math.max(0, s.shield / s.maxShield * 100) + '%';
+  spScoreEl.innerHTML = 'ОЧКИ: <b>' + s.score + '</b>';
+  spLvlEl.textContent = 'УРОВЕНЬ ' + s.level + ' · ' + Math.ceil(s.time) + 'с';
+}
+
+/* fade to black → скрываем комнату → запускаем космос */
+function startFlight(level) {
+  if (!space) {
+    showToast('<b>МОДУЛЬ КОСМОСА ЗАГРУЖАЕТСЯ</b><small>Попробуй ещё раз через секунду</small>');
+    return;
+  }
+  closeUI();
+  fadeEl.classList.add('on');
+  setTimeout(() => {
+    MODE = 'space';
+    room.visible = false;
+    astro.group.visible = false;
+    promptEl.classList.remove('on');
+    actBtn.classList.remove('on');
+    hintEl.classList.add('gone');
+    locEl.textContent = 'ОТСЕК: КОСМОС';
+    space.enter(level, GAME.up);
+    spaceHud.classList.add('on');
+    fadeEl.classList.remove('on');
+  }, 420);
+}
+
+/* возврат в комнату */
+function exitFlight() {
+  fadeEl.classList.add('on');
+  setTimeout(() => {
+    MODE = 'room';
+    space.exit();
+    room.visible = true;
+    astro.group.visible = true;
+    spaceHud.classList.remove('on');
+    locEl.textContent = 'ОТСЕК: ЖИЛОЙ МОДУЛЬ';
+    camera.position.copy(astro.group.position).add(CAM_OFFSET);
+    camLook.set(astro.group.position.x, astro.group.position.y + 1.1, astro.group.position.z);
+    camera.lookAt(camLook);
+    fadeEl.classList.remove('on');
+  }, 420);
+}
+
+function onSpaceEnd(res) {
+  if (res.win) {
+    GAME.credits += res.credits;
+    setCredits();
+    if (GAME.unlocked < GAME.totalLevels) GAME.unlocked++;
+    showToast('<b>УРОВЕНЬ ' + res.level + ' ПРОЙДЕН</b><small>+' + res.credits +
+      ' 💰 · очки ' + res.score + ' · открыт уровень ' + GAME.unlocked + '</small>', 3800);
+  } else {
+    showToast('<b>КОРАБЛЬ УНИЧТОЖЕН</b><small>Очки: ' + res.score + '</small>', 3800);
+  }
+  exitFlight();
+}
+
+/* огонь: кнопка + пробел */
+fireBtn.addEventListener('pointerdown', e => { e.preventDefault(); if (space) space.setFire(true); });
+fireBtn.addEventListener('pointerup',     () => { if (space) space.setFire(false); });
+fireBtn.addEventListener('pointercancel', () => { if (space) space.setFire(false); });
+fireBtn.addEventListener('pointerleave',  () => { if (space) space.setFire(false); });
+exitBtn.addEventListener('click', () => {
+  if (MODE === 'space' && space) { space.setFire(false); exitFlight(); }
+});
+
+/* ============================================================
    10. КОЛЛИЗИИ
    ============================================================ */
 function resolveCollisions(p) {
