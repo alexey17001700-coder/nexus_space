@@ -420,7 +420,8 @@ export function createSpace(opts) {
     }
 
     /* --- корабль --- */
-    const ax = inputX * 46, ay = -inputY * 40;
+    // ДВИГАТЕЛИ: каждый уровень — резче манёвр
+    const ax = inputX * (46 + (engineLv - 1) * 6), ay = -inputY * (40 + (engineLv - 1) * 5);
     shipVX += (ax - shipVX * 3.2) * dt;
     shipVY += (ay - shipVY * 3.2) * dt;
     shipX = Math.max(-13, Math.min(13, shipX + shipVX * dt));
