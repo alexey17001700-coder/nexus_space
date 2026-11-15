@@ -331,6 +331,61 @@
   #modal.term .note{color:#4fbf85}
 
   /* ============================================================
+     КОСМОС — HUD полёта (ЭТАП 3)
+     ============================================================ */
+  #fade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;
+    transition:opacity .4s ease;z-index:30}
+  #fade.on{opacity:1}
+
+  #spaceHud{position:absolute;inset:0;pointer-events:none;opacity:0;
+    transition:opacity .35s ease}
+  #spaceHud.on{opacity:1}
+
+  #spBars{position:absolute;top:calc(74px + env(safe-area-inset-top));
+    left:calc(10px + env(safe-area-inset-left));width:186px}
+  .spRow{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+  .spRow span{font-size:9px;letter-spacing:1px;color:#8fa8bd;width:42px}
+  .spBar{flex:1;height:9px;border-radius:5px;background:rgba(10,22,38,.72);
+    border:1px solid rgba(90,190,255,.3);overflow:hidden}
+  .spBar i{display:block;height:100%;width:100%;transition:width .16s ease}
+  #spHp{background:linear-gradient(90deg,#2fbf74,#8dffb8)}
+  #spSh{background:linear-gradient(90deg,#2a7fb8,#8fe4ff)}
+
+  #spScore{position:absolute;top:calc(74px + env(safe-area-inset-top));
+    right:calc(10px + env(safe-area-inset-right));color:#ffd98a;font-weight:600}
+  #spScore b{color:#fff}
+  #spLvl{position:absolute;top:calc(106px + env(safe-area-inset-top));
+    right:calc(10px + env(safe-area-inset-right));color:#8fe4ff;font-size:11px}
+
+  #fireBtn{position:absolute;right:calc(22px + env(safe-area-inset-right));
+    bottom:calc(34px + env(safe-area-inset-bottom));width:112px;height:112px;
+    border-radius:50%;pointer-events:auto;cursor:pointer;font-family:inherit;
+    background:radial-gradient(circle at 35% 30%,rgba(255,120,120,.4),rgba(60,10,20,.85));
+    border:2px solid rgba(255,140,140,.75);color:#ffe4e4;font-size:14px;font-weight:800;
+    letter-spacing:1px;box-shadow:0 0 30px rgba(255,80,80,.45);transition:transform .1s ease}
+  #fireBtn:active{transform:scale(.92)}
+
+  #exitBtn{position:absolute;left:50%;transform:translateX(-50%);
+    bottom:calc(22px + env(safe-area-inset-bottom));pointer-events:auto;cursor:pointer;
+    padding:11px 18px;border-radius:11px;font-family:inherit;font-size:11.5px;
+    font-weight:700;letter-spacing:1px;color:#cdf1ff;
+    background:rgba(8,16,28,.72);border:1px solid rgba(90,190,255,.45);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  #exitBtn:active{transform:translateX(-50%) scale(.94)}
+
+  @media (max-width:620px),(max-height:640px){
+    #spBars{width:150px;top:calc(66px + env(safe-area-inset-top))}
+    #spScore{top:calc(66px + env(safe-area-inset-top))}
+    #spLvl{top:calc(96px + env(safe-area-inset-top));font-size:10px}
+    #fireBtn{width:96px;height:96px;font-size:12.5px}
+    #exitBtn{font-size:10.5px;padding:10px 14px}
+  }
+  @media (max-height:460px){
+    #fireBtn{width:80px;height:80px;bottom:calc(16px + env(safe-area-inset-bottom))}
+    #exitBtn{bottom:calc(12px + env(safe-area-inset-bottom));padding:8px 12px}
+  }
+
+  /* ============================================================
      ТЕЛЕФОН — компактная вёрстка, крупные зоны нажатия
      ============================================================ */
   @media (max-width:620px),(max-height:640px){
