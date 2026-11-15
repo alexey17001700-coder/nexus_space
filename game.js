@@ -1881,6 +1881,7 @@ function onSpaceEnd(res) {
     GAME.credits += res.credits;
     setCredits();
     if (GAME.unlocked < GAME.totalLevels) GAME.unlocked++;
+    saveGame();     // ЭТАП 4: открытый уровень тоже сохраняем
     showToast('<b>УРОВЕНЬ ' + res.level + ' ПРОЙДЕН</b><small>+' + res.credits +
       ' 💰 · очки ' + res.score + ' · открыт уровень ' + GAME.unlocked + '</small>', 3800);
   } else {
