@@ -166,7 +166,7 @@ room.add(ring2);
 
 // стены
 const wallMat = new THREE.MeshStandardMaterial({
-  map: wallTex, color: 0x8ea6c0, roughness: 0.72, metalness: 0.42, side: THREE.DoubleSide
+  map: wallTex, color: 0xa8bed6, roughness: 0.7, metalness: 0.35, side: THREE.DoubleSide
 });
 const WALL_H = 7.2;
 function addWall(w, x, z, ry) {
