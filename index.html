@@ -777,6 +777,7 @@ function buildTrail(){
   scene.add(trail);
 }
 const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3();
+const _bsv = new THREE.Vector3();   // временный вектор для логики боя с боссом
 function spawnTrail(){
   const nozzles = [engineGlowL, engineGlowR];
   for (let n = 0; n < 2; n++){
