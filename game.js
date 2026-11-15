@@ -282,7 +282,7 @@ function buildShellGeometry() {
     for (let j = 0; j <= AS; j++) {
       const a = (j / AS) * Math.PI;
       pos.push(-w * Math.cos(a), h * Math.sin(a), z);
-      uv.push((j / AS) * 3.0, (i / ZS) * 14.0);
+      uv.push((j / AS) * 0.8, (i / ZS) * 4.2);
     }
   }
   const row = AS + 1;
