@@ -1391,6 +1391,195 @@ const UPGRADES = [
 const MAX_LV = 5;
 const costOf = (k) => 100 * GAME.up[k];
 
+/* ============================================================
+   9.1a СОХРАНЕНИЕ ПРОГРЕССА (localStorage) — ЭТАП 4
+   Кредиты, купленные улучшения и открытые уровни сохраняются
+   в localStorage (JSON) и не теряются при перезагрузке страницы.
+   ============================================================ */
+const SAVE_KEY = 'nexus_space_save_v1';
+let SOUND_ON = true, VOICE_ON = true;
+
+function saveGame() {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      credits: GAME.credits, unlocked: GAME.unlocked, selected: GAME.selected,
+      up: GAME.up, sound: SOUND_ON, voice: VOICE_ON
+    }));
+  } catch (e) {}
+}
+function loadSave() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (typeof d.credits === 'number')  GAME.credits  = Math.max(0, d.credits | 0);
+    if (typeof d.unlocked === 'number') GAME.unlocked = Math.max(1, Math.min(GAME.totalLevels, d.unlocked | 0));
+    if (typeof d.selected === 'number') GAME.selected = Math.max(1, Math.min(GAME.unlocked, d.selected | 0));
+    if (d.up) for (const k of ['hull', 'shield', 'weapon', 'engine']) {
+      if (typeof d.up[k] === 'number') GAME.up[k] = Math.max(1, Math.min(MAX_LV, d.up[k] | 0));
+    }
+    if (typeof d.sound === 'boolean') SOUND_ON = d.sound;
+    if (typeof d.voice === 'boolean') VOICE_ON = d.voice;
+  } catch (e) {}
+}
+function resetProgress() {
+  GAME.credits = 500; GAME.unlocked = 1; GAME.selected = 1;
+  GAME.up = { hull: 1, shield: 1, weapon: 1, engine: 1 };
+  try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+  saveGame();
+  setCredits();
+  renderUI();
+  showToast('<b>ПРОГРЕСС СБРОШЕН</b><small>Кредиты 500 · улучшения обнулены · открыт 1 уровень</small>', 3400);
+}
+
+/* ============================================================
+   9.1b ЗВУК (Web Audio API) — синтез, без внешних mp3
+   Все эффекты генерируются на лету: «пиу» выстрела, «бум»
+   взрыва (белый шум + низкий синус), звук получения урона.
+   ============================================================ */
+const SFX = (function () {
+  let ctx = null, master = null;
+
+  function ensure() {
+    if (ctx) return ctx;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    try {
+      ctx = new AC();
+      master = ctx.createGain();
+      master.gain.value = 0.45;
+      master.connect(ctx.destination);
+    } catch (e) { ctx = null; }
+    return ctx;
+  }
+  function resume() {
+    const c = ensure();
+    if (c && c.state === 'suspended') { try { c.resume(); } catch (e) {} }
+  }
+  function noise(dur) {
+    const c = ensure(); if (!c) return null;
+    const n = Math.max(1, Math.floor(c.sampleRate * dur));
+    const b = c.createBuffer(1, n, c.sampleRate);
+    const d = b.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    return b;
+  }
+
+  /* «пиу» — выстрел лазера */
+  function laser() {
+    if (!SOUND_ON) return;
+    const c = ensure(); if (!c) return; resume();
+    const t = c.currentTime;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'square';
+    o.frequency.setValueAtTime(920, t);
+    o.frequency.exponentialRampToValueAtTime(190, t + 0.11);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.12, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+    o.connect(g); g.connect(master);
+    o.start(t); o.stop(t + 0.15);
+  }
+
+  /* «бум» — взрыв: белый шум через фильтр + низкий синус */
+  function boom(big) {
+    if (!SOUND_ON) return;
+    const c = ensure(); if (!c) return; resume();
+    const t = c.currentTime;
+    const dur = big ? 0.55 : 0.3;
+    const src = c.createBufferSource();
+    const buf = noise(dur);
+    if (!buf) return;
+    src.buffer = buf;
+    const f = c.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.setValueAtTime(big ? 900 : 1500, t);
+    f.frequency.exponentialRampToValueAtTime(120, t + dur * 0.9);
+    const g = c.createGain();
+    g.gain.setValueAtTime(big ? 0.5 : 0.26, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f); f.connect(g); g.connect(master);
+    src.start(t); src.stop(t + dur + 0.05);
+
+    const o = c.createOscillator(), og = c.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(big ? 130 : 180, t);
+    o.frequency.exponentialRampToValueAtTime(38, t + 0.35);
+    og.gain.setValueAtTime(big ? 0.4 : 0.2, t);
+    og.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+    o.connect(og); og.connect(master);
+    o.start(t); o.stop(t + 0.42);
+  }
+
+  /* урон по кораблю */
+  function hit() {
+    if (!SOUND_ON) return;
+    const c = ensure(); if (!c) return; resume();
+    const t = c.currentTime;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(320, t);
+    o.frequency.exponentialRampToValueAtTime(70, t + 0.22);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.2, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.24);
+    o.connect(g); g.connect(master);
+    o.start(t); o.stop(t + 0.26);
+  }
+
+  /* короткий щелчок интерфейса */
+  function ui() {
+    if (!SOUND_ON) return;
+    const c = ensure(); if (!c) return; resume();
+    const t = c.currentTime;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(660, t);
+    o.frequency.exponentialRampToValueAtTime(990, t + 0.07);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.085, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+    o.connect(g); g.connect(master);
+    o.start(t); o.stop(t + 0.12);
+  }
+
+  return { laser, boom, hit, ui, resume };
+})();
+
+/* ============================================================
+   9.1c ГОЛОС КОМПЬЮТЕРА (Web Speech API)
+   Русский голос браузера, низкий «компьютерный» тон.
+   ============================================================ */
+const VOICE = (function () {
+  let ru = null;
+  function pick() {
+    if (!('speechSynthesis' in window)) return;
+    const vs = window.speechSynthesis.getVoices() || [];
+    ru = vs.find(v => /ru[-_]RU/i.test(v.lang)) || vs.find(v => /^ru/i.test(v.lang)) || null;
+  }
+  if ('speechSynthesis' in window) {
+    pick();
+    try { window.speechSynthesis.onvoiceschanged = pick; } catch (e) {}
+  }
+  function say(text) {
+    if (!VOICE_ON || !('speechSynthesis' in window)) return;
+    try {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ru-RU'; u.rate = 0.95; u.pitch = 0.72; u.volume = 0.95;
+      if (ru) u.voice = ru;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function stop() {
+    if ('speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  }
+  return { say, stop };
+})();
+
+// первый жест пользователя — разблокируем AudioContext (требование браузеров)
+addEventListener('pointerdown', () => SFX.resume(), { once: true });
+
 let uiPaused = false;
 let uiKind   = null;
 let uiTab    = 'state';
