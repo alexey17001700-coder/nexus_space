@@ -758,7 +758,11 @@ export function createSpace(opts) {
     /* --- лазеры --- */
     for (let i = 0; i < LAS_MAX; i++) {
       const l = lasers[i];
-      if (!l.alive) { dummy.position.set(0, 0, 0); dummy.scale.setScalar(0); dummy.updateMatrix(); lasMesh.setMatrixAt(i, dummy.matrix); continue; }
+      if (!l.alive) {
+        dummy.position.set(0, 0, 0); dummy.scale.setScalar(0); dummy.updateMatrix();
+        lasMesh.setMatrixAt(i, dummy.matrix); lasMesh2.setMatrixAt(i, dummy.matrix);
+        continue;
+      }
       l.z -= 130 * dt;
       if (l.z < -200) { l.alive = false; }
       dummy.position.set(l.x, l.y, l.z);
@@ -766,8 +770,10 @@ export function createSpace(opts) {
       dummy.scale.setScalar(l.alive ? 1 : 0);
       dummy.updateMatrix();
       lasMesh.setMatrixAt(i, dummy.matrix);
+      lasMesh2.setMatrixAt(i, dummy.matrix);
     }
     lasMesh.instanceMatrix.needsUpdate = true;
+    lasMesh2.instanceMatrix.needsUpdate = true;
 
     /* --- враги --- */
     for (let i = 0; i < EN_MAX; i++) {
