@@ -370,12 +370,12 @@ export function createSpace(opts) {
       return;
     }
   }
-  function fireLaser() {
+  function fireLaser(ox) {
     for (let i = 0; i < LAS_MAX; i++) {
       const l = lasers[i];
       if (l.alive) continue;
       l.alive = true;
-      l.x = shipX; l.y = shipY; l.z = -2.6;
+      l.x = shipX + (ox || 0); l.y = shipY; l.z = -2.6;
       return;
     }
   }
