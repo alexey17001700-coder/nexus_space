@@ -670,22 +670,21 @@ addPointLight(0xbfe2ff, 60, 40, 0, 5.4, -8);
 addPointLight(0xbfe2ff, 60, 40, 0, 5.4, 8);
 
 /* --- 5.9 бортовые панели и трубопроводы --- */
-const sidePanelMat = new THREE.MeshStandardMaterial({ color: 0x46566b, roughness: 0.5, metalness: 0.7 });
-const sideGlowMat  = new THREE.MeshStandardMaterial({
-  color: 0x2a5f88, emissive: 0x5fc8ff, emissiveIntensity: 2.4, roughness: 0.3
+// v2.6: бортовые панели тоже изогнуты по профилю корпуса (не плоские боксы)
+const sidePanelMat = new THREE.MeshStandardMaterial({
+  color: 0x46566b, roughness: 0.5, metalness: 0.7, side: THREE.DoubleSide
 });
-for (const s of [-1]) {   // v2.1: бортовые панели только на дальнем борту
-  for (let z = HULL_Z0 + 8; z <= HULL_Z1 - 8; z += 7) {
-    const w = hullHalf(z);
-    const p = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.5, 3.0), sidePanelMat);
-    p.position.set(s * (w - 0.55), 1.0, z);
-    p.rotation.y = s * 0.06;
-    p.castShadow = true; p.receiveShadow = true;
-    room.add(p);
-    const gl = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 2.4), sideGlowMat);
-    gl.position.set(s * (w - 0.82), 1.5, z);
-    room.add(gl);
-  }
+const sideGlowMat  = new THREE.MeshStandardMaterial({
+  color: 0x2a5f88, emissive: 0x5fc8ff, emissiveIntensity: 2.4, roughness: 0.3,
+  side: THREE.DoubleSide
+});
+for (let z = HULL_Z0 + 8; z <= HULL_Z1 - 8; z += 7) {
+  // щит оборудования — изогнутая пластина на дальнем борту
+  const p = new THREE.Mesh(buildCurvedPanel(z - 1.5, z + 1.5, 0.16, 0.03, 0.30), sidePanelMat);
+  p.castShadow = true; p.receiveShadow = true;
+  room.add(p);
+  // светящаяся полоса над щитом — тоже по дуге
+  room.add(new THREE.Mesh(buildCurvedPanel(z - 1.2, z + 1.2, 0.30, 0.30, 0.36), sideGlowMat));
 }
 
 const pipeMat = new THREE.MeshStandardMaterial({ color: 0x6a7c92, roughness: 0.45, metalness: 0.8 });
