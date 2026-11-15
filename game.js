@@ -1016,6 +1016,8 @@ function buildAstronaut() {
   g.add(beam);
 
   g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  // конус фонаря — только свечение, тени он отбрасывать не должен
+  beam.castShadow = false; beam.receiveShadow = false;
 
   return { group: g, legL, legR, armL, armR, torso, helmet };
 }
