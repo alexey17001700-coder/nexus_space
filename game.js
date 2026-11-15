@@ -501,14 +501,23 @@ function buildCurvedPanel(z0, z1, inset, a0, a1, ZS = 8) {
   g.computeVertexNormals();
   return g;
 }
-// панель идёт от дальнего борта у пола (a=0) вверх по изгибу к своду
-const PANEL_A0 = 0.02, PANEL_A1 = 0.80;
-for (let i = 0; i < ribZs.length - 1; i++) {
-  const z0 = ribZs[i] + 0.24, z1 = ribZs[i + 1] - 0.24;
-  const p = new THREE.Mesh(buildCurvedPanel(z0, z1, 0.07, PANEL_A0, PANEL_A1), gapPanelMat);
+// стена идёт от дальнего борта у пола (a=0) вверх по изгибу к своду
+const WALL_A0 = 0.0, WALL_A1 = 0.86;
+const WALL_SEG = 12;
+for (let i = 0; i < WALL_SEG; i++) {
+  const z0 = HULL_Z0 + 2.0 + (i / WALL_SEG) * (HULL_LEN - 4);
+  const z1 = HULL_Z0 + 2.0 + ((i + 1) / WALL_SEG) * (HULL_LEN - 4);
+  const p = new THREE.Mesh(buildCurvedPanel(z0, z1, 0.07, WALL_A0, WALL_A1), gapPanelMat);
   p.receiveShadow = true;
   room.add(p);
 }
+// светящаяся полоса вдоль всей стены — «богатый» вид без лишних источников света
+const wallTrimMat = new THREE.MeshStandardMaterial({
+  color: 0x2a5f88, emissive: 0x5fc8ff, emissiveIntensity: 2.2, roughness: 0.3,
+  side: THREE.DoubleSide
+});
+room.add(new THREE.Mesh(
+  buildCurvedPanel(HULL_Z0 + 2.2, HULL_Z1 - 2.2, 0.14, 0.42, 0.47, 40), wallTrimMat));
 
 /* --- 5.4 продольные стрингеры по бортам --- */
 const stringerMat = new THREE.MeshStandardMaterial({ color: 0x5e7089, roughness: 0.45, metalness: 0.85 });
