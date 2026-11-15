@@ -498,7 +498,6 @@ for (const z of ribZs) {
   // второй, тонкий внутренний поясок — обшивка выглядит «богаче»
   const rib2 = new THREE.Mesh(ribGeo2, ribMat);
   rib2.scale.set(w - 0.62, h - 0.62, 1);
-  rib2.rotation.z = Math.PI * 0.07;
   rib2.position.set(0, 0, z);
   room.add(rib2);
 }
