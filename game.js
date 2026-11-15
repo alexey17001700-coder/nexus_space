@@ -517,7 +517,7 @@ for (let i = 0; i < ribZs.length - 1; i++) {
 
 /* --- 5.4 продольные стрингеры по бортам --- */
 const stringerMat = new THREE.MeshStandardMaterial({ color: 0x5e7089, roughness: 0.45, metalness: 0.85 });
-for (const s of [-1, 1]) {
+for (const s of [-1]) {   // v2.1: стрингеры только на дальнем борту
   for (const yy of [1.7, 3.3]) {
     const pts = [];
     for (let i = 0; i <= 24; i++) {
