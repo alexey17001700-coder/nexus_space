@@ -264,6 +264,9 @@ export function createSpace(opts) {
   let shipX = 0, shipY = 0, shipVX = 0, shipVY = 0;
   let worldSpd = 26, laserDmg = 1, fireCd = 0, enCd = 0, asCd = 0, hudCd = 0;
   let t = 0;
+  /* ЭТАП 4: улучшения из комнаты влияют на полёт */
+  let weaponLv = 1, engineLv = 1, dualGun = false, fireRate = 0.14;
+  let kills = 0, critSaid = false;
 
   function resetInstances() {
     for (let i = 0; i < EN_MAX; i++) {
