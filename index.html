@@ -463,8 +463,8 @@ function initScene(){
   buildEnv();
 
   /* --- свет --- */
-  scene.add(new THREE.AmbientLight(0x2a4a6e, 0.85));
-  const hemi = new THREE.HemisphereLight(0x88bbff, 0x101828, 0.5);
+  scene.add(new THREE.AmbientLight(0x3a5f88, 1.05));
+  const hemi = new THREE.HemisphereLight(0x88bbff, 0x18283f, 0.95);
   scene.add(hemi);
   const sun = new THREE.DirectionalLight(0xfff2d8, 1.5);
   sun.position.set(6, 9, 5);
