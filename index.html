@@ -534,10 +534,15 @@
    поэтому новый код подтягивается даже на закэшированной странице. */
 (function(){
   var vEl = document.getElementById('ver');
+  function stamp(build, version){
+    if (!vEl || !version || !build) return;
+    vEl.textContent = 'NEXUS SPACE v' + version + ' · build ' + build;
+  }
   function boot(build, version){
-    if (version && build && vEl){
-      vEl.textContent = 'NEXUS SPACE v' + version + ' · build ' + build;
-    }
+    stamp(build, version);
+    /* подстраховка: если game.js перепишет надпись своей версией — вернём серверную */
+    setTimeout(function(){ stamp(build, version); }, 900);
+    setTimeout(function(){ stamp(build, version); }, 2600);
     var s = document.createElement('script');
     s.type = 'module';
     s.src = 'game.js?b=' + (build || 0) + '&t=' + Date.now();
