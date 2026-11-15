@@ -233,16 +233,76 @@ export function createSpace(opts) {
   const nebs = [];
   for (let i = 0; i < NEB_N; i++) {
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: nebTex(NEB_COL[i % NEB_COL.length]),
-      transparent: true, opacity: 0.5, depthWrite: false,
+      map: cloudTex(NEB_COL[i % NEB_COL.length]),
+      transparent: true, opacity: 0.42, depthWrite: false,
       blending: THREE.AdditiveBlending
     }));
-    const sc = 120 + Math.random() * 260;
+    const sc = 140 + Math.random() * 300;
     sp.scale.set(sc, sc, 1);
     sp.position.set((Math.random() - 0.5) * 700, (Math.random() - 0.5) * 420, -Math.random() * 1100);
     scene.add(sp);
     nebs.push(sp);
   }
+  /* 3 ГИГАНТСКИЕ туманности — фиолетовая, синяя, оранжевая */
+  const BIG_NEB = ['150,80,220', '70,120,255', '240,140,60'];
+  for (let i = 0; i < 3; i++) {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: cloudTex(BIG_NEB[i]),
+      transparent: true, opacity: 0.3, depthWrite: false,
+      blending: THREE.AdditiveBlending
+    }));
+    const sc = 900 + i * 260;
+    sp.scale.set(sc, sc * 0.75, 1);
+    sp.position.set((i - 1) * 420, (i % 2 ? 1 : -1) * 180, -900 - i * 300);
+    sp.userData.big = true;
+    scene.add(sp);
+    nebs.push(sp);
+  }
+
+  /* ============================================================
+     2.5 ПЛАНЕТА С АТМОСФЕРОЙ И СОЛНЦЕ (фон)
+     ============================================================ */
+  const planet = new THREE.Group();
+  {
+    const p = new THREE.Mesh(
+      new THREE.SphereGeometry(150, 40, 28),
+      new THREE.MeshStandardMaterial({
+        map: planetTex(), roughness: 0.85, metalness: 0.05,
+        emissive: 0x1a3a6a, emissiveIntensity: 0.35
+      })
+    );
+    planet.add(p);
+    /* атмосферная дымка по краям (BackSide + Additive) */
+    planet.add(new THREE.Mesh(
+      new THREE.SphereGeometry(164, 32, 22),
+      new THREE.MeshBasicMaterial({
+        color: 0x5aa8ff, transparent: true, opacity: 0.22,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+        side: THREE.BackSide, toneMapped: false
+      })
+    ));
+    /* кольцо */
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(192, 252, 72),
+      new THREE.MeshBasicMaterial({
+        color: 0x9fd0ff, transparent: true, opacity: 0.16,
+        blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+        depthWrite: false, toneMapped: false
+      })
+    );
+    ring.rotation.x = Math.PI / 2.35;
+    planet.add(ring);
+    planet.position.set(-330, 130, -780);
+    scene.add(planet);
+  }
+  /* далёкое солнце — спрайт со свечением */
+  const sun = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: GLOW, color: 0xffd9a0, transparent: true, opacity: 0.85,
+    blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false
+  }));
+  sun.scale.set(420, 420, 1);
+  sun.position.set(520, 210, -1100);
+  scene.add(sun);
 
   /* ============================================================
      3. КОРАБЛЬ ИГРОКА
