@@ -26,9 +26,17 @@
   .panel{position:absolute;background:rgba(8,16,28,.62);border:1px solid rgba(90,190,255,.28);
     border-radius:10px;padding:7px 11px;font-size:12px;letter-spacing:.5px;
     backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-  #ver{top:12px;left:12px;color:#7fd4ff;font-weight:600}
-  #fps{top:46px;left:12px;color:#8fa8bd;font-size:11px}
-  #loc{top:12px;right:12px;color:#9fe8c8;font-weight:600}
+  #ver{top:calc(10px + env(safe-area-inset-top));left:calc(10px + env(safe-area-inset-left));color:#7fd4ff;font-weight:600}
+  #fps{top:calc(42px + env(safe-area-inset-top));left:calc(10px + env(safe-area-inset-left));color:#8fa8bd;font-size:11px}
+  #loc{top:calc(10px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));color:#9fe8c8;font-weight:600}
+
+  /* ---------- Полный экран (телефон) ---------- */
+  #fsBtn{position:absolute;top:calc(10px + env(safe-area-inset-top));left:50%;
+    transform:translateX(-50%);width:42px;height:42px;border-radius:11px;
+    background:rgba(8,16,28,.62);border:1px solid rgba(90,190,255,.3);color:#8fd8ff;
+    font-size:17px;line-height:1;pointer-events:auto;cursor:pointer;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:all .18s ease}
+  #fsBtn:active{transform:translateX(-50%) scale(.9);background:rgba(30,80,130,.7)}
   #hint{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;
     font-size:11.5px;color:#7d95ab;text-align:center;line-height:1.6;
     background:rgba(8,16,28,.55);border:1px solid rgba(90,190,255,.18);
