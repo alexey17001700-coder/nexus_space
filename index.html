@@ -911,6 +911,7 @@ const ENEMY_GROW_DIST = 300;        // с какого расстояния вр
 let bullets = [], asteroids = [], enemies = [], explosions = [], shockwaves = [];
 let boss = null, bossParts = [], bossDeath = 0, bossShootCd = 0;
 const bossCourse = new THREE.Vector3();
+const _bq = new THREE.Quaternion(), _bl = new THREE.Vector3();
 let score = 0, level = 1, hp = 100, maxHp = 100;
 /* --- ЭТАП 6: энергетический щит вокруг корабля --- */
 let shieldMesh = null, shieldHp = 100, maxShield = 100;
