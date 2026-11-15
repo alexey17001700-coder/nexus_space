@@ -4,7 +4,7 @@
    ============================================================ */
 import * as THREE from 'three';
 
-const VERSION   = 'v1.7 · build 8';
+const VERSION   = 'v1.9 · build 10';
 const PLAYER_R  = 0.62;    // радиус космонавта
 const MOVE_SPEED = 6.4;
 
