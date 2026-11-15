@@ -1529,6 +1529,8 @@ function updateBoss(dt){
     if (h) h.scale.setScalar((26 + Math.sin(elapsed * 6 + p.world.z * 0.15) * 5) * inv);
     const fl = p.grp.userData.flame;
     if (fl) fl.scale.set(1, 1, 0.8 + Math.sin(elapsed * 18 + p.world.x) * 0.25);
+    const lp = p.grp.userData.lamp;
+    if (lp) lp.intensity = 5.2 + Math.sin(elapsed * 7 + p.world.z * 0.2) * 1.6;
     if (p.kind === 'turret') turrets++;
   });
 
