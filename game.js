@@ -154,13 +154,26 @@ function makeWallTexture() {
 /* ============================================================
    4. ОСВЕЩЕНИЕ (тусклое, атмосферное)
    ============================================================ */
-scene.add(new THREE.AmbientLight(0x7a9cc8, 1.05));
-scene.add(new THREE.HemisphereLight(0x9fd0ff, 0x1e2836, 1.35));
+// Бюджет динамических источников света. Каждый источник в Three.js
+// считается для каждого пикселя — на телефоне их число жёстко ограничено.
+const MAX_POINT_LIGHTS = QUALITY === 'high' ? 99 : QUALITY === 'mid' ? 3 : 0;
+let pointLightsUsed = 0;
+function addPointLight(color, intensity, distance, x, y, z, parent) {
+  if (pointLightsUsed >= MAX_POINT_LIGHTS) return null;
+  pointLightsUsed++;
+  const pl = new THREE.PointLight(color, intensity, distance, 2);
+  pl.position.set(x, y, z);
+  (parent || room).add(pl);
+  return pl;
+}
+
+scene.add(new THREE.AmbientLight(0x7a9cc8, QUALITY === 'high' ? 1.05 : 1.3));
+scene.add(new THREE.HemisphereLight(0x9fd0ff, 0x1e2836, QUALITY === 'high' ? 1.35 : 1.55));
 
 const keyLight = new THREE.DirectionalLight(0xcfe4ff, 1.35);
 keyLight.position.set(14, 26, 10);
-keyLight.castShadow = true;
-keyLight.shadow.mapSize.set(1024, 1024);
+keyLight.castShadow = SHADOWS;
+keyLight.shadow.mapSize.set(SHADOWS ? 1024 : 512, SHADOWS ? 1024 : 512);
 keyLight.shadow.camera.left = -26; keyLight.shadow.camera.right = 26;
 keyLight.shadow.camera.top = 26;   keyLight.shadow.camera.bottom = -26;
 keyLight.shadow.camera.far = 70;
