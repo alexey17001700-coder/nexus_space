@@ -492,7 +492,6 @@ for (const z of ribZs) {
   const w = hullHalf(z), h = hullHeight(z);
   const rib = new THREE.Mesh(ribGeo, ribMat);
   rib.scale.set(w - 0.14, h - 0.14, 1);
-  rib.rotation.z = Math.PI * 0.07;
   rib.position.set(0, 0, z);
   rib.castShadow = true;
   room.add(rib);
