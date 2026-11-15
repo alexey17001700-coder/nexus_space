@@ -592,6 +592,14 @@
     s.src = 'game.js?b=' + (build || 0) + '&t=' + Date.now();
     s.onerror = function(){ if (vEl) vEl.textContent = 'ОШИБКА ЗАГРУЗКИ КОДА'; };
     document.body.appendChild(s);
+    /* v3.4: сторож — если код упал с ошибкой, экран загрузки не должен висеть вечно */
+    setTimeout(function(){
+      var l = document.getElementById('load');
+      if (!l || l.classList.contains('gone')) return;
+      var p = l.querySelector('p');
+      if (p) p.innerHTML = 'ОШИБКА ЗАГРУЗКИ · ОБНОВИ СТРАНИЦУ<br><span style="font-size:10px">код игры не запустился</span>';
+      var b = l.querySelector('.bar'); if (b) b.style.display = 'none';
+    }, 9000);
   }
   fetch('version.json?t=' + Date.now(), {cache:'no-store'})
     .then(function(r){ return r.ok ? r.json() : null; })
