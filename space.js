@@ -892,23 +892,37 @@ export function createSpace(opts) {
 
     /* --- фон --- */
     const sp = worldSpd * dt;
-    for (let i = 0; i < STAR_N; i++) {
-      sPos[i * 3 + 2] += sp * (sSpd[i] / 60);
-      if (sPos[i * 3 + 2] > 320) {
-        sPos[i * 3 + 2] -= SB.z;
-        sPos[i * 3] = (Math.random() - 0.5) * SB.x;
-        sPos[i * 3 + 1] = (Math.random() - 0.5) * SB.y;
+    /* звёзды: полёт + мерцание слоёв */
+    for (const L of starLayers) {
+      for (let i = 0; i < L.n; i++) {
+        L.pos[i * 3 + 2] += sp * (L.spd[i] / 60);
+        if (L.pos[i * 3 + 2] > 320) {
+          L.pos[i * 3 + 2] -= SB.z;
+          L.pos[i * 3] = (Math.random() - 0.5) * SB.x;
+          L.pos[i * 3 + 1] = (Math.random() - 0.5) * SB.y;
+        }
       }
+      L.geo.attributes.position.needsUpdate = true;
+      L.pts.material.opacity = 0.72 + Math.sin(t * 1.7 + L.ph) * 0.24;
     }
-    starGeo.attributes.position.needsUpdate = true;
+    /* туманности: гигантские держат своё место, мелкие рециклятся */
     for (const n of nebs) {
-      n.position.z += sp * 0.55;
+      n.position.z += sp * (n.userData.big ? 0.12 : 0.55);
       if (n.position.z > 200) {
-        n.position.z = -1100 - Math.random() * 300;
-        n.position.x = (Math.random() - 0.5) * 700;
-        n.position.y = (Math.random() - 0.5) * 420;
+        if (n.userData.big) {
+          n.position.z = -1400 - Math.random() * 400;
+        } else {
+          n.position.z = -1100 - Math.random() * 300;
+          n.position.x = (Math.random() - 0.5) * 700;
+          n.position.y = (Math.random() - 0.5) * 420;
+        }
       }
     }
+    /* планета и солнце медленно проплывают */
+    planet.position.z += sp * 0.05;
+    if (planet.position.z > 400) planet.position.z = -1100;
+    sun.position.z += sp * 0.02;
+    if (sun.position.z > 500) sun.position.z = -1400;
 
     /* --- HUD --- */
     hudCd -= dt;
