@@ -1716,6 +1716,31 @@ function paneFly() {
   </div>`;
 }
 
+/* ---------- Настройки (ЭТАП 4) ---------- */
+function paneSet() {
+  return `<div class="pane">
+    <div class="stat"><div class="ic">🔊</div><div style="flex:1">
+      <div class="nm">ЗВУКОВЫЕ ЭФФЕКТЫ <span style="color:#5f7f99">· выстрелы, взрывы, урон</span></div>
+      <div class="meter"><i style="width:${SOUND_ON ? 100 : 0}%"></i></div>
+    </div><button class="btn" data-set="sound">${SOUND_ON ? 'ВКЛ' : 'ВЫКЛ'}</button></div>
+
+    <div class="stat"><div class="ic">🗣</div><div style="flex:1">
+      <div class="nm">ГОЛОС КОМПЬЮТЕРА <span style="color:#5f7f99">· Web Speech API</span></div>
+      <div class="meter"><i style="width:${VOICE_ON ? 100 : 0}%"></i></div>
+    </div><button class="btn" data-set="voice">${VOICE_ON ? 'ВКЛ' : 'ВЫКЛ'}</button></div>
+
+    <div class="stat"><div class="ic">💾</div><div style="flex:1">
+      <div class="nm">ПРОГРЕСС СОХРАНЁН</div>
+      <div class="ds" style="font-size:11px;color:#6f8ea6;margin-top:3px">
+        Кредиты, улучшения и открытые уровни хранятся в браузере</div>
+    </div><div class="vl">${GAME.unlocked}/${GAME.totalLevels}</div></div>
+
+    <button class="btn" data-set="reset" style="width:100%;margin-top:8px;
+      border-color:rgba(255,140,140,.6);color:#ffd0d0">СБРОСИТЬ ПРОГРЕСС</button>
+    <div class="note">Сброс обнулит кредиты (вернёт 500), улучшения и открытые уровни</div>
+  </div>`;
+}
+
 /* ---------- Верстак ---------- */
 function renderBench() {
   let h = '<div class="pane">';
