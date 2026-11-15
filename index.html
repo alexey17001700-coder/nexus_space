@@ -80,6 +80,95 @@
   .bar i{display:block;height:100%;width:40%;background:linear-gradient(90deg,#2a7fb8,#8fe4ff);
     animation:sl 1.1s ease-in-out infinite}
   @keyframes sl{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
+
+  /* ---------- Кредиты ---------- */
+  #credits{top:46px;right:12px;color:#ffd98a;font-weight:600}
+  #credits b{color:#fff}
+
+  /* ---------- Модальные окна ---------- */
+  #modal{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
+    padding:16px;background:rgba(3,7,14,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    opacity:0;pointer-events:none;transition:opacity .3s ease}
+  #modal.on{opacity:1;pointer-events:auto}
+  .win{width:min(780px,96vw);max-height:90vh;display:flex;flex-direction:column;
+    background:linear-gradient(165deg,rgba(13,26,44,.98),rgba(5,10,19,.99));
+    border:1px solid rgba(90,190,255,.42);border-radius:16px;overflow:hidden;
+    box-shadow:0 0 70px rgba(40,140,230,.35),inset 0 0 70px rgba(30,90,150,.1);
+    transform:translateY(30px) scale(.93);opacity:0;
+    transition:transform .34s cubic-bezier(.2,.9,.25,1.25),opacity .3s ease}
+  #modal.on .win{transform:translateY(0) scale(1);opacity:1}
+  .winHead{display:flex;align-items:center;gap:12px;padding:13px 16px;
+    border-bottom:1px solid rgba(90,190,255,.2);background:rgba(10,22,38,.75)}
+  .winTitle{flex:1;font-size:14px;letter-spacing:3px;color:#8fe4ff;font-weight:600}
+  .winTitle small{display:block;font-size:10px;letter-spacing:1.5px;color:#5f7f99;font-weight:400;margin-top:3px}
+  .winClose{width:34px;height:34px;flex:0 0 34px;border-radius:9px;background:rgba(255,80,80,.12);
+    border:1px solid rgba(255,110,110,.45);color:#ff9a9a;font-size:15px;cursor:pointer;
+    transition:all .18s ease;font-family:inherit}
+  .winClose:hover{background:rgba(255,80,80,.3);transform:scale(1.07)}
+  .winBody{padding:16px;overflow-y:auto;flex:1}
+
+  /* вкладки */
+  .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{flex:1;min-width:96px;padding:10px 12px;border-radius:10px;cursor:pointer;
+    background:rgba(12,26,44,.7);border:1px solid rgba(90,190,255,.22);
+    color:#7fa6c0;font-size:12px;letter-spacing:1.5px;font-weight:600;font-family:inherit;
+    transition:all .2s ease}
+  .tab:hover{border-color:rgba(110,220,255,.5);color:#bfe8ff}
+  .tab.act{background:linear-gradient(180deg,rgba(40,140,220,.35),rgba(20,70,120,.3));
+    border-color:rgba(120,225,255,.75);color:#e6faff;box-shadow:0 0 22px rgba(60,180,255,.3)}
+  .pane{animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* статы */
+  .stat{display:flex;align-items:center;gap:12px;padding:11px 13px;margin-bottom:9px;
+    background:rgba(10,22,38,.6);border:1px solid rgba(90,190,255,.16);border-radius:11px}
+  .stat .ic{font-size:18px;width:24px;text-align:center}
+  .stat .nm{font-size:12.5px;color:#a9c8dd;letter-spacing:.6px}
+  .stat .vl{font-size:13px;color:#8fe4ff;font-weight:700;white-space:nowrap}
+  .meter{height:6px;border-radius:6px;background:rgba(90,190,255,.14);overflow:hidden;margin-top:6px}
+  .meter i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#2a7fb8,#8fe4ff)}
+
+  /* карта */
+  .mapWrap{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:6px 0 4px}
+  .node{width:64px;height:64px;border-radius:14px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:1px;font-weight:700;
+    background:rgba(10,22,38,.75);border:1px solid rgba(90,190,255,.2);color:#5f7f99;
+    cursor:pointer;transition:all .2s ease}
+  .node .n{font-size:15px}
+  .node .lk{font-size:11px;opacity:.75}
+  .node.open{border-color:rgba(120,225,255,.6);color:#bfe8ff;background:rgba(20,50,80,.7)}
+  .node.open:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(60,180,255,.3)}
+  .node.sel{border-color:#8fe4ff;color:#fff;
+    background:linear-gradient(180deg,rgba(50,160,240,.45),rgba(20,70,120,.5));
+    box-shadow:0 0 26px rgba(80,200,255,.55);transform:translateY(-3px)}
+  .node.lock{opacity:.55;cursor:not-allowed}
+  .node.boss{border-color:rgba(255,120,120,.5)}
+  .node.boss.open{color:#ffc9c9}
+
+  /* апгрейды */
+  .up{display:flex;align-items:center;gap:13px;padding:13px;margin-bottom:10px;
+    background:rgba(10,22,38,.6);border:1px solid rgba(90,190,255,.16);border-radius:12px;
+    transition:all .2s ease}
+  .up:hover{border-color:rgba(110,220,255,.4);background:rgba(14,30,50,.75)}
+  .up .ic{font-size:22px;width:30px;text-align:center}
+  .up .info{flex:1;min-width:0}
+  .up .nm{font-size:13px;color:#cfe8f8;font-weight:600;letter-spacing:.8px}
+  .up .ds{font-size:11px;color:#6f8ea6;margin-top:3px}
+  .up .lv{font-size:11px;color:#8fe4ff;margin-top:4px;letter-spacing:1px}
+  .btn{padding:10px 14px;border-radius:10px;font-size:12px;font-weight:700;letter-spacing:.8px;
+    cursor:pointer;font-family:inherit;border:1px solid rgba(120,225,255,.55);
+    background:linear-gradient(180deg,rgba(40,140,220,.4),rgba(18,60,100,.5));color:#e6faff;
+    transition:all .18s ease;white-space:nowrap}
+  .btn:hover{box-shadow:0 0 22px rgba(60,180,255,.45);transform:translateY(-1px)}
+  .btn:active{transform:scale(.96)}
+  .btn:disabled{opacity:.42;cursor:not-allowed;box-shadow:none;transform:none}
+  .btn.big{width:100%;padding:16px;font-size:15px;letter-spacing:3px;
+    background:linear-gradient(180deg,rgba(60,200,140,.4),rgba(15,80,55,.5));
+    border-color:rgba(120,255,190,.6);color:#dcffee}
+  .btn.big:hover{box-shadow:0 0 34px rgba(60,230,160,.5)}
+  .btn.gold{border-color:rgba(255,210,120,.6);
+    background:linear-gradient(180deg,rgba(220,160,50,.35),rgba(90,60,15,.5));color:#ffe9bd}
+  .note{font-size:11.5px;color:#6f8ea6;line-height:1.7;margin-top:12px;text-align:center}
 </style>
 </head>
 <body>
