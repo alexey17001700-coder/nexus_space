@@ -4,24 +4,48 @@
    ============================================================ */
 import * as THREE from 'three';
 
-const VERSION   = 'v1.4 · build 5';
+const VERSION   = 'v1.5 · build 6';
 const ROOM_HALF = 19;      // половина стороны комнаты
 const PLAYER_R  = 0.62;    // радиус космонавта
 const MOVE_SPEED = 6.4;
 
 /* ============================================================
+   0. УСТРОЙСТВО И КАЧЕСТВО ГРАФИКИ
+   Игра рассчитана на телефонный браузер — качество подбирается
+   автоматически, чтобы держать стабильный FPS.
+   ============================================================ */
+const IS_TOUCH  = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+const IS_MOBILE = IS_TOUCH && Math.min(window.innerWidth, window.innerHeight) < 900;
+const CORES     = navigator.hardwareConcurrency || 4;
+const QUALITY   = !IS_MOBILE ? 'high' : (CORES <= 4 ? 'low' : 'mid');
+const PR_CAP    = QUALITY === 'low' ? 1.0 : QUALITY === 'mid' ? 1.25 : 1.5;
+const SHADOWS   = QUALITY === 'high';
+
+/* ============================================================
    1. РЕНДЕР
    ============================================================ */
 const app = document.getElementById('app');
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+const renderer = new THREE.WebGLRenderer({
+  antialias: QUALITY !== 'low',
+  powerPreference: 'high-performance',
+  alpha: false,
+  stencil: false,
+  depth: true
+});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, PR_CAP));
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = SHADOWS;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.28;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 app.appendChild(renderer.domElement);
+
+// телефоны часто теряют WebGL-контекст при сворачивании — не даём игре «умереть»
+renderer.domElement.addEventListener('webglcontextlost', e => e.preventDefault(), false);
+renderer.domElement.addEventListener('webglcontextrestored', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}, false);
 
 /* ============================================================
    2. СЦЕНА И КАМЕРА (изометрия)
