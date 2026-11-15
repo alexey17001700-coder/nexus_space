@@ -1608,7 +1608,14 @@ function animate() {
 
   /* --- режим КОСМОСА: своя сцена и камера, комната не считается --- */
   if (MODE === 'space' && space) {
-    space.setInput(stick.x, stick.y);
+    let sx = stick.x, sy = stick.y;
+    if (keys['KeyA'] || keys['ArrowLeft'])  sx -= 1;
+    if (keys['KeyD'] || keys['ArrowRight']) sx += 1;
+    if (keys['KeyW'] || keys['ArrowUp'])    sy -= 1;
+    if (keys['KeyS'] || keys['ArrowDown'])  sy += 1;
+    const sm = Math.hypot(sx, sy);
+    if (sm > 1) { sx /= sm; sy /= sm; }
+    space.setInput(sx, sy);
     space.update(dt);
     space.render();
     fpsAcc += dt; fpsFrames++;
