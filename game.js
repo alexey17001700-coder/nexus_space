@@ -506,7 +506,7 @@ for (let i = 0; i < ribZs.length - 1; i++) {
   const zc = (ribZs[i] + ribZs[i + 1]) / 2;
   const w = hullHalf(zc), h = hullHeight(zc);
   const ph = Math.max(1.6, h - 1.7);
-  for (const s of [-1, 1]) {
+  for (const s of [-1]) {   // v2.1: панели только на дальнем борту
     const p = new THREE.Mesh(new THREE.BoxGeometry(0.16, ph, 2.7), gapPanelMat);
     p.position.set(s * (w - 0.42), ph / 2 + 0.28, zc);
     p.rotation.y = s * 0.05;
