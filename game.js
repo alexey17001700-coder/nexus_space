@@ -492,13 +492,13 @@ for (let z = HULL_Z0 + 3.2; z <= HULL_Z1 - 3.2; z += 3.6) ribZs.push(z);
 for (const z of ribZs) {
   const w = hullHalf(z), h = hullHeight(z);
   const rib = new THREE.Mesh(ribGeo, ribMat);
-  rib.scale.set(w - 0.14, h - 0.14, 1);
+  rib.scale.set(w - 0.10, h - 0.10, 1);
   rib.position.set(0, 0, z);
   rib.castShadow = true;
   room.add(rib);
   // второй, тонкий внутренний поясок — обшивка выглядит «богаче»
   const rib2 = new THREE.Mesh(ribGeo2, ribMat);
-  rib2.scale.set(w - 0.62, h - 0.62, 1);
+  rib2.scale.set(w - 0.58, h - 0.58, 1);
   rib2.position.set(0, 0, z);
   room.add(rib2);
 }
