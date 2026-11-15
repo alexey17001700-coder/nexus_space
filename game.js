@@ -1149,7 +1149,7 @@ setCredits();
    ============================================================ */
 function resolveCollisions(p) {
   // борта корпуса — ширина зависит от сечения по длине корабля
-  const w = hullHalf(p.z) - 0.95;
+  const w = hullHalf(p.z) - 1.3;
   p.x = Math.max(-w, Math.min(w, p.x));
   p.z = Math.max(HULL_Z0 + 1.8, Math.min(HULL_Z1 - 1.8, p.z));
 
