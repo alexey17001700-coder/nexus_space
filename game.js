@@ -1469,14 +1469,23 @@ function animate() {
   MAT.screen3.emissiveIntensity = 0.85 + Math.sin(t * 2.3 + 1) * 0.2;
   termScreen.update(dt);
 
-  /* --- FPS --- */
+  /* --- FPS + авто-деградация --- */
   fpsAcc += dt; fpsFrames++;
   if (fpsAcc >= 0.5) {
-    fpsEl.textContent = Math.round(fpsFrames / fpsAcc) + ' FPS';
+    const fps = Math.round(fpsFrames / fpsAcc);
+    fpsEl.textContent = fps + ' FPS';
     fpsAcc = 0; fpsFrames = 0;
+    // если блум роняет FPS — гасим его, чтобы игра осталась плавной
+    if (composer && fps < 42) {
+      if (++lowFps >= 3) {
+        composer = null; bloomPass = null; BLOOM_ON = false;
+        showToast('<b>РЕЖИМ ЭКОНОМИИ</b><small>Свечение отключено для стабильного FPS</small>', 3000);
+      }
+    } else lowFps = 0;
   }
 
-  renderer.render(scene, camera);
+  if (composer) composer.render();
+  else renderer.render(scene, camera);
 }
 
 /* ============================================================
