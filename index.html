@@ -457,12 +457,12 @@
 </div>
 
 <script>
-/* ===== АВТООБНОВЛЕНИЕ (v2.8) =====
+/* ===== АВТООБНОВЛЕНИЕ (v2.9) =====
    Проверяет version.json в обход кэша. Если на сервере сборка новее —
    обновляет Service Worker и перезагружает страницу с обходом кэша.
    Кнопка «ОБНОВИТЬ» делает то же самое вручную. */
 (function(){
-  var BUILD = 20, VERSION = '2.8';
+  var BUILD = 20, VERSION = '2.9';
   var btn = document.getElementById('updBtn');
   var busy = false;
 
@@ -600,7 +600,7 @@
 })();
 </script>
 <script>
-/* ===== SERVICE WORKER (v2.8) =====
+/* ===== SERVICE WORKER (v2.9) =====
    Сеть в приоритете: index.html / game.js / version.json всегда тянутся
    свежими, кэш браузера и CDN больше не мешают обновлениям.
    updateViaCache:'none' — сам sw.js тоже не кэшируется. */
