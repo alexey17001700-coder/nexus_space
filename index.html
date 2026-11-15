@@ -604,18 +604,35 @@ function buildClusters(){
 
 /* ---------------- Туманности ---------------- */
 function buildNebulas(){
-  const palette = ['#3b2a8c', '#0d5f8c', '#7a1f6b', '#14406e', '#2b6f7a'];
-  for (let i = 0; i < 7; i++){
+  const palette = ['#3b2a8c', '#0d5f8c', '#7a1f6b', '#14406e', '#2b6f7a',
+                   '#4a2f9e', '#0f6f9e', '#8a2a5e', '#1f5a8c', '#3f7f8f'];
+  // средние туманности — их стало заметно больше
+  for (let i = 0; i < 18; i++){
     const hex = palette[i % palette.length];
     const mat = new THREE.SpriteMaterial({
-      map: nebulaTexture(hex), transparent: true, opacity: 0.32,
+      map: nebulaTexture(hex), transparent: true, opacity: 0.5,
       depthWrite: false, blending: THREE.AdditiveBlending
     });
     const sp = new THREE.Sprite(mat);
-    const sc = 500 + Math.random() * 900;
+    const sc = 600 + Math.random() * 1200;
     sp.scale.set(sc, sc, 1);
-    sp.position.set((Math.random()-0.5)*2600, (Math.random()-0.5)*1800, -400 - Math.random()*2200);
-    sp.userData = { spread: 2600 };
+    sp.position.set((Math.random()-0.5)*2800, (Math.random()-0.5)*1900, -400 - Math.random()*2400);
+    sp.userData = { spread: 2800 };
+    scene.add(sp);
+    nebulas.push(sp);
+  }
+  // крупные яркие ядра — общий свет фону
+  const cores = ['#5f8fff', '#ff8fd0', '#8fffd0', '#ffd08f', '#b08fff', '#7fd0ff'];
+  for (let i = 0; i < 6; i++){
+    const mat = new THREE.SpriteMaterial({
+      map: nebulaTexture(cores[i]), transparent: true, opacity: 0.34,
+      depthWrite: false, blending: THREE.AdditiveBlending
+    });
+    const sp = new THREE.Sprite(mat);
+    const sc = 1600 + Math.random() * 1400;
+    sp.scale.set(sc, sc, 1);
+    sp.position.set((Math.random()-0.5)*3000, (Math.random()-0.5)*2000, -900 - Math.random()*2600);
+    sp.userData = { spread: 3000 };
     scene.add(sp);
     nebulas.push(sp);
   }
