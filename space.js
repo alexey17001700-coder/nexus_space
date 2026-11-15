@@ -391,10 +391,18 @@ export function createSpace(opts) {
       state.hp -= amount;
     }
     state.shake = Math.min(1.1, state.shake + 0.55);
+    if (audio) audio.hit();                       // ЭТАП 4: звук получения урона
+    /* ЭТАП 4: компьютер предупреждает о критическом состоянии (один раз) */
+    if (!critSaid && state.hp > 0 && state.hp / state.maxHp < 0.35) {
+      critSaid = true;
+      if (speech) speech.say('Критические повреждения корпуса!');
+    }
     if (state.hp <= 0) {
       state.hp = 0;
       state.over = true;
       boom(shipX, shipY, 0, LOW ? 60 : 110, [1.0, 0.65, 0.3], 22);
+      if (audio) audio.boom(true);
+      if (speech) speech.say('Корабль уничтожен');
       setTimeout(() => { if (state.over) onEnd({ win: false, score: state.score, level: state.level, credits: 0 }); }, 900);
     }
   }
