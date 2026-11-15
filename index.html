@@ -2220,6 +2220,40 @@ function boot(){
   }
 }
 
+/* ---------------- Главное меню и настройки ---------------- */
+function setVoice(on){
+  voiceOn = on;
+  $('voice').textContent = voiceOn ? '🔊 Голос: вкл' : '🔇 Голос: выкл';
+  $('voice').classList.toggle('off', !voiceOn);
+  const t = $('setVoice');
+  if (t){
+    t.textContent = voiceOn ? 'Вкл' : 'Выкл';
+    t.classList.toggle('off', !voiceOn);
+  }
+  if (voiceOn) say('Голос включён');
+  else if ('speechSynthesis' in window) speechSynthesis.cancel();
+}
+function bindMenu(){
+  const show = id => {
+    ['start','how','set','about'].forEach(s => $(s).classList.add('hide'));
+    $(id).classList.remove('hide');
+  };
+  $('mHow').addEventListener('click',   () => show('how'));
+  $('mSet').addEventListener('click',   () => show('set'));
+  $('mAbout').addEventListener('click', () => show('about'));
+  $('howBack').addEventListener('click',   () => show('start'));
+  $('setBack').addEventListener('click',   () => show('start'));
+  $('aboutBack').addEventListener('click', () => show('start'));
+
+  $('setVoice').addEventListener('click', () => setVoice(!voiceOn));
+  const sl = $('setSens');
+  sl.addEventListener('input', () => {
+    sens = sl.value / 100;
+    $('sensVal').textContent = sl.value + '%';
+  });
+  setVoice(voiceOn);
+}
+
 /* ---------------- Проверка новой версии (обход кэша) ---------------- */
 function checkVersion(){
   setInterval(async () => {
