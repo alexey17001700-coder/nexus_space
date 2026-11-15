@@ -28,7 +28,7 @@ app.appendChild(renderer.domElement);
    ============================================================ */
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x070a12);
-scene.fog = new THREE.FogExp2(0x070a12, 0.013);
+scene.fog = new THREE.FogExp2(0x0b1220, 0.008);
 
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 400);
 const CAM_OFFSET = new THREE.Vector3(12.5, 14.5, 12.5);
