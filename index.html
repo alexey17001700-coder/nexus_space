@@ -1689,22 +1689,22 @@ function updateBoss(dt){
     });
   }
 
-  // таран корпуса
-  if (dist < 26){
-    _v1.subVectors(shipRoot.position, boss.position);
-    if (_v1.lengthSq() < 1) _v1.set(0, 1, 0);
-    _v1.normalize();
-    shipRoot.position.copy(boss.position).addScaledVector(_v1, 27);
-    explode(shipRoot.position, 12, 0xff8844);
-    shake = 1.2;
+  // ЖЁСТКИЙ БАРЬЕР: сквозь корпус босса не пролететь — он всегда впереди
+  _bq.copy(boss.quaternion).invert();
+  _bl.copy(shipRoot.position).sub(boss.position).applyQuaternion(_bq);
+  if (Math.abs(_bl.x) < 9.5 && Math.abs(_bl.y) < 7.5 && _bl.z < -20){
+    _bl.z = -23;
+    shipRoot.position.copy(_bl.applyQuaternion(boss.quaternion)).add(boss.position);
+    explode(shipRoot.position, 9, 0xff8844);
+    shake = 1.1;
     if (invuln <= 0){
-      const rest = absorbShield(20);
+      const rest = absorbShield(14);
       if (rest > 0){
         hp -= rest;
         if (hp <= maxHp * 0.35) say('Критические повреждения');
         if (hp <= 0){ hp = 0; endGame(false); return; }
       }
-      invuln = 1.4;
+      invuln = 1.2;
       refreshHUD();
     }
   }
