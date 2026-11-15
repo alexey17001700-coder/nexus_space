@@ -1908,7 +1908,15 @@ function updateShip(dt){
 
   // движение — одна постоянная скорость вперёд; «◀ НАЗАД» даёт задний ход
   const back = reversing || keys[' '] || keys['shift'] || keys['x'];
-  speed = back ? -12 : 20;
+  if (back){
+    speed = -12;
+  } else if (boss && bossDeath <= 0){
+    // бой с боссом: догоняем, затем идём вровень с ним до победы или смерти
+    const d = boss.position.distanceTo(shipRoot.position);
+    speed = d > BOSS_CATCH_DIST ? BOSS_SPEED + 6 : BOSS_SPEED;
+  } else {
+    speed = 20;
+  }
   fwd.set(0, 0, -1).applyQuaternion(shipRoot.quaternion);
   shipRoot.position.addScaledVector(fwd, speed * dt);
 
