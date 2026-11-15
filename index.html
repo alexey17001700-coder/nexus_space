@@ -684,7 +684,7 @@
    updateViaCache:'none' — сам sw.js тоже не кэшируется. */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js', {scope: './', updateViaCache: 'none'})
+    navigator.serviceWorker.register('sw.js?v=30', {scope: './', updateViaCache: 'none'})
       .then(function(reg){ try { reg.update(); } catch(e){} })
       .catch(function(){});
   });
