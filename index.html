@@ -527,6 +527,28 @@
   }
 }
 </script>
-<script type="module" src="game.js?v=7"></script>
+<script>
+/* ===== ЗАГРУЗЧИК КОДА (v1.8) =====
+   index.html может лежать в кэше браузера, но этот скрипт всегда читает
+   свежий version.json и подключает game.js по уникальному адресу —
+   поэтому новый код подтягивается даже на закэшированной странице. */
+(function(){
+  var vEl = document.getElementById('ver');
+  function boot(build, version){
+    if (version && build && vEl){
+      vEl.textContent = 'NEXUS SPACE v' + version + ' · build ' + build;
+    }
+    var s = document.createElement('script');
+    s.type = 'module';
+    s.src = 'game.js?b=' + (build || 0) + '&t=' + Date.now();
+    s.onerror = function(){ if (vEl) vEl.textContent = 'ОШИБКА ЗАГРУЗКИ КОДА'; };
+    document.body.appendChild(s);
+  }
+  fetch('version.json?t=' + Date.now(), {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){ boot(d && d.build, d && d.version); })
+    .catch(function(){ boot(0, null); });
+})();
+</script>
 </body>
 </html>
