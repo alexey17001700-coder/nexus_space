@@ -1334,6 +1334,12 @@ function buildBossMesh(){
   coreGlow.rotation.y = Math.PI;
   g.add(coreGlow);
   g.userData.coreGlow = coreGlow;
+
+  // общая подсветка корпуса босса — гигант не теряется в темноте
+  const lamp = new THREE.PointLight(0xff5577, 9, 120, 2);
+  lamp.position.set(0, 0, -6);
+  g.add(lamp);
+  g.userData.lamp = lamp;
   return g;
 }
 
