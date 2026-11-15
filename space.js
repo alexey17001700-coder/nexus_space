@@ -440,7 +440,12 @@ export function createSpace(opts) {
 
     /* --- стрельба --- */
     fireCd -= dt;
-    if (firing && fireCd <= 0) { fireLaser(); fireCd = 0.14; }
+    if (firing && fireCd <= 0) {
+      if (dualGun) { fireLaser(-0.95); fireLaser(0.95); }   // ОРУЖИЕ 2+ → два лазера
+      else fireLaser(0);
+      fireCd = fireRate;
+      if (audio) audio.laser();
+    }
 
     /* --- спавн --- */
     enCd -= dt;
