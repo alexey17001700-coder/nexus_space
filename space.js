@@ -58,7 +58,136 @@ export function createSpace(opts) {
     t.colorSpace = THREE.SRGBColorSpace;
     return t;
   }
+  /* ---------- ПРОЦЕДУРНАЯ ТЕКСТУРА КОРПУСА (панели, заклёпки, царапины, полосы) ---------- */
+  function hullTex() {
+    const W = 512, H = 512;
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    const bg = g.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#eef4fc'); bg.addColorStop(0.5, '#cbd9e8'); bg.addColorStop(1, '#a3b4c8');
+    g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    /* панели */
+    for (let i = 0; i < 95; i++) {
+      const x = Math.random() * W, y = Math.random() * H;
+      const w = 28 + Math.random() * 115, h = 16 + Math.random() * 72;
+      g.fillStyle = 'rgba(' + (150 + Math.random() * 80 | 0) + ',' + (168 + Math.random() * 78 | 0) + ',' + (188 + Math.random() * 66 | 0) + ',' + (0.10 + Math.random() * 0.22) + ')';
+      g.fillRect(x, y, w, h);
+      g.strokeStyle = 'rgba(58,78,104,0.34)'; g.lineWidth = 1;
+      g.strokeRect(x + 0.5, y + 0.5, w, h);
+    }
+    /* заклёпки */
+    g.fillStyle = 'rgba(68,88,114,0.5)';
+    for (let i = 0; i < 280; i++) {
+      g.beginPath(); g.arc(Math.random() * W, Math.random() * H, 1.4, 0, 6.283); g.fill();
+    }
+    /* царапины */
+    for (let i = 0; i < 80; i++) {
+      const x = Math.random() * W, y = Math.random() * H;
+      const len = 12 + Math.random() * 95, a = Math.random() * 6.283;
+      g.strokeStyle = 'rgba(255,255,255,' + (0.06 + Math.random() * 0.17) + ')';
+      g.lineWidth = 0.6 + Math.random();
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * len, y + Math.sin(a) * len); g.stroke();
+    }
+    /* потёртости */
+    for (let i = 0; i < 45; i++) {
+      g.fillStyle = 'rgba(88,104,126,' + (0.05 + Math.random() * 0.12) + ')';
+      g.beginPath();
+      g.ellipse(Math.random() * W, Math.random() * H, 4 + Math.random() * 22, 2 + Math.random() * 9, Math.random() * 3, 0, 6.283);
+      g.fill();
+    }
+    /* предупреждающие жёлто-чёрные полосы */
+    g.save();
+    g.translate(0, H - 44);
+    for (let x = -60; x < W + 60; x += 26) {
+      g.fillStyle = ((x / 26 | 0) % 2 === 0) ? '#e8c33a' : '#1e242c';
+      g.beginPath();
+      g.moveTo(x, 0); g.lineTo(x + 13, 0); g.lineTo(x + 13 - 18, 34); g.lineTo(x - 18, 34);
+      g.closePath(); g.fill();
+    }
+    g.restore();
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.anisotropy = 4;
+    return t;
+  }
+
+  /* ---------- ПРОЦЕДУРНАЯ ТЕКСТУРА ОБЛАКОВ (для туманностей) ---------- */
+  function cloudTex(rgb) {
+    const S = 256;
+    const c = document.createElement('canvas'); c.width = c.height = S;
+    const g = c.getContext('2d');
+    const rg = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+    rg.addColorStop(0, 'rgba(' + rgb + ',0.40)');
+    rg.addColorStop(0.42, 'rgba(' + rgb + ',0.17)');
+    rg.addColorStop(1, 'rgba(' + rgb + ',0)');
+    g.fillStyle = rg; g.fillRect(0, 0, S, S);
+    for (let i = 0; i < 95; i++) {
+      const a = Math.random() * 6.283, d = Math.pow(Math.random(), 0.7) * S * 0.44;
+      const x = S / 2 + Math.cos(a) * d, y = S / 2 + Math.sin(a) * d;
+      const r = 12 + Math.random() * 58;
+      const cg = g.createRadialGradient(x, y, 0, x, y, r);
+      cg.addColorStop(0, 'rgba(' + rgb + ',' + (0.05 + Math.random() * 0.14) + ')');
+      cg.addColorStop(1, 'rgba(' + rgb + ',0)');
+      g.fillStyle = cg; g.beginPath(); g.arc(x, y, r, 0, 6.283); g.fill();
+    }
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }
+
+  /* ---------- ТЕКСТУРА ПЛАНЕТЫ (континенты, облака, шапки) ---------- */
+  function planetTex() {
+    const W = 512, H = 256;
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    const bg = g.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#2f63b4'); bg.addColorStop(0.45, '#1e427f'); bg.addColorStop(1, '#122a52');
+    g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    for (let i = 0; i < 28; i++) {
+      const x = Math.random() * W, y = 26 + Math.random() * (H - 52);
+      g.fillStyle = 'rgba(' + (58 + Math.random() * 70 | 0) + ',' + (108 + Math.random() * 82 | 0) + ',' + (68 + Math.random() * 60 | 0) + ',0.5)';
+      g.beginPath();
+      const pts = 7 + (Math.random() * 5 | 0);
+      for (let k = 0; k < pts; k++) {
+        const a = k / pts * 6.283, rr = 14 + Math.random() * 46;
+        const px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr * 0.6;
+        k ? g.lineTo(px, py) : g.moveTo(px, py);
+      }
+      g.closePath(); g.fill();
+    }
+    for (let i = 0; i < 130; i++) {
+      const x = Math.random() * W, y = Math.random() * H, r = 8 + Math.random() * 40;
+      const cg = g.createRadialGradient(x, y, 0, x, y, r);
+      cg.addColorStop(0, 'rgba(255,255,255,0.26)');
+      cg.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = cg; g.beginPath(); g.arc(x, y, r, 0, 6.283); g.fill();
+    }
+    g.fillStyle = 'rgba(232,246,255,0.5)';
+    g.fillRect(0, 0, W, 14); g.fillRect(0, H - 14, W, 14);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = THREE.RepeatWrapping;
+    return t;
+  }
+
+  /* ---------- МЯГКОЕ СВЕЧЕНИЕ (фейковый bloom) ---------- */
+  function glowTex() {
+    const c = document.createElement('canvas'); c.width = c.height = 128;
+    const g = c.getContext('2d');
+    const rg = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    rg.addColorStop(0, 'rgba(255,255,255,0.95)');
+    rg.addColorStop(0.18, 'rgba(180,235,255,0.55)');
+    rg.addColorStop(0.5, 'rgba(90,180,255,0.18)');
+    rg.addColorStop(1, 'rgba(40,120,255,0)');
+    g.fillStyle = rg; g.fillRect(0, 0, 128, 128);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }
+
   const DOT = dotTex();
+  const GLOW = glowTex();
 
   /* ============================================================
      1. ЗВЁЗДЫ (particle system, рециклится вокруг корабля)
