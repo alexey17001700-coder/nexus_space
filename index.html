@@ -1452,8 +1452,9 @@ function updateCombat(dt){
    ============================================================ */
 const BOSS_SCALE = 1.5;
 const BOSS_PARTS = 4;
-const BOSS_SPEED = 20;        // босс идёт ровно со скоростью игрока — не уйдёт и не отстанет
-const BOSS_CATCH_DIST = 60;   // ближе этого — идём вровень, дальше — догоняем
+const BOSS_SPEED = 20;        // базовая скорость босса
+const BOSS_HOLD_DIST = 62;    // целевая дистанция — держимся ЗА кормой босса
+const BOSS_MIN_DIST  = 40;    // ближе этого не подпускаем (жёсткий минимум)
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
 function buildBossMesh(){
