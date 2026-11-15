@@ -8,7 +8,7 @@ import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
 
-const VERSION   = 'v3.5 · build 26';
+const VERSION   = 'v3.6 · build 27';
 const PLAYER_R  = 0.62;    // радиус космонавта
 const MOVE_SPEED = 6.4;
 
