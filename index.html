@@ -1745,9 +1745,9 @@ function updateBoss(dt){
     else if (py <= pz)             _bl.y = (_bl.y < 0 ? -1 : 1) * (HY + 0.6);
     else                           _bl.z = (_bl.z < 0 ? -1 : 1) * (HZ + 0.6);
     hardHit = true;
-  } else if (Math.abs(_bl.x) < 10 && Math.abs(_bl.y) < 7 && _bl.z < -HZ && _bl.z > -MIN_GAP){
+  } else if (Math.abs(_bl.x) < 18 && Math.abs(_bl.y) < 14 && _bl.z < -HZ && _bl.z > -MIN_GAP){
     // позади кормы, но слишком близко — мягко отодвигаем на безопасный зазор
-    _bl.z += (-MIN_GAP - _bl.z) * Math.min(1, dt * 8);
+    _bl.z += (-MIN_GAP - _bl.z) * Math.min(1, dt * 9);
     nudged = true;
   }
   if (hardHit || nudged){
