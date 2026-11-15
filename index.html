@@ -1732,10 +1732,13 @@ function updateBoss(dt){
   }
 
   // ЖЁСТКИЙ БАРЬЕР: сквозь корпус босса не пролететь — он всегда впереди
+  // ВАЖНО: срабатывает только когда игрок РЕАЛЬНО внутри габаритов кормы,
+  // а не «где-то сзади» (раньше условие _bl.z < -20 ловило игрока сразу
+  // после спавна и телепортировало его в корму босса — отсюда «спавн внутри»)
   _bq.copy(boss.quaternion).invert();
   _bl.copy(shipRoot.position).sub(boss.position).applyQuaternion(_bq);
-  if (Math.abs(_bl.x) < 9.5 && Math.abs(_bl.y) < 7.5 && _bl.z < -20){
-    _bl.z = -23;
+  if (Math.abs(_bl.x) < 9.5 && Math.abs(_bl.y) < 7.5 && _bl.z > -26 && _bl.z < 3){
+    _bl.z = -28;
     shipRoot.position.copy(_bl.applyQuaternion(boss.quaternion)).add(boss.position);
     explode(shipRoot.position, 9, 0xff8844);
     shake = 1.1;
