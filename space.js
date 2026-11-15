@@ -956,6 +956,7 @@ export function createSpace(opts) {
       pGeo.attributes.position.needsUpdate = true;
       pGeo.attributes.color.needsUpdate = true;
     }
+    updateRings(dt);
   }
 
   function render() { renderer.render(scene, camera); }
