@@ -407,12 +407,26 @@ export function createSpace(opts) {
      4. ЛАЗЕРЫ (InstancedMesh, пул)
      ============================================================ */
   const LAS_MAX = LOW ? 30 : 48;
-  const lasGeo = new THREE.BoxGeometry(0.16, 0.16, 2.8);
-  const lasMat = new THREE.MeshBasicMaterial({ color: 0x7ff2ff, toneMapped: false });
+  /* объёмный лазер = 2 цилиндра:
+     тонкое ярко-белое ЯДРО + толстая полупрозрачная цветная ОБОЛОЧКА (Additive) */
+  const lasGeo = new THREE.CylinderGeometry(0.055, 0.055, 3.0, 6);
+  lasGeo.rotateX(Math.PI / 2);
+  const lasMat = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
   const lasMesh = new THREE.InstancedMesh(lasGeo, lasMat, LAS_MAX);
   lasMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   lasMesh.frustumCulled = false;
   scene.add(lasMesh);
+
+  const lasGeo2 = new THREE.CylinderGeometry(0.2, 0.2, 3.5, 8);
+  lasGeo2.rotateX(Math.PI / 2);
+  const lasMat2 = new THREE.MeshBasicMaterial({
+    color: 0x4fd8ff, transparent: true, opacity: 0.45,
+    blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false
+  });
+  const lasMesh2 = new THREE.InstancedMesh(lasGeo2, lasMat2, LAS_MAX);
+  lasMesh2.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  lasMesh2.frustumCulled = false;
+  scene.add(lasMesh2);
   const lasers = [];
   for (let i = 0; i < LAS_MAX; i++) lasers.push({ alive: false, x: 0, y: 0, z: 0 });
 
