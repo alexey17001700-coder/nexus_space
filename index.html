@@ -1619,6 +1619,7 @@ function spawnBoss(){
   eBullets.forEach(b => { b.alive = false; b.mesh.visible = false; });
 
   hp = Math.min(maxHp, hp + 40);
+  invuln = 1.6;              // короткая неуязвимость на выход — без «мгновенного тарана»
   refreshHUD();
 
   $('bossbar').classList.add('on');
