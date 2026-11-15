@@ -1062,15 +1062,24 @@ function spawnAsteroid(){
 /* --- вражеские корабли (нос смотрит в +Z) --- */
 function makeEnemy(){
   const g = new THREE.Group();
-  const hull = new THREE.MeshStandardMaterial({ color: 0xff7d96, metalness: 0.55, roughness: 0.3,
-    emissive: 0xff2a4e, emissiveIntensity: 2.4 });
-  const dark = new THREE.MeshStandardMaterial({ color: 0xd06078, metalness: 0.6, roughness: 0.42,
-    emissive: 0xff1a3a, emissiveIntensity: 1.5 });
-  const glow = new THREE.MeshBasicMaterial({ color: 0xfff0f4 });
+  const hull = new THREE.MeshStandardMaterial({ color: 0xff9db2, metalness: 0.18, roughness: 0.42,
+    emissive: 0xff3a5e, emissiveIntensity: 2.6 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0xff7f96, metalness: 0.2, roughness: 0.5,
+    emissive: 0xff2244, emissiveIntensity: 2.0 });
+  const glow = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
   const body = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.75, 2.6, 14), hull);
   body.rotation.x = Math.PI / 2;
   g.add(body);
+
+  // светящаяся оболочка — силуэт виден даже в полной темноте
+  const shell = new THREE.Mesh(
+    new THREE.SphereGeometry(1.5, 16, 12),
+    new THREE.MeshBasicMaterial({ color: 0xff3355, transparent: true, opacity: 0.20,
+      blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide })
+  );
+  shell.scale.set(1, 0.85, 1.85);
+  g.add(shell);
 
   const nose = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.5, 14), hull);
   nose.rotation.x = Math.PI / 2;
