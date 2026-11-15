@@ -654,7 +654,7 @@ for (const s of [-1]) {   // v2.1: бортовые панели только н
 }
 
 const pipeMat = new THREE.MeshStandardMaterial({ color: 0x6a7c92, roughness: 0.45, metalness: 0.8 });
-for (const s of [-1, 1]) {
+for (const s of [-1]) {   // v2.1: трубопроводы только на дальнем борту
   const pts = [];
   for (let i = 0; i <= 20; i++) {
     const z = HULL_Z0 + 3 + (i / 20) * (HULL_LEN - 6);
