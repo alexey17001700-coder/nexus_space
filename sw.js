@@ -1,28 +1,49 @@
 /* ============================================================
-   NEXUS SPACE — Service Worker (v2.3)
+   NEXUS SPACE — Service Worker (v2.8)
    Стратегия: СЕТЬ В ПРИОРИТЕТЕ (network-first).
    Любое обновление index.html / game.js / version.json
    подтягивается сразу — кэш браузера и CDN больше не мешают.
    Кэш используется только как офлайн-подстраховка.
-   ============================================================ */
-const CACHE = 'nexus-space-v1';
 
-self.addEventListener('install', function () {
+   ВАЖНО: новый воркер вступает в силу НЕМЕДЛЕННО (skipWaiting),
+   старые кэши удаляются при активации, страницы захватываются
+   сразу (clients.claim). Поэтому кнопка «ОБНОВИТЬ» реально
+   сбрасывает кэш, а не отдаёт старые файлы.
+   ============================================================ */
+const CACHE_NAME = 'nexus_space_v2_8';
+
+/* ---------- УСТАНОВКА: новый SW вступает в силу сразу ---------- */
+self.addEventListener('install', function (event) {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', function (e) {
-  e.waitUntil((async function () {
-    try {
-      const keys = await caches.keys();
-      await Promise.all(keys.map(function (k) { return k === CACHE ? null : caches.delete(k); }));
-    } catch (err) {}
-    try { await self.clients.claim(); } catch (err) {}
-  })());
+/* ---------- АКТИВАЦИЯ: чистим старые кэши + захватываем страницы ---------- */
+self.addEventListener('activate', function (event) {
+  event.waitUntil(
+    caches.keys().then(function (cacheNames) {
+      return Promise.all(
+        cacheNames.map(function (cacheName) {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);   /* удаляем старые кэши */
+          }
+        })
+      );
+    }).then(function () {
+      return self.clients.claim();             /* захват контроля над страницами */
+    })
+  );
 });
 
-self.addEventListener('fetch', function (e) {
-  const req = e.request;
+/* ---------- Сообщение от страницы: активироваться немедленно ---------- */
+self.addEventListener('message', function (event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+/* ---------- ЗАПРОСЫ: сеть в приоритете, кэш — только офлайн ---------- */
+self.addEventListener('fetch', function (event) {
+  const req = event.request;
   if (req.method !== 'GET') return;
 
   let url;
@@ -30,12 +51,12 @@ self.addEventListener('fetch', function (e) {
   /* three.js с CDN не трогаем — пусть грузится напрямую */
   if (url.origin !== self.location.origin) return;
 
-  e.respondWith((async function () {
+  event.respondWith((async function () {
     try {
       const fresh = await fetch(req, { cache: 'no-store' });
       if (fresh && fresh.ok && fresh.type === 'basic') {
         try {
-          const c = await caches.open(CACHE);
+          const c = await caches.open(CACHE_NAME);
           c.put(req, fresh.clone());
         } catch (err) {}
       }
