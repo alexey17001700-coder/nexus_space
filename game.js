@@ -1366,7 +1366,7 @@ function resolveCollisions(p) {
    ============================================================ */
 const clock = new THREE.Clock();
 let walkPhase = 0;
-let fpsAcc = 0, fpsFrames = 0;
+let fpsAcc = 0, fpsFrames = 0, lowFps = 0;
 const fpsEl = document.getElementById('fps');
 const hintEl = document.getElementById('hint');
 const locEl = document.getElementById('loc');
