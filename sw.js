@@ -14,7 +14,7 @@
    старые кэши удаляются при активации, страницы захватываются
    сразу (clients.claim).
    ============================================================ */
-const CACHE_NAME = 'nexus_space_v4_2';
+const CACHE_NAME = 'wlupidol_space_v4_2';
 
 /* ---------- УСТАНОВКА: новый SW вступает в силу сразу ---------- */
 self.addEventListener('install', function (event) {
