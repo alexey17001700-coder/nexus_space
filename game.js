@@ -1594,7 +1594,7 @@ function openUI(kind) {
   uiPaused = true;
   if (kind === 'computer') {
     uiTab = 'state';
-    winTitleEl.innerHTML = 'БОРТОВОЙ КОМПЬЮТЕР<small>ТЕРМИНАЛ · NEXUS-7</small>';
+    winTitleEl.innerHTML = 'БОРТОВОЙ КОМПЬЮТЕР<small>ТЕРМИНАЛ · WLUPIDOL-7</small>';
   } else if (kind === 'bench') {
     winTitleEl.innerHTML = 'ВЕРСТАК<small>МОДУЛЬ УЛУЧШЕНИЙ</small>';
   } else {
