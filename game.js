@@ -1396,7 +1396,8 @@ const costOf = (k) => 100 * GAME.up[k];
    Кредиты, купленные улучшения и открытые уровни сохраняются
    в localStorage (JSON) и не теряются при перезагрузке страницы.
    ============================================================ */
-const SAVE_KEY = 'nexus_space_save_v1';
+const SAVE_KEY = 'wlupidol_space_save_v1';
+const SAVE_KEY_OLD = 'nexus_space_save_v1';
 let SOUND_ON = true, VOICE_ON = true;
 
 function saveGame() {
@@ -2090,7 +2091,7 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-document.getElementById('ver').textContent = 'WLUPIDOL SPACE ' + VERSION;
+document.getElementById('ver').textContent = 'NEXUS SPACE ' + VERSION;
 
 animate();
 
