@@ -2090,7 +2090,7 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-document.getElementById('ver').textContent = 'NEXUS SPACE ' + VERSION;
+document.getElementById('ver').textContent = 'WLUPIDOL SPACE ' + VERSION;
 
 animate();
 
