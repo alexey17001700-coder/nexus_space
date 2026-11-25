@@ -1410,7 +1410,12 @@ function saveGame() {
 }
 function loadSave() {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    /* миграция старого ключа (nexus_* → wlupidol_*) — прогресс не теряется */
+    let raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) {
+      raw = localStorage.getItem(SAVE_KEY_OLD);
+      if (raw) { try { localStorage.setItem(SAVE_KEY, raw); localStorage.removeItem(SAVE_KEY_OLD); } catch (e) {} }
+    }
     if (!raw) return;
     const d = JSON.parse(raw);
     if (typeof d.credits === 'number')  GAME.credits  = Math.max(0, d.credits | 0);
