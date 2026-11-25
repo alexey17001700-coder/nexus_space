@@ -255,7 +255,7 @@ function makeTerminalScreen() {
     // шапка
     g.fillStyle = '#8dffb8';
     g.font = 'bold 15px "Courier New",monospace';
-    g.fillText('NEXUS-7 // БОРТОВОЙ ТЕРМИНАЛ', 10, 19);
+    g.fillText('WLUPIDOL-7 // БОРТОВОЙ ТЕРМИНАЛ', 10, 19);
     g.fillStyle = 'rgba(120,255,180,0.6)';
     g.font = '11px "Courier New",monospace';
     g.fillText('UPTIME ' + (performance.now() / 1000).toFixed(1) + 's   MEM ' +
